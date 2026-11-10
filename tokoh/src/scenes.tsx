@@ -48,15 +48,15 @@ export const SceneTajuk: React.FC = () => {
   const slam = ci(fr, hit, hit + 10, 0, 1, easeOut);
   const shine = ci(fr, hit + 14, hit + 50);
   const sub = ci(fr, hit + f(1.4), hit + f(2.0), 0, 1, easeOut);
-  const dim = ci(fr, f(4.7), f(5.2));
-  const siapa = ci(fr, f(5.1), f(5.8), 0, 1, easeOut);
+  const dim = ci(fr, f(4.6), f(5.1), 0, 1, easeInOut);
+  const siapa = ci(fr, f(5.2), f(5.9), 0, 1, easeOut);
   const out = 1 - ci(fr, f(7.0), f(7.34));
   const shake = fr >= hit && fr < hit + 8 ? (random('sh' + fr) - 0.5) * 14 * (1 - (fr - hit) / 8) : 0;
   return (
     <AbsoluteFill style={{...darkBg('#20183a', '#020106'), opacity: fadeIn * out}}>
       <Stars n={260} drift={10} />
       <Glow cx={W / 2} cy={H / 2} r={700} opacity={0.35 * slam} />
-      <AbsoluteFill style={{justifyContent: 'center', alignItems: 'center', transform: `translate(${shake}px, ${shake * 0.6}px)`, opacity: 1 - dim * 0.85}}>
+      <AbsoluteFill style={{justifyContent: 'center', alignItems: 'center', transform: `translate(${shake}px, ${shake * 0.6}px)`, opacity: 1 - dim, filter: `blur(${dim * 12}px)`}}>
         <Img src={staticFile('img/logo.png')} style={{height: 150, opacity: logo, transform: `translateY(${-40 * (1 - logo)}px)`, marginBottom: 26, filter: 'drop-shadow(0 0 24px rgba(255,200,100,0.35))'}} />
         <div style={{fontFamily: SANS, fontWeight: 600, fontSize: 30, letterSpacing: 18, color: '#e9dcc0', opacity: slam, marginBottom: 6}}>ANUGERAH</div>
         <div style={{transform: `scale(${1.6 - 0.6 * slam})`, opacity: slam}}>
@@ -169,11 +169,12 @@ export const SceneSiluet: React.FC = () => {
   return (
     <AbsoluteFill style={{background: '#000', opacity: out}}>
       <OffthreadVideo src={staticFile('video/siluet.mp4')} muted />
-      <div style={{position: 'absolute', left: 0, width: 660, top: 0, height: H, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: t, transform: `translateX(${-60 * (1 - t)}px)`, filter: `blur(${(1 - t) * 10}px)`}}>
-        <Gold size={96} spacing={8}>SIAPAKAH</Gold>
+      {/* kepala siluet ~ x 770-965, y 150-426 (lihat scripts/siluet.py) */}
+      <div style={{position: 'absolute', right: W - 735, top: 230, textAlign: 'right', opacity: t, transform: `translateX(${-50 * (1 - t)}px)`, filter: `blur(${(1 - t) * 10}px)`}}>
+        <Gold size={92} spacing={6}>SIAPAKAH</Gold>
       </div>
-      <div style={{position: 'absolute', right: 0, width: 660, top: 0, height: H, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: t, transform: `translateX(${60 * (1 - t)}px)`, filter: `blur(${(1 - t) * 10}px)`}}>
-        <Gold size={96} spacing={8}>DIA?</Gold>
+      <div style={{position: 'absolute', left: 1000, top: 230, opacity: t, transform: `translateX(${50 * (1 - t)}px)`, filter: `blur(${(1 - t) * 10}px)`}}>
+        <Gold size={92} spacing={6}>DIA?</Gold>
       </div>
       <Letterbox />
       <Vignette strength={0.5} />
@@ -221,6 +222,7 @@ export const SceneKira: React.FC = () => {
       <Flash at={60} len={6} max={0.35} color="#ffd9a0" />
       <Letterbox />
       <Vignette />
+      {fr >= 90 - 13 ? <AbsoluteFill style={{background: '#000'}} /> : null}
     </AbsoluteFill>
   );
 };

@@ -216,4 +216,84 @@ save("sub_drop.wav", fit(sweep_sine(d, 90, 24, 1.8) * env_exp(d, 1.4), int(d * S
 d = 0.7
 pop = np.sin(2 * np.pi * 2637 * tt(d)) * env_exp(d, 9) + np.sin(2 * np.pi * 3951 * tt(d)) * env_exp(d, 12) * 0.5
 save("pop_bintang.wav", reverb(fit(pop, int(d * SR)), rt=1.2, wet=0.35, tone=9000), peak=0.45)
+
+# ===================================================== bunyi "WOW" & suspens tambahan
+def saw(freq, d, harm=40):
+    t = tt(d)
+    y = np.zeros_like(t)
+    for k in range(1, harm + 1):
+        if np.max(freq) * k > 6000:
+            break
+        y += np.sin(2 * np.pi * freq * k * t) / k
+    return y
+
+
+# 19. BRAAAM (brass rendah ala trailer)
+d = 4.5
+t = tt(d)
+src = np.zeros_like(t)
+for fq in (43.65, 65.41, 87.31, 130.81):
+    for det in (-0.004, 0.0, 0.005):
+        src += saw(fq * (1 + det), d)
+src = np.tanh(src * 0.35)
+dark = filt(src, "lowpass", 260)
+bright = filt(src, "lowpass", 2600)
+openv = np.clip(t / 0.06, 0, 1) * np.exp(-t * 1.6)
+amp = np.clip(t / 0.03, 0, 1) * np.exp(-t * 0.55)
+br = (dark * (1 - openv) + bright * openv) * amp
+br += np.sin(2 * np.pi * 43.65 * t) * amp * 0.8
+save("braam.wav", reverb(fit(br, len(t)), rt=3.0, wet=0.3, tone=3000)[:, : int(6 * SR)])
+
+# 20. dram taiko
+d = 2.5
+t = tt(d)
+tk = sweep_sine(d, 170, 55, 9) * np.exp(-t * 4.5) + filt(noise(d, 1)[0], "bandpass", [90, 900]) * np.exp(-t * 22) * 0.6
+save("taiko.wav", reverb(fit(tk, len(t)), rt=2.4, wet=0.35, tone=2500))
+
+# 21. stinger tali (kelompok sumbang, membengkak lalu putus)
+d = 2.6
+t = tt(d)
+st = np.zeros_like(t)
+for fq in (1046.5, 1108.7, 1174.7, 1244.5):
+    trem = 1 + 0.3 * np.sin(2 * np.pi * (6 + fq % 3) * t)
+    st += saw(fq * (1 + 0.003 * np.sin(2 * np.pi * 5 * t)), d, 6) * trem
+st = filt(st, "bandpass", [700, 6000]) * (t / d) ** 2.5
+save("stinger.wav", reverb(fit(st, len(t)), rt=1.5, wet=0.3, tone=8000)[:, : len(t)], peak=0.7)
+
+# 22. sedutan terbalik (reverse swell) - berakhir mengejut
+d = 1.6
+burst = np.zeros((2, int(0.05 * SR)))
+burst += filt(noise(0.05), "bandpass", [300, 8000]) * env_exp(0.05, 40)
+burst = fit(burst, int(0.05 * SR))
+sw = reverb(burst, rt=d, wet=1.0, tone=7000)[:, : int(d * SR)]
+sw = sw[:, ::-1] * np.linspace(0.2, 1, sw.shape[1])
+save("sedutan.wav", sw, peak=0.75)
+
+# 23. dengung tegang (latar 28 s untuk petunjuk)
+d = 28.0
+t = tt(d)
+dr = np.zeros_like(t)
+for fq, a in ((55.0, 1.0), (58.27, 0.7), (82.41, 0.6), (110.0, 0.35), (116.54, 0.25)):
+    dr += saw(fq, d, 12) * a
+dr = filt(np.tanh(dr * 0.3), "lowpass", 700)
+pulse = 0.65 + 0.35 * np.sin(2 * np.pi * (0.25 + 0.35 * t / d) * t) ** 2
+hi = filt(noise(d, 1)[0], "bandpass", [3000, 6000]) * 0.04 * (0.5 + 0.5 * np.sin(2 * np.pi * 0.1 * t))
+dr = (dr * pulse + hi) * np.minimum(1, t / 3) * np.minimum(1, (d - t) / 1.5) * (0.6 + 0.4 * t / d)
+save("dengung.wav", reverb(fit(dr, len(t)), rt=2.5, wet=0.3, tone=3000)[:, : len(t)], peak=0.8)
+
+# 24. koir "aah" (formant)
+d = 7.0
+t = tt(d)
+ch = np.zeros((2, len(t)))
+for fq in (130.81, 196.0, 261.63, 329.63, 392.0, 523.25):
+    for v in range(3):
+        det = 1 + rng.uniform(-0.006, 0.006)
+        vib = 1 + 0.004 * np.sin(2 * np.pi * rng.uniform(4.5, 6) * t + rng.uniform(0, 6))
+        voice = np.sin(2 * np.pi * np.cumsum(fq * det * vib) / SR)
+        voice = sum(np.sin(2 * np.pi * np.cumsum(fq * det * vib * k) / SR) / k for k in range(1, 18) if fq * k < 7000)
+        ch += pan(voice, rng.uniform(-0.8, 0.8))
+form = sum(filt(ch, "bandpass", [fc / 1.15, fc * 1.15]) * g for fc, g in ((800, 1.0), (1150, 0.6), (2900, 0.25)))
+form *= np.minimum(1, t / 0.5) * np.minimum(1, (d - t) / 2.0)
+save("koir.wav", reverb(form, rt=3.5, wet=0.45, tone=7000)[:, : int(8.5 * SR)], peak=0.7)
+
 print("siap")

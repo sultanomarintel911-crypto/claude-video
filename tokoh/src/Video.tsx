@@ -20,20 +20,24 @@ add(1.05, 'swish_teks', 0.55);
 add(6.75, 'swish_teks', 0.5);
 add(7.6, 'cymbal_terbalik', 0.7);
 add(9.55, 'whoosh_panjang', 0.6);
-// tajuk
-add(T.tajukHit, 'impact_lembut', 1.0);
-add(T.tajukHit + 0.05, 'kilauan', 0.6);
-add(T.tajuk + 5.1, 'swish_teks', 0.55);
-add(T.tajuk + 5.1, 'sub_drop', 0.5);
-// petunjuk
+// tajuk: sedutan -> BRAAAM
+add(T.tajukHit - 1.6, 'sedutan', 0.6);
+add(T.tajukHit, 'braam', 0.95);
+add(T.tajukHit, 'impact_lembut', 0.7);
+add(T.tajukHit + 0.05, 'kilauan', 0.55);
+add(T.tajuk + 5.2, 'swish_teks', 0.55);
+add(T.tajuk + 5.2, 'sub_drop', 0.6);
+// petunjuk: dengung tegang + sedutan -> taiko pada kata kunci
+add(T.clue0 - 0.5, 'dengung', 0.6);
 CLUES.forEach((c, i) => {
   const s = T.clue0 + i * T.clueLen;
-  add(s - 0.3, 'whoosh_pendek', 0.55);
+  add(s - 0.3, 'whoosh_pendek', 0.5);
   const n = c.teks.length;
   for (let k = 0; k < n; k += 2) {
-    if (c.teks[k] !== ' ') add(s + 0.25 + (1.55 * k) / n, 'taip', 0.55);
+    if (c.teks[k] !== ' ') add(s + 0.25 + (1.55 * k) / n, 'taip', 0.5);
   }
-  add(s + 2.1, 'impact_lembut', 0.75);
+  add(s + 2.1 - 1.6, 'sedutan', 0.5);
+  add(s + 2.1, 'taiko', 0.9);
   add(s + 2.15, 'kilauan', 0.4);
   if (c.extra === 'kaunter') for (let k = 0; k < 6; k++) add(s + 2.2 + k * 0.18, 'blip', 0.7);
   if (c.extra === 'bintang') for (let k = 0; k < 4; k++) add(s + 2.5 + (k * 7) / FPS, 'pop_bintang', 0.7);
@@ -42,20 +46,35 @@ CLUES.forEach((c, i) => {
 add(T.siluet, 'sub_drop', 0.8);
 add(T.siluet, 'api', 0.85);
 add(T.siluet + 2.6, 'bara_naik', 0.9);
+add(T.siluet + 4.4 - 2.5, 'stinger', 0.55);
+add(T.siluet + 4.4, 'taiko', 0.85);
 add(T.siluet + 4.4, 'swish_teks', 0.5);
-[4.5, 5.45, 6.4].forEach((d) => add(T.siluet + d, 'degupan', 1.0));
-// kiraan detik
-add(T.kira - 1.0, 'riser', 0.85);
-add(T.kira, 'drumroll', 0.85);
+// degupan jantung makin laju sehingga senyap sebelum pendedahan
+{
+  const senyap = T.reveal - 0.44;
+  let tb = T.siluet + 2.2;
+  let gap = 1.05;
+  while (tb < senyap - 0.25) {
+    add(tb, 'degupan', 1.0);
+    tb += gap;
+    gap = Math.max(0.42, gap * 0.9);
+  }
+}
+// kiraan detik: riser & drumroll berakhir tepat pada detik senyap
+add(T.reveal - 0.44 - 4.0, 'riser', 0.85);
+add(T.reveal - 0.44 - 3.0, 'drumroll', 0.85);
 [0, 1, 2].forEach((k) => {
-  add(T.kira + k, 'impact_lembut', 0.55);
+  add(T.kira + k, 'taiko', 0.75);
   add(T.kira + k, 'detik', 0.8);
 });
-// pendedahan
+// PENDEDAHAN: senyap 0.44 s -> BOOM + BRAAAM + koir
 add(T.reveal, 'impact_besar', 1.0);
+add(T.reveal, 'braam', 1.0);
+add(T.reveal, 'sub_drop', 0.8);
 add(T.reveal + 0.05, 'kilauan', 0.7);
-add(T.reveal + 0.3, 'tepukan', 0.55);
-add(T.reveal + 34 / FPS + 0.0, 'swish_teks', 0.45);
+add(T.reveal + 0.1, 'koir', 0.55);
+add(T.reveal + 0.6, 'tepukan', 0.55);
+add(T.reveal + 34 / FPS, 'swish_teks', 0.45);
 add(T.reveal + 41 / FPS, 'swish_teks', 0.4);
 add(T.reveal + 2.7, 'kilauan', 0.35);
 // montaj
@@ -72,7 +91,10 @@ SHOTS.forEach((s, i) => {
   if (s.kind === 'kebangsaan') for (let k = 0; k < 6; k++) add(m + (10 + k * 14.6 * 0.75) / FPS, 'swish_teks', 0.35);
 });
 // penutup
+add(T.finale - 1.6, 'sedutan', 0.5);
 add(T.finale, 'impact_lembut', 0.9);
+add(T.finale, 'braam', 0.6);
+add(T.finale + 0.1, 'koir', 0.45);
 add(T.finale + 0.05, 'kilauan', 0.7);
 add(T.finale + 0.2, 'tepukan', 0.65);
 add(T.finale + 1.4, 'kilauan', 0.4);
