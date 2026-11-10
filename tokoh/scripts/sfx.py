@@ -296,4 +296,79 @@ form = sum(filt(ch, "bandpass", [fc / 1.15, fc * 1.15]) * g for fc, g in ((800, 
 form *= np.minimum(1, t / 0.5) * np.minimum(1, (d - t) / 2.0)
 save("koir.wav", reverb(form, rt=3.5, wet=0.45, tone=7000)[:, : int(8.5 * SR)], peak=0.7)
 
+
+# ===================================================== bunyi sci-fi
+# 25. dengung mesin (latar pembukaan)
+d = 12.0
+t = tt(d)
+hm = sum(saw(fq, d, 10) * a for fq, a in ((50.0, 1.0), (100.0, 0.5), (150.0, 0.3)))
+hm = filt(np.tanh(hm * 0.4), "lowpass", 420) * (0.75 + 0.25 * np.sin(2 * np.pi * 0.3 * t))
+hm += filt(noise(d, 1)[0], "bandpass", [2000, 5000]) * 0.03
+hm *= np.minimum(1, t / 1.5) * np.minimum(1, (d - t) / 0.6)
+save("hum.wav", reverb(fit(hm, len(t)), rt=1.5, wet=0.2, tone=2000)[:, : len(t)], peak=0.7)
+
+# 26. sistem dihidupkan
+d = 1.6
+t = tt(d)
+f0 = 180 * (1600 / 180) ** (t / d)
+up = np.sin(2 * np.pi * np.cumsum(f0 * (1 + 0.05 * np.sin(2 * np.pi * 30 * t))) / SR) * np.minimum(1, t / 0.1) * (t / d) ** 0.5
+up += filt(noise(d, 1)[0], "bandpass", [500, 6000]) * (t / d) ** 2 * 0.3
+save("hud_boot.wav", reverb(fit(up * np.minimum(1, (d - t) / 0.05), len(t)), rt=1.0, wet=0.25), peak=0.6)
+
+# 27. glitch digital
+d = 0.5
+x = np.zeros((2, int(d * SR)))
+pos = 0
+while pos < x.shape[1] - 200:
+    ln = int(rng.uniform(0.01, 0.05) * SR)
+    seg = tt(ln / SR)
+    kind = rng.integers(0, 3)
+    if kind == 0:
+        g = np.sign(np.sin(2 * np.pi * rng.uniform(200, 3000) * seg))
+    elif kind == 1:
+        g = rng.standard_normal(len(seg))
+    else:
+        g = np.zeros(len(seg))
+    g = np.round(g * 4) / 4
+    x[:, pos:pos + ln] += pan(g * rng.uniform(0.3, 1), rng.choice([-0.9, 0, 0.9]))[:, : x.shape[1] - pos]
+    pos += ln
+save("glitch.wav", x, peak=0.5)
+
+# 28. aliran data (bip pantas rawak)
+d = 6.5
+x = np.zeros((2, int(d * SR)))
+for _ in range(int(d * 18)):
+    st = rng.uniform(0, d - 0.05)
+    ln = rng.uniform(0.015, 0.04)
+    b = np.sign(np.sin(2 * np.pi * rng.uniform(800, 2400) * tt(ln))) * env_exp(ln, 60)
+    i = int(st * SR)
+    x[:, i:i + len(b)] += pan(filt(b, "lowpass", 5000) * rng.uniform(0.2, 0.7), rng.uniform(-0.8, 0.8))
+x += filt(noise(d), "bandpass", [1500, 4000]) * 0.02
+save("data.wav", x, peak=0.4)
+
+# 29. bip HUD
+d = 0.15
+bp = np.sin(2 * np.pi * 1000 * tt(d)) * np.minimum(1, (d - tt(d)) / 0.02) * np.minimum(1, tt(d) / 0.003)
+save("bip.wav", fit(filt(bp, "lowpass", 4000), int(d * SR)), peak=0.35)
+
+# 30. amaran "padanan ditemui"
+d = 1.4
+t = tt(d)
+al = np.zeros_like(t)
+for k, fq in enumerate((880, 660, 880)):
+    a0 = k * 0.4
+    m = (t >= a0) & (t < a0 + 0.28)
+    al[m] += np.sign(np.sin(2 * np.pi * fq * (t[m] - a0))) * np.exp(-(t[m] - a0) * 4)
+save("amaran.wav", reverb(fit(filt(al, "lowpass", 3000), len(t)), rt=1.2, wet=0.3), peak=0.55)
+
+# 31. imbasan (sapuan resonan kiri->kanan)
+d = 1.5
+t = tt(d)
+n = noise(d, 1)[0]
+sc = np.zeros_like(t)
+for i, fc in enumerate(np.geomspace(400, 2400, 10)):
+    sc += filt(n, "bandpass", [fc / 1.08, fc * 1.08]) * np.exp(-((t / d * 9 - i) / 1.3) ** 2)
+sc *= np.sin(np.pi * t / d)
+save("imbasan.wav", reverb(pan(sc, np.linspace(-0.9, 0.9, len(t))), rt=0.8, wet=0.2), peak=0.5)
+
 print("siap")

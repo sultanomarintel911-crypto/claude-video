@@ -6,66 +6,95 @@ import '@fontsource/cinzel/900.css';
 import '@fontsource/montserrat/500.css';
 import '@fontsource/montserrat/600.css';
 import '@fontsource/montserrat/700.css';
-import {CLUES, f, FPS, MUSIK_KEMENANGAN_MULA, SHOTS, T} from './data';
-import {SceneClue, SceneDron, SceneFinale, SceneKira, SceneReveal, SceneShot, SceneSiluet, SceneTajuk} from './scenes';
+import '@fontsource/orbitron/700.css';
+import '@fontsource/orbitron/900.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/700.css';
+import {f, FPS, MUSIK_KEMENANGAN_MULA, SHOTS, SIFAT_MASA, T} from './data';
+import {SceneBuka, SceneDron, SceneFail, SceneFinale, SceneKira, SceneReveal, SceneShot, SceneSiluet, SceneTajuk} from './scenes';
 
 // --------------------------------------------------------------- kesan bunyi
 type Sfx = {at: number; file: string; vol: number};
 const SFX: Sfx[] = [];
 const SENYAP = T.reveal - 0.44; // detik senyap mutlak sebelum pendedahan
 const add = (at: number, file: string, vol = 1) => SFX.push({at, file, vol});
+const taip = (start: number, text: string, cps = 38, vol = 0.3) => {
+  for (let k = 0; k < text.length; k += 2) if (text[k] !== ' ') add(start + k / cps, 'taip', vol);
+};
 
-// pembukaan dron
-add(0.0, 'whoosh_panjang', 0.45);
-add(1.05, 'swish_teks', 0.55);
-add(6.75, 'swish_teks', 0.5);
-add(7.6, 'cymbal_terbalik', 0.7);
-add(9.55, 'whoosh_panjang', 0.6);
-// tajuk: sedutan -> BRAAAM
+// 1. pembukaan sci-fi
+add(0, 'hum', 0.75);
+add(0.8, 'glitch', 0.8);
+add(0.8, 'hud_boot', 0.8);
+add(0.8, 'sub_drop', 0.5);
+taip(1.0, '> SISTEM ARKIB SK SULTAN OMAR · DALAM TALIAN');
+add(2.2, 'bip', 0.6);
+taip(2.2, '> MENGIMBAS REKOD MURID TAHUN 6 · 2026');
+add(2.6, 'imbasan', 0.6);
+add(2.6, 'data', 0.45);
+add(6.18, 'taiko', 0.6);
+add(6.2, 'bip', 0.6);
+taip(6.2, '> MENGANALISIS: KEPIMPINAN · SUKAN · SAHSIAH · ILMU');
+add(6.3, 'imbasan', 0.5);
+taip(7.7, '> MENAPIS CALON...');
+add(8.9, 'glitch', 0.8);
+add(8.9, 'amaran', 0.75);
+add(8.9, 'taiko', 0.7);
+taip(9.0, '> PADANAN DISAHKAN. MEMBUKA FAIL...');
+add(10.4, 'glitch', 0.7);
+add(10.75, 'glitch', 0.6);
+// 2. tajuk anugerah: sedutan -> BRAAAM
 add(T.tajukHit - 1.6, 'sedutan', 0.6);
 add(T.tajukHit, 'braam', 0.95);
 add(T.tajukHit, 'impact_lembut', 0.7);
-add(T.tajuk + 5.2, 'swish_teks', 0.55);
-add(T.tajuk + 5.2, 'sub_drop', 0.6);
-// petunjuk: dengung tegang + sedutan -> taiko pada kata kunci
-add(T.clue0 - 0.5, 'dengung', 0.6);
-CLUES.forEach((c, i) => {
-  const s = T.clue0 + i * T.clueLen;
-  add(s - 0.3, 'whoosh_pendek', 0.5);
-  const n = c.teks.length;
-  for (let k = 0; k < n; k += 2) {
-    if (c.teks[k] !== ' ') add(s + 0.25 + (1.55 * k) / n, 'taip', 0.5);
-  }
-  add(s + 2.1 - 1.6, 'sedutan', 0.5);
-  add(s + 2.1, 'taiko', 0.9);
-  if (c.extra === 'kaunter') for (let k = 0; k < 6; k++) add(s + 2.2 + k * 0.18, 'blip', 0.7);
+// 3. di bumi bertuah ini
+add(T.dron - 0.2, 'whoosh_panjang', 0.5);
+add(T.dron + 0.6, 'swish_teks', 0.45);
+add(T.dron + 4.0, 'swish_teks', 0.45);
+add(T.dron + 6.9, 'swish_teks', 0.45);
+add(T.fail - 2.5, 'cymbal_terbalik', 0.6);
+// 4. fail sulit
+add(T.fail - 0.3, 'dengung', 0.55);
+add(T.fail, 'glitch', 0.7);
+add(T.fail + 0.2, 'hud_boot', 0.5);
+add(T.fail + 0.5, 'data', 0.3);
+add(T.fail + 7.0, 'data', 0.3);
+SIFAT_MASA.forEach((t) => {
+  add(t - 1.6, 'sedutan', 0.5);
+  add(t, 'taiko', 0.9);
+  add(t, 'glitch', 0.6);
+  add(t + 0.1, 'imbasan', 0.35);
 });
-// siluet
+add(T.siluet - 2.0, 'amaran', 0.7);
+add(T.siluet - 2.0, 'glitch', 0.7);
+add(T.siluet - 0.8, 'glitch', 0.7);
+// 5. siluet
 add(T.siluet, 'sub_drop', 0.8);
 add(T.siluet, 'api', 0.7);
 add(T.siluet + 2.6, 'bara_naik', 0.75);
+add(T.siluet + 3.6, 'imbasan', 0.6);
 add(T.siluet + 4.4 - 2.5, 'stinger', 0.45);
 add(T.siluet + 4.4, 'taiko', 0.7);
+add(T.siluet + 4.5, 'bip', 0.5);
 add(T.siluet + 4.4, 'swish_teks', 0.5);
-// degupan jantung makin laju sehingga senyap sebelum pendedahan
 {
-  const senyap = T.reveal - 0.44;
+  // degupan jantung makin laju sehingga senyap
   let tb = T.siluet + 2.2;
   let gap = 1.05;
-  while (tb < senyap - 0.25) {
+  while (tb < SENYAP - 0.25) {
     add(tb, 'degupan', 0.8);
     tb += gap;
     gap = Math.max(0.42, gap * 0.9);
   }
 }
-// kiraan detik: riser & drumroll berakhir tepat pada detik senyap
-add(T.reveal - 0.44 - 4.0, 'riser', 0.85);
-add(T.reveal - 0.44 - 3.0, 'drumroll', 0.85);
+// 6. kiraan detik
+add(SENYAP - 4.0, 'riser', 0.85);
+add(SENYAP - 3.0, 'drumroll', 0.85);
 [0, 1, 2].forEach((k) => {
   add(T.kira + k, 'taiko', 0.75);
   add(T.kira + k, 'detik', 0.8);
 });
-// PENDEDAHAN: senyap 0.44 s -> BOOM + BRAAAM + koir
+// 7. PENDEDAHAN: senyap -> BOOM + BRAAAM + koir
 add(T.reveal, 'impact_besar', 0.7);
 add(T.reveal, 'braam', 0.65);
 add(T.reveal, 'sub_drop', 0.5);
@@ -73,19 +102,19 @@ add(T.reveal + 0.1, 'koir', 0.55);
 add(T.reveal + 0.6, 'tepukan', 0.55);
 add(T.reveal + 34 / FPS, 'swish_teks', 0.45);
 add(T.reveal + 41 / FPS, 'swish_teks', 0.4);
-// montaj
+// 8. montaj
 SHOTS.forEach((s, i) => {
   const m = T.montaj + i * T.shotLen;
   add(m - 0.12, 'whoosh_pendek', 0.5);
-  if (s.kind === 'foto') add(m, 'kamera', 0.35);
-  if (s.kind === 'foto' || s.kind === 'video') add(m + 0.3, 'swish_teks', 0.35);
-  if (s.kind === 'foto' && s.badge) {
-    add(m + 26 / FPS, 'impact_lembut', 0.55);
+  if (s.kind === 'foto') {
+    add(m, 'kamera', 0.35);
+    add(m + 0.3, 'swish_teks', 0.35);
+    if (s.badge) add(m + 26 / FPS, 'impact_lembut', 0.55);
   }
   if (s.kind === 'statistik') for (let k = 0; k < 4; k++) for (let j = 0; j < 5; j++) add(m + (8 + k * 7 + j * 5) / FPS, 'blip', 0.45);
   if (s.kind === 'kebangsaan') for (let k = 0; k < 6; k++) add(m + (10 + k * 14.6 * 0.75) / FPS, 'swish_teks', 0.35);
 });
-// penutup
+// 9. penutup
 add(T.finale - 1.6, 'sedutan', 0.5);
 add(T.finale, 'impact_lembut', 0.9);
 add(T.finale, 'braam', 0.6);
@@ -96,40 +125,29 @@ add(T.finale + 0.2, 'tepukan', 0.65);
 export const TokohMurid: React.FC = () => {
   const [handle] = useState(() => delayRender('fon'));
   useEffect(() => {
-    Promise.all([
-      document.fonts.load('900 40px Cinzel'),
-      document.fonts.load('800 40px Cinzel'),
-      document.fonts.load('700 40px Cinzel'),
-      document.fonts.load('500 40px Montserrat'),
-      document.fonts.load('600 40px Montserrat'),
-      document.fonts.load('700 40px Montserrat'),
-    ]).then(() => continueRender(handle));
+    Promise.all(
+      ['900 40px Cinzel', '800 40px Cinzel', '700 40px Cinzel', '500 40px Montserrat', '600 40px Montserrat', '700 40px Montserrat', '700 40px Orbitron', '900 40px Orbitron', '400 40px "JetBrains Mono"', '700 40px "JetBrains Mono"'].map((x) =>
+        document.fonts.load(x),
+      ),
+    ).then(() => continueRender(handle));
   }, [handle]);
 
   const endF = f(T.end);
   const musik2Len = f(T.end - T.reveal);
+  const seq = (from: number, to: number, el: React.ReactNode, key?: string) => (
+    <Sequence key={key} from={f(from)} durationInFrames={f(to) - f(from)}>
+      {el}
+    </Sequence>
+  );
   return (
     <AbsoluteFill style={{background: '#000'}}>
-      <Sequence from={f(T.dron)} durationInFrames={f(10.05)}>
-        <SceneDron />
-      </Sequence>
-      <Sequence from={f(T.tajuk)} durationInFrames={f(T.clue0 - T.tajuk)}>
-        <SceneTajuk />
-      </Sequence>
-      {CLUES.map((_, i) => (
-        <Sequence key={i} from={f(T.clue0 + i * T.clueLen)} durationInFrames={f(T.clueLen)}>
-          <SceneClue i={i} />
-        </Sequence>
-      ))}
-      <Sequence from={f(T.siluet)} durationInFrames={f(T.siluetLen)}>
-        <SceneSiluet />
-      </Sequence>
-      <Sequence from={f(T.kira)} durationInFrames={f(T.reveal - T.kira)}>
-        <SceneKira />
-      </Sequence>
-      <Sequence from={f(T.reveal)} durationInFrames={f(T.montaj - T.reveal)}>
-        <SceneReveal />
-      </Sequence>
+      {seq(T.buka, T.tajuk + 0.4, <SceneBuka />)}
+      {seq(T.tajuk, T.dron, <SceneTajuk />)}
+      {seq(T.dron, T.dron + T.dronLen, <SceneDron />)}
+      {seq(T.fail, T.siluet, <SceneFail />)}
+      {seq(T.siluet, T.siluet + T.siluetLen, <SceneSiluet />)}
+      {seq(T.kira, T.reveal, <SceneKira />)}
+      {seq(T.reveal, T.montaj, <SceneReveal />)}
       {SHOTS.map((s, i) => {
         const from = f(T.montaj + i * T.shotLen);
         const to = f(T.montaj + (i + 1) * T.shotLen);
@@ -147,7 +165,7 @@ export const TokohMurid: React.FC = () => {
       <Sequence from={0} durationInFrames={f(T.reveal)}>
         <Audio
           src={staticFile('audio/misteri.mp3')}
-          volume={(fr) => interpolate(fr, [0, f(1.5), f(T.kira - 1.5), f(T.kira + 0.3)], [0, 0.7, 0.7, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})}
+          volume={(fr) => interpolate(fr, [0, f(1.5), f(T.kira - 1.5), f(T.kira + 0.3)], [0, 0.65, 0.65, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})}
         />
       </Sequence>
       <Sequence from={f(T.reveal)} durationInFrames={musik2Len}>
@@ -157,7 +175,7 @@ export const TokohMurid: React.FC = () => {
           volume={(fr) => interpolate(fr, [0, musik2Len - f(3.5), musik2Len], [0.85, 0.85, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})}
         />
       </Sequence>
-      {/* kesan bunyi */}
+      {/* kesan bunyi; semua yang bermula sebelum detik senyap dipotong pada detik itu */}
       {SFX.map((s, i) => {
         const from = Math.max(0, f(s.at));
         const cut = from < f(SENYAP) ? f(SENYAP) - from : Infinity;

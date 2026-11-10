@@ -79,11 +79,8 @@ def ff(*args):
 
 
 # video
-# video asal ialah rakaman skrin: padam ikon 'play' di tengah & potong bar pemain di bawah
-ff("-i", os.path.join(SRC, "intro_sekolah.mp4"), "-an",
-   "-vf", "delogo=x=626:y=581:w=40:h=36,crop=1180:664:50:0,scale=1920:1080:flags=lanczos",
-   "-c:v", "libx264", "-crf", "17", "-pix_fmt", "yuv420p",
-   os.path.join(PUB, "video", "intro_dron.mp4"))
+# video asal ialah rakaman skrin: ikon 'play' bergerak dipadam bingkai demi bingkai
+subprocess.run(["python3", os.path.join(HERE, "bersih_dron.py")], check=True)
 ff("-ss", "45.0", "-to", "48.9", "-i", os.path.join(SRC, "pen_ket_pengawas.mp4"), "-an", "-c:v", "libx264", "-crf", "18",
    "-pix_fmt", "yuv420p", os.path.join(PUB, "video", "thoriq_pengawas.mp4"))
 

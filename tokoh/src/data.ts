@@ -10,20 +10,22 @@ export const f = (sec: number) => Math.round(sec * FPS);
 export const BEAT = 0.4876;
 export const SWELL = 5.38;
 
+export const N_SHOTS = 9;
 export const T = {
-  dron: 0,
-  tajuk: 9.6,
-  tajukHit: 11.56,
-  clue0: 16.94,
-  clueLen: SWELL,
+  buka: 0, // pembukaan sci-fi (hentakan muzik 0.80 & 6.18)
+  tajuk: 11.2,
+  tajukHit: 11.56, // hentakan muzik
+  dron: 16.94, // "Di bumi bertuah ini..."
+  dronLen: 10.04,
+  fail: 26.98, // fail sulit; sifat pada hentakan 27.70, 33.08, 38.46
   siluet: 16.94 + SWELL * 5, // 43.84
   siluetLen: 7.2,
   kira: 51.04,
   reveal: 54.04,
   montaj: 54.04 + 16 * BEAT, // 61.84
   shotLen: 8 * BEAT, // 3.90
-  finale: 54.04 + 16 * BEAT + 10 * 8 * BEAT, // 100.85
-  end: 113.5,
+  finale: 54.04 + 16 * BEAT + N_SHOTS * 8 * BEAT, // 96.95
+  end: 54.04 + 16 * BEAT + N_SHOTS * 8 * BEAT + 12.65,
 };
 export const MUSIK_KEMENANGAN_MULA = T.reveal - 0.44;
 
@@ -35,13 +37,12 @@ export const NAMA_BIN = 'BIN MOHAMMAD NOR BAKRI';
 export const NAMA_PENUH = 'THORIQ YUSUF BIN MOHAMMAD NOR BAKRI';
 export const KELAS = '6 IBNU MAJAH';
 
-export type Clue = {teks: string; kunci: string; sub: string; bg: string; extra?: 'kaunter' | 'bintang' | 'trofi'};
-export const CLUES: Clue[] = [
-  {teks: 'Dia dipercayai memimpin rakan-rakannya setiap hari...', kunci: 'PENOLONG KETUA MURID', sub: 'SK Sultan Omar 2026', bg: 'img/blur_koridor.jpg'},
-  {teks: 'Suaranya di sebalik kamera, semangatnya di padang...', kunci: 'PENGERUSI TV PSS', sub: '& Ketua Rumah Temenggung', bg: 'img/blur_sekolah.jpg'},
-  {teks: 'Raketnya menggegarkan gelanggang...', kunci: 'JOHAN SKUASY', sub: 'Peringkat Daerah & Negeri', bg: 'img/blur_squash_match.jpg', extra: 'trofi'},
-  {teks: 'Namanya tercatat di pentas negara...', kunci: 'PERTANDINGAN KEBANGSAAN', sub: 'daripada 18 penyertaan sepanjang 2026', bg: 'img/blur_handball_team.jpg', extra: 'kaunter'},
-  {teks: 'Dan di sebalik semua itu... dia ulat buku sejati.', kunci: 'NILAM 4 BINTANG', sub: 'Pembaca tegar SK Sultan Omar', bg: 'img/blur_papan_skeso.jpg', extra: 'bintang'},
+// Fail sulit: hanya sifat, tanpa butiran (biar misteri)
+export const SIFAT_MASA = [16.94 + SWELL * 2, 16.94 + SWELL * 3, 16.94 + SWELL * 4]; // 27.70, 33.08, 38.46
+export const SIFAT = [
+  {kata: 'PEMIMPIN', bg: 'img/blur_koridor.jpg'},
+  {kata: 'PEJUANG', bg: 'img/blur_squash_match.jpg'},
+  {kata: 'PENCINTA ILMU', bg: 'img/blur_papan_skeso.jpg'},
 ];
 
 // Kotak wajah Thoriq (dinormalkan 0..1 kepada saiz gambar) - zon larangan animasi
@@ -70,8 +71,7 @@ export const SHOTS: Shot[] = [
   {kind: 'foto', photo: 'handball_team', z0: 1.2, z1: 1.0, fx0: 0.6, fx1: 0.5, fy: 0.38, kicker: 'SUKAN · BOLA BALING', title: 'Zon Sura & MSSD Dungun', sub: 'Kejohanan Bola Baling 2026', badge: 'KETIGA'},
   {kind: 'statistik'},
   {kind: 'kebangsaan'},
-  {kind: 'video', src: 'video/thoriq_pengawas.mp4', face: [0.42, 0.12, 0.58, 0.5], kicker: 'KEPIMPINAN', title: 'Penolong Ketua Murid', sub: 'SK Sultan Omar 2026'},
-  {kind: 'foto', photo: 'standing', z0: 1.05, z1: 1.3, fx0: 0.62, fx1: 0.66, fy: 0.32, kicker: 'KEPIMPINAN & KOKURIKULUM', title: 'Ketua Rumah Temenggung', sub: 'Pengerusi TV PSS · AJK Tunas Kadet Remaja Sekolah'},
+  {kind: 'foto', photo: 'standing', z0: 1.05, z1: 1.3, fx0: 0.62, fx1: 0.66, fy: 0.32, kicker: 'KEPIMPINAN', title: 'Penolong Ketua Murid', sub: 'Ketua Rumah Temenggung · Pengerusi TV PSS'},
   {kind: 'foto', photo: 'kelas', z0: 1.0, z1: 1.9, fx0: 0.37, fx1: 0.62, fy: 0.36, kicker: 'KELUARGA KEDUA', title: '6 Ibnu Majah', sub: 'Majlis Apresiasi Tahun 6 · 2026'},
   {kind: 'foto', photo: 'graduation', z0: 1.0, z1: 1.2, fx0: 0.36, fx1: 0.33, fy: 0.42, kicker: 'RAJIN USAHA, TANGGA KEJAYAAN', title: 'Perjalanan baru bermula', sub: 'Teruskan melangkah, Thoriq!'},
 ];
