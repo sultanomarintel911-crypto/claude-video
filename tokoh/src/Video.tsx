@@ -12,6 +12,7 @@ import {SceneClue, SceneDron, SceneFinale, SceneKira, SceneReveal, SceneShot, Sc
 // --------------------------------------------------------------- kesan bunyi
 type Sfx = {at: number; file: string; vol: number};
 const SFX: Sfx[] = [];
+const SENYAP = T.reveal - 0.44; // detik senyap mutlak sebelum pendedahan
 const add = (at: number, file: string, vol = 1) => SFX.push({at, file, vol});
 
 // pembukaan dron
@@ -44,10 +45,10 @@ CLUES.forEach((c, i) => {
 });
 // siluet
 add(T.siluet, 'sub_drop', 0.8);
-add(T.siluet, 'api', 0.85);
-add(T.siluet + 2.6, 'bara_naik', 0.9);
-add(T.siluet + 4.4 - 2.5, 'stinger', 0.55);
-add(T.siluet + 4.4, 'taiko', 0.85);
+add(T.siluet, 'api', 0.7);
+add(T.siluet + 2.6, 'bara_naik', 0.75);
+add(T.siluet + 4.4 - 2.5, 'stinger', 0.45);
+add(T.siluet + 4.4, 'taiko', 0.7);
 add(T.siluet + 4.4, 'swish_teks', 0.5);
 // degupan jantung makin laju sehingga senyap sebelum pendedahan
 {
@@ -55,7 +56,7 @@ add(T.siluet + 4.4, 'swish_teks', 0.5);
   let tb = T.siluet + 2.2;
   let gap = 1.05;
   while (tb < senyap - 0.25) {
-    add(tb, 'degupan', 1.0);
+    add(tb, 'degupan', 0.8);
     tb += gap;
     gap = Math.max(0.42, gap * 0.9);
   }
@@ -68,9 +69,9 @@ add(T.reveal - 0.44 - 3.0, 'drumroll', 0.85);
   add(T.kira + k, 'detik', 0.8);
 });
 // PENDEDAHAN: senyap 0.44 s -> BOOM + BRAAAM + koir
-add(T.reveal, 'impact_besar', 1.0);
-add(T.reveal, 'braam', 1.0);
-add(T.reveal, 'sub_drop', 0.8);
+add(T.reveal, 'impact_besar', 0.7);
+add(T.reveal, 'braam', 0.65);
+add(T.reveal, 'sub_drop', 0.5);
 add(T.reveal + 0.05, 'kilauan', 0.7);
 add(T.reveal + 0.1, 'koir', 0.55);
 add(T.reveal + 0.6, 'tepukan', 0.55);
@@ -114,7 +115,7 @@ export const TokohMurid: React.FC = () => {
   }, [handle]);
 
   const endF = f(T.end);
-  const musik2Len = f(T.end - MUSIK_KEMENANGAN_MULA);
+  const musik2Len = f(T.end - T.reveal);
   return (
     <AbsoluteFill style={{background: '#000'}}>
       <Sequence from={f(T.dron)} durationInFrames={f(10.05)}>
@@ -157,18 +158,23 @@ export const TokohMurid: React.FC = () => {
           volume={(fr) => interpolate(fr, [0, f(1.5), f(T.kira - 1.5), f(T.kira + 0.3)], [0, 0.7, 0.7, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})}
         />
       </Sequence>
-      <Sequence from={f(MUSIK_KEMENANGAN_MULA)} durationInFrames={musik2Len}>
+      <Sequence from={f(T.reveal)} durationInFrames={musik2Len}>
         <Audio
           src={staticFile('audio/kemenangan.mp3')}
+          trimBefore={f(T.reveal - MUSIK_KEMENANGAN_MULA)}
           volume={(fr) => interpolate(fr, [0, musik2Len - f(3.5), musik2Len], [0.85, 0.85, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'})}
         />
       </Sequence>
       {/* kesan bunyi */}
-      {SFX.map((s, i) => (
-        <Sequence key={'sfx' + i} from={Math.max(0, f(s.at))}>
-          <Audio src={staticFile(`sfx/${s.file}.wav`)} volume={s.vol} />
-        </Sequence>
-      ))}
+      {SFX.map((s, i) => {
+        const from = Math.max(0, f(s.at));
+        const cut = from < f(SENYAP) ? f(SENYAP) - from : Infinity;
+        return (
+          <Sequence key={'sfx' + i} from={from}>
+            <Audio src={staticFile(`sfx/${s.file}.wav`)} volume={(fr) => (fr >= cut ? 0 : fr >= cut - 2 ? s.vol * 0.3 : s.vol)} />
+          </Sequence>
+        );
+      })}
     </AbsoluteFill>
   );
 };

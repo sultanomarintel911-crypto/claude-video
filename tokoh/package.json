@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "studio": "remotion studio src/index.ts",
-    "preview": "remotion render src/index.ts TokohMurid out/preview.mp4 --scale=0.5 --crf=28",
-    "final": "remotion render src/index.ts TokohMurid out/final.mp4 --crf=16"
+    "preview": "remotion render src/index.ts TokohMurid out/_mentah.mp4 --scale=0.5 --crf=26 --concurrency=4 && ffmpeg -y -loglevel error -i out/_mentah.mp4 -c:v copy -af \"alimiter=limit=0.89:attack=3:release=80,aresample=48000\" -c:a aac -b:a 256k out/pratonton.mp4",
+    "final": "remotion render src/index.ts TokohMurid out/_mentah.mp4 --crf=16 --concurrency=4 && ffmpeg -y -loglevel error -i out/_mentah.mp4 -c:v copy -af \"alimiter=limit=0.89:attack=3:release=80,aresample=48000\" -c:a aac -b:a 256k out/final_tokoh_murid_2026.mp4"
   },
   "dependencies": {
     "@fontsource/cinzel": "^5.3.0",
