@@ -111,6 +111,13 @@ SHOTS.forEach((s, i) => {
     add(m + 0.3, 'swish_teks', 0.35);
     if (s.badge) add(m + 26 / FPS, 'impact_lembut', 0.55);
   }
+  if (s.kind === 'triptik') {
+    for (let k = 0; k < 3; k++) {
+      add(m + (k * 14.63 * 0.9) / FPS, 'whoosh_pendek', 0.45);
+      add(m + (k * 14.63 * 0.9) / FPS, 'kamera', 0.35);
+    }
+    add(m + (2 * 14.63) / FPS, 'swish_teks', 0.35);
+  }
   if (s.kind === 'statistik') for (let k = 0; k < 4; k++) for (let j = 0; j < 5; j++) add(m + (8 + k * 7 + j * 5) / FPS, 'blip', 0.45);
   if (s.kind === 'kebangsaan') for (let k = 0; k < 6; k++) add(m + (10 + k * 14.6 * 0.75) / FPS, 'swish_teks', 0.35);
 });

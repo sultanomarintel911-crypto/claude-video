@@ -10,7 +10,7 @@ export const f = (sec: number) => Math.round(sec * FPS);
 export const BEAT = 0.4876;
 export const SWELL = 5.38;
 
-export const N_SHOTS = 9;
+export const N_SHOTS = 11;
 export const T = {
   buka: 0, // pembukaan sci-fi (hentakan muzik 0.80 & 6.18)
   tajuk: 11.2,
@@ -55,11 +55,16 @@ export const PHOTOS: Record<string, Photo> = {
   standing: {src: 'img/standing.jpg', iw: 2560, ih: 1429, face: [0.47, 0.31, 0.537, 0.44]},
   graduation: {src: 'img/graduation.jpg', iw: 2560, ih: 1707, face: [0.27, 0.43, 0.365, 0.6]},
   kelas: {src: 'img/kelas.jpg', iw: 2560, ih: 1828, face: [0.33, 0.285, 0.4, 0.38]},
+  olahraga_1: {src: 'img/olahraga_1.jpg', iw: 1706, ih: 2560, face: [0.47, 0.385, 0.58, 0.49]},
+  olahraga_2: {src: 'img/olahraga_2.jpg', iw: 1720, ih: 2560, face: [0.455, 0.33, 0.585, 0.45]},
+  olahraga_3: {src: 'img/olahraga_3.jpg', iw: 2560, ih: 1707, face: [0.565, 0.42, 0.615, 0.51]},
+  olahraga_4: {src: 'img/olahraga_4.jpg', iw: 1706, ih: 2560, face: [0.39, 0.36, 0.535, 0.49]},
 };
 
 export type Shot =
   | {kind: 'foto'; photo: string; z0: number; z1: number; fx0: number; fx1: number; fy: number; kicker: string; title: string; sub: string; badge?: 'JOHAN' | 'KETIGA'}
   | {kind: 'video'; src: string; face: Rect; kicker: string; title: string; sub: string}
+  | {kind: 'triptik'; photos: string[]; kicker: string; title: string; sub: string}
   | {kind: 'statistik'}
   | {kind: 'kebangsaan'};
 
@@ -69,6 +74,8 @@ export const SHOTS: Shot[] = [
   {kind: 'foto', photo: 'hitting_ball', z0: 1.15, z1: 1.0, fx0: 0.42, fx1: 0.36, fy: 0.3, kicker: 'SUKAN · SKUASY', title: 'Kejohanan MSST Skuasy', sub: 'Peringkat Negeri Terengganu', badge: 'JOHAN'},
   {kind: 'foto', photo: 'squash_court', z0: 1.0, z1: 1.35, fx0: 0.56, fx1: 0.62, fy: 0.38, kicker: 'MEWAKILI TERENGGANU', title: 'Kejohanan Skuasy MSSM 2026', sub: 'Peringkat Kebangsaan · 6 – 13 Jun 2026'},
   {kind: 'foto', photo: 'handball_team', z0: 1.2, z1: 1.0, fx0: 0.6, fx1: 0.5, fy: 0.38, kicker: 'SUKAN · BOLA BALING', title: 'Zon Sura & MSSD Dungun', sub: 'Kejohanan Bola Baling 2026', badge: 'KETIGA'},
+  {kind: 'foto', photo: 'olahraga_3', z0: 1.0, z1: 1.25, fx0: 0.56, fx1: 0.62, fy: 0.36, kicker: 'SUKAN · OLAHRAGA', title: 'Kejohanan Olahraga MSSD Dungun', sub: 'Peringkat Daerah · 5 – 9 Julai 2026'},
+  {kind: 'triptik', photos: ['olahraga_4', 'olahraga_1', 'olahraga_2'], kicker: 'OLAHRAGA · LARI BERPAGAR', title: 'Langkah Tanpa Gentar', sub: 'MSSD Dungun 2026'},
   {kind: 'statistik'},
   {kind: 'kebangsaan'},
   {kind: 'foto', photo: 'standing', z0: 1.05, z1: 1.3, fx0: 0.62, fx1: 0.66, fy: 0.32, kicker: 'KEPIMPINAN', title: 'Penolong Ketua Murid', sub: 'Ketua Rumah Temenggung · Pengerusi TV PSS'},

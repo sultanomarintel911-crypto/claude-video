@@ -245,6 +245,18 @@ export function kbLayout(iw: number, ih: number, face: Rect, z: number, tx: numb
   return {fw, fh, left, top, rect};
 }
 
+// sama seperti kbLayout tetapi untuk panel bersaiz pw x ph
+export function kbLayoutPanel(iw: number, ih: number, face: Rect, pw: number, ph: number, z: number, tx: number, ty: number) {
+  const s = Math.max(pw / iw, ph / ih) * z;
+  const fw = iw * s;
+  const fh = ih * s;
+  const fcx = ((face[0] + face[2]) / 2) * fw;
+  const fcy = ((face[1] + face[3]) / 2) * fh;
+  const left = Math.min(0, Math.max(pw - fw, tx - fcx));
+  const top = Math.min(0, Math.max(ph - fh, ty - fcy));
+  return {fw, fh, left, top};
+}
+
 export const KenBurns: React.FC<{
   src: string;
   iw: number;

@@ -2,7 +2,7 @@ import React from 'react';
 import {AbsoluteFill, Easing, Img, OffthreadVideo, random, staticFile, useCurrentFrame} from 'remotion';
 import {
   Badge, Caption, ci, Confetti, cutLayout, easeInOut, easeOut, Embers, faceUnion, Flash, Glow, Gold, GOLD, GOLD_GRAD,
-  KenBurns, Letterbox, pickCaptionSlot, Rays, SANS, SERIF, Stars, Vignette,
+  KenBurns, kbLayoutPanel, Letterbox, overlap, pickCaptionSlot, Rays, SANS, SERIF, Stars, Vignette,
 } from './components';
 import {
   CUT_GRAD, CUT_STAND, f, H, KEBANGSAAN, KELAS, NAMA_1, NAMA_2, NAMA_BIN, NAMA_PENUH, PHOTOS, Rect, Shot, SIFAT, SIFAT_MASA, STATS, T, W,
@@ -349,8 +349,11 @@ const ShotFoto: React.FC<{s: Extract<Shot, {kind: 'foto'}>; dur: number}> = ({s,
   const P = PHOTOS[s.photo];
   const u = faceUnion(P.iw, P.ih, P.face, s.z0, s.z1, s.fx0, s.fx1, s.fy);
   const slot = pickCaptionSlot(u);
-  const badgeX = slot.side === 'left' ? slot.rect[0] + 110 : slot.rect[2] - 110;
-  const badgeY = slot.v === 'bottom' ? slot.rect[1] - 40 : slot.rect[3] + 40;
+  // lencana di atas kapsyen dengan jarak; jika bertindih wajah, pindah ke sudut atas sebelah sama
+  const badgeX = slot.side === 'left' ? slot.rect[0] + 100 : slot.rect[2] - 100;
+  let badgeY = slot.v === 'bottom' ? slot.rect[1] - 95 : slot.rect[3] + 95;
+  const bRect: Rect = [badgeX - 100, badgeY - 100, badgeX + 100, badgeY + 100];
+  if (overlap(bRect, [u[0] - 40, u[1] - 40, u[2] + 40, u[3] + 40])) badgeY = slot.v === 'bottom' ? 110 + 95 : H - 110 - 95;
   const punch = 1.04 - 0.04 * ci(fr, 0, 12, 0, 1, easeOut);
   const bandTop = slot.v === 'top';
   return (
@@ -363,6 +366,36 @@ const ShotFoto: React.FC<{s: Extract<Shot, {kind: 'foto'}>; dur: number}> = ({s,
       />
       {s.badge ? <Badge text={s.badge} x={badgeX} y={badgeY} /> : null}
       <Caption slot={slot} kicker={s.kicker} title={s.title} sub={s.sub} />
+    </AbsoluteFill>
+  );
+};
+
+const ShotTriptik: React.FC<{s: Extract<Shot, {kind: 'triptik'}>; dur: number}> = ({s, dur}) => {
+  const fr = useCurrentFrame();
+  const beat = 14.63;
+  const pw = W / 3;
+  const slot = {side: 'left' as const, v: 'bottom' as const, rect: [110, H - 330, 1110, H - 90] as Rect};
+  return (
+    <AbsoluteFill style={{background: '#000'}}>
+      {s.photos.map((k, i) => {
+        const P = PHOTOS[k];
+        const st = i * beat * 0.9;
+        const p = ci(fr, st, st + 10, 0, 1, easeOut);
+        const z = 1.12 - 0.1 * ci(fr, st, dur);
+        const L = kbLayoutPanel(P.iw, P.ih, P.face, pw, H, z, pw / 2, H * 0.4);
+        const dir = i % 2 === 0 ? 1 : -1;
+        return (
+          <div key={i} style={{position: 'absolute', left: i * pw, top: 0, width: pw, height: H, overflow: 'hidden', opacity: p, transform: `translateY(${dir * 120 * (1 - p)}px)`}}>
+            <Img src={staticFile(P.src)} style={{position: 'absolute', left: L.left, top: L.top, width: L.fw, height: L.fh}} />
+            <AbsoluteFill style={{background: `rgba(255,220,150,${0.6 * (1 - ci(fr, st, st + 8))})`}} />
+          </div>
+        );
+      })}
+      {[1, 2].map((i) => (
+        <div key={i} style={{position: 'absolute', left: i * pw - 2, top: 0, width: 4, height: H * ci(fr, (i - 0.5) * beat, (i + 0.5) * beat, 0, 1, easeOut), background: GOLD_GRAD, boxShadow: '0 0 14px rgba(255,190,80,0.8)'}} />
+      ))}
+      <AbsoluteFill style={{background: 'linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.35) 26%, transparent 45%)'}} />
+      <Caption slot={slot} kicker={s.kicker} title={s.title} sub={s.sub} delay={Math.round(2 * beat)} />
     </AbsoluteFill>
   );
 };
@@ -468,6 +501,7 @@ export const SceneShot: React.FC<{s: Shot; dur: number}> = ({s, dur}) => {
   const inn = ci(fr, 0, 5);
   let body: React.ReactNode = null;
   if (s.kind === 'foto') body = <ShotFoto s={s} dur={dur} />;
+  if (s.kind === 'triptik') body = <ShotTriptik s={s} dur={dur} />;
   if (s.kind === 'statistik') body = <ShotStatistik />;
   if (s.kind === 'kebangsaan') body = <ShotKebangsaan />;
   return (
