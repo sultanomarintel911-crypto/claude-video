@@ -171,17 +171,24 @@ def make_portrait():
     mask = Image.new("L", (w, h), 0)
     d, m = ImageDraw.Draw(img), ImageDraw.Draw(mask)
     skin, skin2, hair = (226, 176, 134), (200, 150, 110), (28, 22, 18)
+    shirt = (244, 244, 248)
     shapes = [
-        ("ellipse", (40, 420, 520, 960), (244, 244, 248)),  # baju
-        ("rect", (245, 350, 315, 440), skin2),  # leher
-        ("ellipse", (165, 245, 195, 300), skin2),  # telinga
-        ("ellipse", (365, 245, 395, 300), skin2),
-        ("ellipse", (172, 112, 388, 300), hair),  # rambut
-        ("ellipse", (180, 140, 380, 380), skin),  # muka
+        ("poly", [(0, 700), (0, 610), (30, 545), (110, 492), (230, 452), (330, 452), (450, 492),
+                  (530, 545), (560, 610), (560, 700)], shirt),  # baju (bahu menurun)
+        ("ellipse", (10, 480, 230, 760), shirt),
+        ("ellipse", (330, 480, 550, 760), shirt),
+        ("poly", [(250, 335), (310, 335), (318, 462), (242, 462)], skin2),  # leher
+        ("ellipse", (171, 248, 191, 300), skin2),  # telinga
+        ("ellipse", (369, 248, 389, 300), skin2),
+        ("ellipse", (174, 118, 386, 300), hair),  # rambut
     ]
+    for i in range(9):  # tekstur rambut
+        x = 186 + i * 21
+        shapes.append(("poly", [(x, 160), (x + 13, 111 + (i % 3) * 4), (x + 30, 160)], hair))
+    shapes.append(("ellipse", (182, 142, 378, 378), skin))  # muka
     for kind, box, col in shapes:
-        (d.ellipse if kind == "ellipse" else d.rectangle)(box, fill=col)
-        (m.ellipse if kind == "ellipse" else m.rectangle)(box, fill=255)
+        {"ellipse": d.ellipse, "rect": d.rectangle, "poly": d.polygon}[kind](box, fill=col)
+        {"ellipse": m.ellipse, "rect": m.rectangle, "poly": m.polygon}[kind](box, fill=255)
     d.chord((180, 128, 380, 290), 180, 360, fill=hair)
     d.ellipse((232, 262, 254, 282), fill=(35, 25, 20))
     d.ellipse((306, 262, 328, 282), fill=(35, 25, 20))
@@ -338,27 +345,30 @@ LOGO_GLOW.alpha_composite(LOGO)
 
 T_SEK = text_img(SEKOLAH, F_XB(58), tracking=6)
 T_TAJ = gold(text_img(TAJUK, F_B(28), tracking=8))
-T_SIAPA = text_img("SIAPAKAH DIA?", F_XB(56), tracking=8)
 T_PET = [gold(text_img(f"PETUNJUK {i + 1}", F_B(24), tracking=10), glow=False) for i in range(3)]
 F_CLUE = F_M(44)
 NUMS = {n: gold(text_img(str(n), F_XB(250))) for n in (1, 2, 3)}
 
-# siluet
+# siluet (gaya lampu pentas dari belakang)
 SW, SH, SP = 480, 600, 60
-smask = PMASK.resize((SW, SH), Image.BILINEAR)
+smask = PMASK.resize((SW, SH), Image.LANCZOS)
 smask_p = Image.new("L", (SW + 2 * SP, SH + 2 * SP), 0)
 smask_p.paste(smask, (SP, SP))
-rim = ImageChops.subtract(smask_p.filter(ImageFilter.MaxFilter(9)), smask_p).filter(ImageFilter.GaussianBlur(5))
-SIL = Image.new("RGBA", smask_p.size, (90, 140, 255, 0))
-SIL.putalpha(smask_p.filter(ImageFilter.GaussianBlur(30)).point(lambda v: int(v * 0.55)))
-rim_l = Image.new("RGBA", smask_p.size, (255, 205, 120, 0))
-rim_l.putalpha(rim.point(lambda v: min(255, v * 2)))
-SIL.alpha_composite(rim_l)
-fill_l = Image.new("RGBA", smask_p.size, (6, 8, 16, 0))
-fill_l.putalpha(smask_p)
-SIL.alpha_composite(fill_l)
+SMASK_SOFT = smask_p.filter(ImageFilter.GaussianBlur(1.2))
 PORT_S = Image.new("RGB", smask_p.size, (0, 0, 0))
-PORT_S.paste(PORT.resize((SW, SH), Image.BILINEAR), (SP, SP))
+PORT_S.paste(PORT.resize((SW, SH), Image.LANCZOS), (SP, SP))
+_edge = ImageChops.subtract(smask_p, smask_p.filter(ImageFilter.MinFilter(5))).filter(ImageFilter.GaussianBlur(1.4))
+_topw = vgrad(smask_p.size, (255, 255, 255), (40, 40, 40)).convert("L")  # tepi atas lebih terang
+RIM = Image.new("RGBA", smask_p.size, (255, 238, 205, 0))
+RIM.putalpha(ImageChops.multiply(_edge, _topw).point(lambda v: min(255, int(v * 1.8))))
+HALO = Image.new("RGBA", smask_p.size, (255, 205, 130, 0))
+HALO.putalpha(ImageChops.multiply(smask_p.filter(ImageFilter.GaussianBlur(26)), _topw).point(lambda v: int(v * 0.95)))
+BACKLIGHT = radial((235, 190, 135), (3, 5, 14), cy=0.45, sx=0.55, sy=0.75, power=0.55)
+_fr = np.random.default_rng(9)
+FOG = [Image.fromarray((_fr.random((10, 30)) * 255).astype(np.uint8)).resize((W * 2, H), Image.BICUBIC)
+       .filter(ImageFilter.GaussianBlur(40)) for _ in range(2)]
+FOG_COL = Image.new("RGB", (W, H), (150, 165, 205))
+T_SIAPA = gold(text_img("SIAPAKAH DIA?", F_XB(56), tracking=8))
 
 # potret berbingkai
 FP = 40
@@ -435,17 +445,24 @@ def s_clues(t, D):
 
 
 def s_silhouette(t, D):
-    img = SPOT.copy()
-    DUST.draw(img, t, 0.5)
-    q = prog(t, 2.2, D)
-    lay = SIL.copy()
-    if q > 0:
-        bl = PORT_S.filter(ImageFilter.GaussianBlur(lerp(30, 9, q))).convert("RGBA")
-        bl.putalpha(smask_p.point(lambda v: int(v * 0.55 * q)))
-        lay.alpha_composite(bl)
-    paste(img, lay, W / 2, 420, scale=1.0 + 0.08 * ease_io(t / D))
-    pulse = 0.75 + 0.25 * math.sin(t * 5)
-    paste(img, T_SIAPA, W / 2, 95, alpha=prog(t, 0.3, 0.9) * pulse)
+    breathe = 0.92 + 0.08 * math.sin(t * 2.2)
+    img = ImageEnhance.Brightness(BACKLIGHT).enhance(breathe * lerp(0.6, 1.0, ease_out(t / 1.2)))
+    r = rays(W / 2, 300, -90 + 8 * math.sin(t * 0.5), n=22, alpha=22)
+    img.paste(r, (0, 0), r)
+    for i, fog in enumerate(FOG):
+        ox = int((t * (35 + 25 * i)) % W)
+        fm = fog.crop((ox, 0, ox + W, H)).point(lambda v: int(max(0, v - 90) * 0.55))
+        img.paste(FOG_COL, (0, 0), fm)
+    DUST.draw(img, t, 0.9)
+    q = ease_io(prog(t, 2.0, D))
+    fig = PORT_S.filter(ImageFilter.GaussianBlur(lerp(7, 3.5, q)))
+    fig = Image.blend(Image.new("RGB", fig.size, (4, 6, 16)), fig, lerp(0.05, 0.2, q)).convert("RGBA")
+    fig.putalpha(SMASK_SOFT)
+    lay = HALO.copy()
+    lay.alpha_composite(fig)
+    lay.alpha_composite(RIM)
+    paste(img, lay, W / 2, 425, scale=1.0 + 0.06 * ease_io(t / D))
+    paste(img, T_SIAPA, W / 2, 95, alpha=prog(t, 0.4, 1.0) * (0.8 + 0.2 * math.sin(t * 4)))
     letterbox(img)
     return fade(img, prog(t, 0, 0.3))
 
