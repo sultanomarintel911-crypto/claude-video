@@ -10,7 +10,7 @@ import '@fontsource/orbitron/700.css';
 import '@fontsource/orbitron/900.css';
 import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/700.css';
-import {f, FPS, MUSIK_KEMENANGAN_MULA, SHOTS, SIFAT_MASA, T, TEASER} from './data';
+import {f, FPS, KAD, MUSIK_KEMENANGAN_MULA, SHOTS, T, TEASER} from './data';
 import {SceneBuka, SceneKira, SceneReveal, SceneShot, SceneSiluet, SceneTajuk} from './scenes';
 import {SceneBumi, SceneMozek, SceneSah, SceneTeaser, SceneWarp} from './v6';
 
@@ -62,14 +62,13 @@ add(T.fail - 0.3, 'dengung', 0.5);
 add(T.fail + 0.3, 'data', 0.2);
 add(T.fail + 6.8, 'data', 0.2);
 TEASER.forEach(([a], i) => {
-  add(a, i % 2 === 0 ? 'taiko' : 'impact_lembut', i % 2 === 0 ? 0.9 : 0.7);
-  add(a, 'glitch', 0.45);
-  add(a - 0.25, 'whoosh_pendek', 0.4);
+  add(a, i % 2 === 0 ? 'taiko' : 'impact_lembut', i % 2 === 0 ? 0.85 : 0.65);
+  add(a, 'glitch', 0.4);
 });
-SIFAT_MASA.forEach((t) => {
-  add(t - 1.6, 'sedutan', 0.5);
-  add(t + 0.4, 'braam', 0.45);
-  add(t + 0.45, 'imbasan', 0.3);
+KAD.forEach(([a, , teks]) => {
+  add(a - 1.0, 'sedutan', 0.4);
+  add(a, teks.startsWith('SATU') ? 'impact_besar' : 'braam', teks.startsWith('SATU') ? 0.55 : 0.5);
+  add(a + 0.05, 'swish_teks', 0.35);
 });
 // identiti disahkan -> hiperangkasa
 add(T.sah, 'amaran', 0.7);

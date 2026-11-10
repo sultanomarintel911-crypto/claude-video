@@ -17,16 +17,16 @@ export const T = {
   tajukHit: 11.56, // hentakan muzik
   dron: 16.94, // "Di bumi bertuah ini..."
   fail: 16.94 + SWELL * 2, // 27.70 teaser tanpa wajah; sifat pada hentakan 27.70, 33.08, 38.46
-  sah: 41.3, // IDENTITI DISAHKAN
-  warp: 42.45, // lompatan hiperangkasa
-  siluet: 16.94 + SWELL * 5, // 43.84
+  sah: 46.7, // IDENTITI DISAHKAN
+  warp: 47.85, // lompatan hiperangkasa
+  siluet: 16.94 + SWELL * 6, // 49.22
   siluetLen: 7.2,
-  kira: 51.04,
-  reveal: 54.04,
-  montaj: 54.04 + 16 * BEAT, // 61.84
+  kira: 56.42,
+  reveal: 59.42,
+  montaj: 59.42 + 16 * BEAT, // 67.22
   shotLen: 8 * BEAT, // 3.90
-  finale: 54.04 + 16 * BEAT + N_SHOTS * 8 * BEAT, // 96.95
-  end: 54.04 + 16 * BEAT + N_SHOTS * 8 * BEAT + 12.4,
+  finale: 59.42 + 16 * BEAT + N_SHOTS * 8 * BEAT,
+  end: 59.42 + 16 * BEAT + N_SHOTS * 8 * BEAT + 12.4,
 };
 export const MUSIK_KEMENANGAN_MULA = T.reveal - 0.44;
 
@@ -48,13 +48,28 @@ export const DRON_KLIP: Array<[number, number, string, number]> = [
 // Teaser tanpa wajah: hanya sifat, tiada butiran (biar misteri)
 export const SIFAT_MASA = [16.94 + SWELL * 2, 16.94 + SWELL * 3, 16.94 + SWELL * 4]; // 27.70, 33.08, 38.46
 export const SIFAT = ['PEMIMPIN', 'PEJUANG', 'PENCINTA ILMU'];
-// [mula, tamat, fail, mula dalam fail]; jurang di antaranya = potongan hitam ala trailer
+// Gaya trailer: klip -> GELAP -> klip -> GELAP ... [mula, tamat, fail, mula dalam fail]
 export const TEASER: Array<[number, number, string, number]> = [
-  [27.7, 30.9, 'video/tangga.mp4', 0.6],
-  [31.2, 33.08, 'video/bayang_koridor.mp4', 2.6],
-  [33.08, 35.6, 'video/raket.mp4', 1.0],
-  [35.82, 38.46, 'video/tali_kasut.mp4', 0.2],
-  [38.46, 41.1, 'video/sekolah_senja.mp4', 1.6],
+  // blok 1 (hentakan 27.70)
+  [27.7, 29.5, 'video/tangga.mp4', 0.6],
+  [30.3, 32.25, 'video/bayang_koridor.mp4', 2.6],
+  // blok 2 (33.08)
+  [33.08, 34.8, 'video/raket.mp4', 1.0],
+  [35.6, 37.6, 'video/tali_kasut.mp4', 0.2],
+  // blok 3 (38.46)
+  [38.46, 40.3, 'video/sekolah_senja.mp4', 1.6],
+  [41.1, 42.9, 'video/tangga.mp4', 3.4],
+  // blok 4 (43.84): kelipan pantas
+  [43.84, 44.4, 'video/raket.mp4', 3.6],
+  [44.75, 45.3, 'video/bayang_koridor.mp4', 3.6],
+  [45.6, 46.1, 'video/tali_kasut.mp4', 3.4],
+];
+// Kad teks di atas skrin gelap [mula, tamat, teks, kecil?]
+export const KAD: Array<[number, number, string, string]> = [
+  [29.5, 30.3, 'PEMIMPIN', 'SIFAT DIKESAN'],
+  [34.8, 35.6, 'PEJUANG', 'SIFAT DIKESAN'],
+  [40.3, 41.1, 'PENCINTA ILMU', 'SIFAT DIKESAN'],
+  [46.1, 46.7, 'SATU NAMA...', ''],
 ];
 
 // Kotak wajah Thoriq (dinormalkan 0..1 kepada saiz gambar) - zon larangan animasi
@@ -92,7 +107,7 @@ export const SHOTS: Shot[] = [
   {kind: 'statistik'},
   {kind: 'kebangsaan'},
   {kind: 'foto', photo: 'pelantikan', z0: 1.0, z1: 1.18, fx0: 0.5, fx1: 0.56, fy: 0.3, kicker: 'MAJLIS WATIKAH PELANTIKAN PENGAWAS', title: 'Penolong Ketua Murid', sub: 'Ketua Rumah Temenggung · Pengerusi TV PSS', parallax: true, kata: 'PEMIMPIN'},
-  {kind: 'foto', photo: 'kelas', z0: 1.0, z1: 1.9, fx0: 0.37, fx1: 0.62, fy: 0.36, kicker: 'KELUARGA KEDUA', title: '6 Ibnu Majah', sub: 'Majlis Apresiasi Tahun 6 · 2026'},
+  {kind: 'foto', photo: 'kelas', z0: 1.0, z1: 1.9, fx0: 0.37, fx1: 0.62, fy: 0.36, kicker: 'KELUARGA KEDUA', title: '6 Ibnu Majah', sub: 'SK Sultan Omar · 2026'},
   {kind: 'foto', photo: 'graduation', z0: 1.0, z1: 1.2, fx0: 0.36, fx1: 0.33, fy: 0.42, kicker: 'RAJIN USAHA, TANGGA KEJAYAAN', title: 'Perjalanan baru bermula', sub: 'Teruskan melangkah, Thoriq!', parallax: true},
 ];
 

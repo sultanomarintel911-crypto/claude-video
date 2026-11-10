@@ -94,7 +94,7 @@ export const SceneTajuk: React.FC = () => {
           <div style={{width: 160 * slam, height: 2, background: GOLD_GRAD}} />
         </div>
         <div style={{fontFamily: SANS, fontWeight: 500, fontSize: 28, letterSpacing: 5, color: '#cfc6b3', marginTop: 34, opacity: sub}}>
-          MAJLIS APRESIASI TAHUN 6 · SK SULTAN OMAR
+          HARI ANUGERAH KECEMERLANGAN · SK SULTAN OMAR
         </div>
       </AbsoluteFill>
       <Flash at={hit} len={10} max={0.6} />

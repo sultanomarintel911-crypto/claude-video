@@ -3,7 +3,7 @@ import React from 'react';
 import {AbsoluteFill, Easing, Img, OffthreadVideo, random, Sequence, staticFile, useCurrentFrame} from 'remotion';
 import mosaic from './mosaic.json';
 import {ci, easeInOut, easeOut, Embers, Gold, GOLD, GOLD_GRAD, SANS, SERIF, Vignette} from './components';
-import {DRON_KLIP, f, H, NAMA_PENUH, SIFAT, SIFAT_MASA, T, TEASER, W} from './data';
+import {DRON_KLIP, f, H, KAD, NAMA_PENUH, T, TEASER, W} from './data';
 import {Brackets, CYAN, GlitchBands, GlitchText, HexGrid, MONO, ORB, RED, Scanlines, Scramble} from './scifi';
 
 // gred warna sinematik (teal-oren) untuk b-roll
@@ -69,7 +69,7 @@ export const SceneBumi: React.FC = () => {
   );
 };
 
-// ============================================================ TEASER TANPA WAJAH (gaya trailer + HUD rakaman)
+// ============================================================ TEASER TANPA WAJAH (klip -> GELAP -> klip ...)
 export const SceneTeaser: React.FC = () => {
   const fr = useCurrentFrame();
   const t0 = T.fail;
@@ -85,18 +85,20 @@ export const SceneTeaser: React.FC = () => {
         <Sequence key={i} from={L(a)} durationInFrames={L(b) - L(a)}>
           <Klip src={src} from={from} len={L(b) - L(a)} />
           <FlashIn />
+          <FadeOut len={L(b) - L(a)} />
         </Sequence>
       ))}
-      {SIFAT.map((w, i) => {
-        const s = L(SIFAT_MASA[i]) + 12;
-        const e = s + f(2.0);
-        const p = ci(fr, s, s + 14, 0, 1, easeOut) * (1 - ci(fr, e - 10, e));
-        if (p <= 0) return null;
-        const sp = 70 - 44 * ci(fr, s, e, 0, 1, Easing.out(Easing.quad));
+      {KAD.map(([a, b, teks, kecil], i) => {
+        const s0 = L(a);
+        const e0 = L(b);
+        if (fr < s0 || fr >= e0) return null;
+        const p = ci(fr, s0, s0 + 6, 0, 1, easeOut) * (1 - ci(fr, e0 - 5, e0));
+        const sp = 64 - 40 * ci(fr, s0, e0, 0, 1, Easing.out(Easing.quad));
         return (
           <AbsoluteFill key={i} style={{justifyContent: 'center', alignItems: 'center', opacity: p}}>
-            <div style={{fontFamily: MONO, fontSize: 22, letterSpacing: 10, color: CYAN, marginBottom: 14, textShadow: `0 0 10px ${CYAN}`}}>SIFAT DIKESAN</div>
-            <div style={{fontFamily: SANS, fontWeight: 700, fontSize: w.length > 10 ? 104 : 128, letterSpacing: sp, color: '#fff', textShadow: '0 0 30px rgba(255,190,90,0.65), 0 6px 20px rgba(0,0,0,0.9)', marginRight: -sp}}>{w}</div>
+            <Embers n={30} seed={'kad' + i} opacity={0.7} />
+            {kecil ? <div style={{fontFamily: MONO, fontSize: 22, letterSpacing: 10, color: CYAN, marginBottom: 16, textShadow: `0 0 10px ${CYAN}`}}>{kecil}</div> : null}
+            <div style={{fontFamily: SANS, fontWeight: 700, fontSize: teks.length > 10 ? 104 : 128, letterSpacing: sp, marginRight: -sp, color: '#fff', textShadow: '0 0 30px rgba(255,190,90,0.6), 0 6px 20px rgba(0,0,0,0.9)'}}>{teks}</div>
           </AbsoluteFill>
         );
       })}
@@ -130,6 +132,12 @@ export const SceneTeaser: React.FC = () => {
       <Vignette strength={0.6} />
     </AbsoluteFill>
   );
+};
+// pudar ke hitam pada hujung klip
+const FadeOut: React.FC<{len: number}> = ({len}) => {
+  const fr = useCurrentFrame();
+  const o = ci(fr, len - 5, len);
+  return o > 0 ? <AbsoluteFill style={{background: '#000', opacity: o}} /> : null;
 };
 // kilat ringkas pada awal setiap klip (frame tempatan Sequence)
 const FlashIn: React.FC = () => {
