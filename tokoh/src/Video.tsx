@@ -10,8 +10,9 @@ import '@fontsource/orbitron/700.css';
 import '@fontsource/orbitron/900.css';
 import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/700.css';
-import {f, FPS, MUSIK_KEMENANGAN_MULA, SHOTS, SIFAT_MASA, T} from './data';
-import {SceneBuka, SceneDron, SceneFail, SceneFinale, SceneKira, SceneReveal, SceneShot, SceneSiluet, SceneTajuk} from './scenes';
+import {f, FPS, MUSIK_KEMENANGAN_MULA, SHOTS, SIFAT_MASA, T, TEASER} from './data';
+import {SceneBuka, SceneKira, SceneReveal, SceneShot, SceneSiluet, SceneTajuk} from './scenes';
+import {SceneBumi, SceneMozek, SceneSah, SceneTeaser, SceneWarp} from './v6';
 
 // --------------------------------------------------------------- kesan bunyi
 type Sfx = {at: number; file: string; vol: number};
@@ -47,27 +48,35 @@ add(10.75, 'glitch', 0.6);
 add(T.tajukHit - 1.6, 'sedutan', 0.6);
 add(T.tajukHit, 'braam', 0.95);
 add(T.tajukHit, 'impact_lembut', 0.7);
-// 3. di bumi bertuah ini
+// 3. di bumi bertuah ini (dron -> bendera -> bintang)
 add(T.dron - 0.2, 'whoosh_panjang', 0.5);
-add(T.dron + 0.6, 'swish_teks', 0.45);
-add(T.dron + 4.0, 'swish_teks', 0.45);
-add(T.dron + 6.9, 'swish_teks', 0.45);
+add(17.5, 'swish_teks', 0.45);
+add(20.7, 'swish_teks', 0.4);
+add(23.0, 'impact_lembut', 0.45);
+add(23.0, 'whoosh_pendek', 0.45);
+add(25.3, 'whoosh_pendek', 0.45);
+add(25.6, 'swish_teks', 0.45);
 add(T.fail - 2.5, 'cymbal_terbalik', 0.6);
-// 4. fail sulit
-add(T.fail - 0.3, 'dengung', 0.55);
-add(T.fail, 'glitch', 0.7);
-add(T.fail + 0.2, 'hud_boot', 0.5);
-add(T.fail + 0.5, 'data', 0.3);
-add(T.fail + 7.0, 'data', 0.3);
+// 4. teaser tanpa wajah: hentakan trailer pada setiap potongan, senyap pada jurang hitam
+add(T.fail - 0.3, 'dengung', 0.5);
+add(T.fail + 0.3, 'data', 0.2);
+add(T.fail + 6.8, 'data', 0.2);
+TEASER.forEach(([a], i) => {
+  add(a, i % 2 === 0 ? 'taiko' : 'impact_lembut', i % 2 === 0 ? 0.9 : 0.7);
+  add(a, 'glitch', 0.45);
+  add(a - 0.25, 'whoosh_pendek', 0.4);
+});
 SIFAT_MASA.forEach((t) => {
   add(t - 1.6, 'sedutan', 0.5);
-  add(t, 'taiko', 0.9);
-  add(t, 'glitch', 0.6);
-  add(t + 0.1, 'imbasan', 0.35);
+  add(t + 0.4, 'braam', 0.45);
+  add(t + 0.45, 'imbasan', 0.3);
 });
-add(T.siluet - 2.0, 'amaran', 0.7);
-add(T.siluet - 2.0, 'glitch', 0.7);
-add(T.siluet - 0.8, 'glitch', 0.7);
+// identiti disahkan -> hiperangkasa
+add(T.sah, 'amaran', 0.7);
+add(T.sah, 'glitch', 0.8);
+add(T.sah + 0.8, 'glitch', 0.6);
+add(T.warp - 0.15, 'warp', 0.9);
+add(T.siluet - 0.05, 'impact_lembut', 0.7);
 // 5. siluet
 add(T.siluet, 'sub_drop', 0.8);
 add(T.siluet, 'api', 0.7);
@@ -99,6 +108,8 @@ add(T.reveal, 'impact_besar', 0.7);
 add(T.reveal, 'braam', 0.65);
 add(T.reveal, 'sub_drop', 0.5);
 add(T.reveal + 0.1, 'koir', 0.55);
+add(T.reveal + 0.2, 'whoosh_panjang', 0.4);
+for (let k = 0; k < 2; k++) add(T.reveal + (36 + k * 20 - 20) / FPS, 'sedutan', 0.25);
 add(T.reveal + 0.6, 'tepukan', 0.55);
 add(T.reveal + 34 / FPS, 'swish_teks', 0.45);
 add(T.reveal + 41 / FPS, 'swish_teks', 0.4);
@@ -121,12 +132,16 @@ SHOTS.forEach((s, i) => {
   if (s.kind === 'statistik') for (let k = 0; k < 4; k++) for (let j = 0; j < 5; j++) add(m + (8 + k * 7 + j * 5) / FPS, 'blip', 0.45);
   if (s.kind === 'kebangsaan') for (let k = 0; k < 6; k++) add(m + (10 + k * 14.6 * 0.75) / FPS, 'swish_teks', 0.35);
 });
-// 9. penutup
-add(T.finale - 1.6, 'sedutan', 0.5);
-add(T.finale, 'impact_lembut', 0.9);
-add(T.finale, 'braam', 0.6);
-add(T.finale + 0.1, 'koir', 0.45);
-add(T.finale + 0.2, 'tepukan', 0.65);
+// 9. penutup: mozek -> potret hidup -> tahniah
+add(T.finale - 0.1, 'whoosh_panjang', 0.5);
+add(T.finale, 'kepingan', 0.85);
+add(T.finale + 2.0, 'sedutan', 0.5);
+add(T.finale + 3.2, 'impact_lembut', 0.85);
+add(T.finale + 3.2, 'braam', 0.6);
+add(T.finale + 3.3, 'koir', 0.5);
+add(T.finale + 3.9, 'swish_teks', 0.45);
+add(T.finale + 4.2, 'tepukan', 0.65);
+add(T.finale + 9.2, 'whoosh_pendek', 0.4);
 
 // --------------------------------------------------------------- video utama
 export const TokohMurid: React.FC = () => {
@@ -150,8 +165,10 @@ export const TokohMurid: React.FC = () => {
     <AbsoluteFill style={{background: '#000'}}>
       {seq(T.buka, T.tajuk + 0.4, <SceneBuka />)}
       {seq(T.tajuk, T.dron, <SceneTajuk />)}
-      {seq(T.dron, T.dron + T.dronLen, <SceneDron />)}
-      {seq(T.fail, T.siluet, <SceneFail />)}
+      {seq(T.dron, T.fail, <SceneBumi />)}
+      {seq(T.fail, T.sah, <SceneTeaser />)}
+      {seq(T.sah, T.warp, <SceneSah />)}
+      {seq(T.warp, T.siluet, <SceneWarp len={f(T.siluet) - f(T.warp)} />)}
       {seq(T.siluet, T.siluet + T.siluetLen, <SceneSiluet />)}
       {seq(T.kira, T.reveal, <SceneKira />)}
       {seq(T.reveal, T.montaj, <SceneReveal />)}
@@ -165,7 +182,7 @@ export const TokohMurid: React.FC = () => {
         );
       })}
       <Sequence from={f(T.finale)} durationInFrames={endF - f(T.finale)}>
-        <SceneFinale />
+        <SceneMozek dur={endF - f(T.finale)} />
       </Sequence>
 
       {/* muzik */}

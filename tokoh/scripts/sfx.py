@@ -371,4 +371,36 @@ for i, fc in enumerate(np.geomspace(400, 2400, 10)):
 sc *= np.sin(np.pi * t / d)
 save("imbasan.wav", reverb(pan(sc, np.linspace(-0.9, 0.9, len(t))), rt=0.8, wet=0.2), peak=0.5)
 
+
+# ===================================================== v6: hiperangkasa & mozek
+# 32. lompatan hiperangkasa (naik pantas, berakhir dengan hentakan)
+d = 1.6
+t = tt(d)
+up = np.sin(2 * np.pi * np.cumsum(150 * (12 ** (t / d) ** 1.6)) / SR) * (t / d) ** 1.5
+nz = np.zeros_like(t)
+n0 = noise(d, 1)[0]
+for i, fc in enumerate(np.geomspace(300, 8000, 12)):
+    nz += filt(n0, "bandpass", [fc / 1.2, min(fc * 1.2, SR / 2 - 100)]) * np.exp(-((t / d * 11 - i) / 1.8) ** 2)
+wp = (up * 0.5 + nz * 0.8) * np.minimum(1, (d - t) / 0.03)
+x = fit(wp, len(t))
+x[:, -int(0.02 * SR):] *= 0
+save("warp.wav", reverb(x, rt=1.2, wet=0.25)[:, : len(t)], peak=0.75)
+
+# 33. kepingan mozek berterbangan
+d = 3.0
+t = tt(d)
+x = np.zeros((2, len(t)))
+dens = np.interp(t, [0, 0.3, 1.8, 2.6, 3.0], [0, 1, 1, 0.2, 0])
+for _ in range(260):
+    st = rng.uniform(0, d - 0.06)
+    if rng.uniform() > dens[int(st * SR)]:
+        continue
+    ln = rng.uniform(0.03, 0.07)
+    fc = rng.uniform(1500, 5000)
+    c = filt(noise(ln, 1)[0], "bandpass", [fc / 1.5, min(fc * 1.5, 20000)]) * np.sin(np.pi * tt(ln) / ln)
+    i = int(st * SR)
+    x[:, i:i + len(c)] += pan(c * rng.uniform(0.2, 0.7), rng.uniform(-1, 1))
+x += whoosh(d, 200, 2500, 0.5, -0.5, 0.5)[:, : len(t)] * 0.5
+save("kepingan.wav", reverb(x, rt=1.0, wet=0.2)[:, : len(t)], peak=0.6)
+
 print("siap")

@@ -2,11 +2,12 @@ import React from 'react';
 import {AbsoluteFill, Easing, Img, OffthreadVideo, random, staticFile, useCurrentFrame} from 'remotion';
 import {
   Badge, Caption, ci, Confetti, cutLayout, easeInOut, easeOut, Embers, faceUnion, Flash, Glow, Gold, GOLD, GOLD_GRAD,
-  KenBurns, kbLayoutPanel, Letterbox, overlap, pickCaptionSlot, Rays, SANS, SERIF, Stars, Vignette,
+  KenBurns, kbLayout, kbLayoutPanel, Letterbox, overlap, pickCaptionSlot, Rays, SANS, SERIF, Stars, Vignette,
 } from './components';
 import {
   CUT_GRAD, CUT_STAND, f, H, KEBANGSAAN, KELAS, NAMA_1, NAMA_2, NAMA_BIN, NAMA_PENUH, PHOTOS, Rect, Shot, SIFAT, SIFAT_MASA, STATS, T, W,
 } from './data';
+import {NamaZarah, RevealFX} from './v6';
 import {Brackets, CYAN, CYAN_DIM, DataStream, fadeInOut, GlitchBands, GlitchText, HexGrid, HudRings, MONO, ORB, ProgressBar, RadarSweep, RED, Scanlines, Scramble, TypedLine} from './scifi';
 
 const darkBg = (c1 = '#1b1430', c2 = '#030208', at = '50% 50%') => ({background: `radial-gradient(ellipse at ${at}, ${c1} 0%, ${c2} 75%)`});
@@ -104,117 +105,6 @@ export const SceneTajuk: React.FC = () => {
   );
 };
 
-// ============================================================ 3. DI BUMI BERTUAH INI (dron)
-export const SceneDron: React.FC = () => {
-  const fr = useCurrentFrame();
-  const inn = ci(fr, 0, 12);
-  const t1 = ci(fr, f(0.6), f(1.3), 0, 1, easeOut) * (1 - ci(fr, f(3.4), f(3.9)));
-  const lt = ci(fr, f(4.0), f(4.6), 0, 1, easeOut) * (1 - ci(fr, f(6.3), f(6.8)));
-  const t2 = ci(fr, f(6.9), f(7.6), 0, 1, easeOut) * (1 - ci(fr, f(9.3), f(9.9)));
-  return (
-    <AbsoluteFill style={{background: '#000', opacity: inn}}>
-      <OffthreadVideo src={staticFile('video/intro_dron.mp4')} muted />
-      <AbsoluteFill style={{background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.05) 50%), linear-gradient(0deg, rgba(0,0,0,0.6) 0%, transparent 35%)'}} />
-      <AbsoluteFill style={{justifyContent: 'center', alignItems: 'center', opacity: t1}}>
-        <div style={{fontFamily: SERIF, fontWeight: 700, fontSize: 76, color: '#fff', letterSpacing: 3, textShadow: '0 4px 28px rgba(0,0,0,0.9)', transform: `translateY(${16 * (1 - t1)}px)`, filter: `blur(${(1 - t1) * 8}px)`}}>
-          Di bumi bertuah ini...
-        </div>
-      </AbsoluteFill>
-      <div style={{position: 'absolute', left: 110, bottom: 110, display: 'flex', alignItems: 'center', gap: 28, opacity: lt, transform: `translateX(${-50 * (1 - lt)}px)`}}>
-        <Img src={staticFile('img/logo.png')} style={{height: 130, filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.7))'}} />
-        <div>
-          <div style={{width: 80 * lt, height: 3, background: GOLD_GRAD, marginBottom: 12}} />
-          <div style={{fontFamily: SERIF, fontWeight: 800, fontSize: 46, color: '#fff', textShadow: '0 3px 14px rgba(0,0,0,0.9)'}}>Sekolah Kebangsaan Sultan Omar</div>
-          <div style={{fontFamily: SANS, fontWeight: 600, fontSize: 24, letterSpacing: 6, color: GOLD, marginTop: 6, textShadow: '0 2px 10px rgba(0,0,0,0.9)'}}>DUNGUN · TERENGGANU</div>
-        </div>
-      </div>
-      <AbsoluteFill style={{justifyContent: 'center', alignItems: 'center', opacity: t2}}>
-        <div style={{fontFamily: SERIF, fontWeight: 700, fontSize: 76, color: '#fff', letterSpacing: 3, textShadow: '0 4px 28px rgba(0,0,0,0.9)', transform: `translateY(${16 * (1 - t2)}px)`, filter: `blur(${(1 - t2) * 8}px)`}}>
-          ...lahir seorang bintang.
-        </div>
-      </AbsoluteFill>
-      <Vignette strength={0.55} />
-    </AbsoluteFill>
-  );
-};
-
-// ============================================================ 4. FAIL SULIT (sifat sahaja, tiada butiran)
-export const SceneFail: React.FC = () => {
-  const fr = useCurrentFrame();
-  const dur = f(T.siluet - T.fail);
-  const inn = ci(fr, 0, 14);
-  const decP = ci(fr, f(0.5), dur - f(2.2));
-  const ok = fr >= dur - f(2.0);
-  const okP = ci(fr, dur - f(2.0), dur - f(1.7));
-  const glitchOut = ci(fr, dur - f(0.8), dur);
-  const panel = ci(fr, f(0.2), f(0.9), 0, 1, easeOut);
-  // indeks sifat aktif ikut hentakan muzik
-  const local = SIFAT_MASA.map((t) => f(t - T.fail));
-  let k = -1;
-  local.forEach((s, i) => {
-    if (fr >= s) k = i;
-  });
-  const kStart = k >= 0 ? local[k] : 0;
-  const kEnd = k >= 0 ? (k < 2 ? local[k + 1] : dur - f(2.2)) : 0;
-  const wordP = k >= 0 ? fadeInOut(fr, kStart, kEnd - 4, 6) : 0;
-  const wordGlitch = k >= 0 ? Math.max(0, 1 - (fr - kStart) / 10) : 0;
-  return (
-    <AbsoluteFill style={{background: '#010409', opacity: inn * (1 - glitchOut)}}>
-      <Stars n={160} seed="fail" opacity={0.5} />
-      {SIFAT.map((s, i) => {
-        const o = i === k ? fadeInOut(fr, local[i], i < 2 ? local[i + 1] : dur - f(2.2), 10) : 0;
-        return o > 0 ? (
-          <Img key={i} src={staticFile(s.bg)} style={{position: 'absolute', width: W, height: H, opacity: o * 0.45, filter: 'grayscale(1) sepia(1) hue-rotate(155deg) saturate(2.2) brightness(0.8)', transform: `scale(${1.15 - 0.08 * ((fr - local[i]) / 160)})`}} />
-        ) : null;
-      })}
-      <HexGrid opacity={0.14} />
-      {/* tajuk fail */}
-      <div style={{position: 'absolute', left: 140, top: 120, display: 'flex', alignItems: 'center', gap: 22, opacity: panel}}>
-        <div style={{fontFamily: ORB, fontWeight: 700, fontSize: 26, letterSpacing: 8, color: CYAN, textShadow: `0 0 10px ${CYAN}`}}>FAIL TOKOH MURID · 2026</div>
-        <div style={{fontFamily: MONO, fontWeight: 700, fontSize: 20, color: '#fff', background: RED, padding: '4px 12px', letterSpacing: 4, opacity: 0.6 + 0.4 * Math.abs(Math.sin(fr / 8))}}>SULIT</div>
-      </div>
-      {/* kad identiti */}
-      <div style={{position: 'absolute', left: 140, top: 210, width: 760, height: 470, border: `1.5px solid ${CYAN_DIM}`, background: 'linear-gradient(160deg, rgba(98,230,255,0.08), rgba(98,230,255,0.02))', opacity: panel, transform: `translateX(${-40 * (1 - panel)}px)`, boxShadow: '0 0 40px rgba(98,230,255,0.12)'}}>
-        <div style={{position: 'absolute', left: 36, top: 40, width: 220, height: 280, border: `1.5px solid ${CYAN_DIM}`, overflow: 'hidden', background: 'rgba(0,0,0,0.5)'}}>
-          <svg width={220} height={280} viewBox="0 0 220 280">
-            <path d="M110 40c30 0 48 22 48 52s-18 56-48 56-48-26-48-56 18-52 48-52zM20 280c4-70 42-104 90-104s86 34 90 104z" fill="rgba(98,230,255,0.18)" />
-            <text x="110" y="120" textAnchor="middle" fontFamily="Orbitron" fontWeight="900" fontSize="64" fill={ok ? GOLD : CYAN}>?</text>
-          </svg>
-          {Array.from({length: 14}).map((_, i) => (
-            <div key={i} style={{position: 'absolute', left: 0, top: random(`st-${i}-${Math.floor(fr / 2)}`) * 280, width: 220, height: 2, background: 'rgba(98,230,255,0.35)'}} />
-          ))}
-        </div>
-        <div style={{position: 'absolute', left: 290, top: 44, fontFamily: MONO, fontSize: 24, color: '#d8f8ff', lineHeight: '50px'}}>
-          <div><span style={{color: CYAN_DIM}}>NAMA   : </span><Scramble text="██████ █████ ███ ███████" reveal={0} seed="nm" /></div>
-          <div><span style={{color: CYAN_DIM}}>KELAS  : </span><Scramble text="█ ████ █████" reveal={0} seed="kl" /></div>
-          <div><span style={{color: CYAN_DIM}}>STATUS : </span><span style={{color: ok ? GOLD : '#fff'}}>{ok ? 'DISAHKAN' : 'DISULITKAN'}</span></div>
-          <div><span style={{color: CYAN_DIM}}>SIFAT  : </span><span style={{color: GOLD}}>{SIFAT.slice(0, k + 1).map((s) => s.kata).join(' · ') || '...'}</span></div>
-        </div>
-        <ProgressBar x={36} y={360} w={688} p={decP} label="PENYAHSULITAN" color={ok ? GOLD : CYAN} />
-      </div>
-      <DataStream x={1560} y={720} rows={9} seed="fail" opacity={0.4} />
-      {/* sifat - kata besar */}
-      <div style={{position: 'absolute', left: 980, top: 300, width: 860, height: 300, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', opacity: wordP}}>
-        <div style={{fontFamily: MONO, fontSize: 22, letterSpacing: 8, color: CYAN, marginBottom: 18}}>SIFAT DIKESAN</div>
-        {k >= 0 ? (
-          <GlitchText size={SIFAT[k].kata.length > 10 ? 78 : 104} color={GOLD} intensity={0.15 + wordGlitch * 0.85} seed={'w' + k} spacing={6}>
-            {SIFAT[k].kata}
-          </GlitchText>
-        ) : null}
-      </div>
-      {ok ? (
-        <div style={{position: 'absolute', left: 0, width: W, top: 790, display: 'flex', justifyContent: 'center', opacity: okP}}>
-          <GlitchText size={66} color={GOLD} intensity={0.3 + glitchOut} seed="ok" spacing={12}>IDENTITI DISAHKAN</GlitchText>
-        </div>
-      ) : null}
-      <GlitchBands intensity={Math.max(wordGlitch * 0.7, glitchOut, ok && fr < dur - f(1.7) ? 0.7 : 0)} seed="fb" />
-      <Scanlines />
-      <Letterbox />
-      <Vignette strength={0.7} />
-    </AbsoluteFill>
-  );
-};
-
 // ============================================================ 4. SILUET (bangkit dari abu)
 export const SceneSiluet: React.FC = () => {
   const fr = useCurrentFrame();
@@ -293,7 +183,6 @@ export const SceneReveal: React.FC = () => {
   const L = cutLayout(CUT_GRAD, 600, 70, 1010);
   const rise = ci(fr, 0, 28, 0, 1, easeOut);
   const st = (k: number) => ci(fr, 34 + k * 7, 52 + k * 7, 0, 1, easeOut);
-  const shine = ci(fr, 80, 120);
   const faceEx: Rect[] = [L.face];
   const fc = [(L.face[0] + L.face[2]) / 2, (L.face[1] + L.face[3]) / 2];
   return (
@@ -317,18 +206,17 @@ export const SceneReveal: React.FC = () => {
       />
       <div style={{position: 'absolute', left: 1010, top: 170, width: 860}}>
         <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 26, letterSpacing: 12, color: GOLD, opacity: st(0), transform: `translateX(${60 * (1 - st(0))}px)`}}>TOKOH MURID 2026</div>
-        <div style={{opacity: st(1), transform: `translateX(${90 * (1 - st(1))}px)`, marginTop: 14}}>
-          <Gold size={150} spacing={6} shine={shine}>{NAMA_1}</Gold>
-        </div>
-        <div style={{opacity: st(2), transform: `translateX(${90 * (1 - st(2))}px)`}}>
-          <Gold size={150} spacing={6} shine={shine}>{NAMA_2}</Gold>
-        </div>
+        {/* ruang untuk nama (dilukis oleh NamaZarah di bawah) */}
+        <div style={{height: 14 + 156 * 2}} />
         <div style={{fontFamily: SERIF, fontWeight: 700, fontSize: 42, color: '#fff', letterSpacing: 3, marginTop: 10, opacity: st(3), transform: `translateX(${60 * (1 - st(3))}px)`, textShadow: '0 3px 14px rgba(0,0,0,0.8)'}}>{NAMA_BIN}</div>
         <div style={{width: 520 * st(4), height: 2, background: GOLD_GRAD, margin: '30px 0 26px'}} />
         <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, letterSpacing: 6, color: '#fff', opacity: st(4)}}>{KELAS}</div>
         <div style={{fontFamily: SANS, fontWeight: 500, fontSize: 26, letterSpacing: 6, color: '#cbbfa6', marginTop: 8, opacity: st(5)}}>SK SULTAN OMAR · DUNGUN</div>
       </div>
+      <NamaZarah text={NAMA_1} size={150} start={36} x={1010} y={216} />
+      <NamaZarah text={NAMA_2} size={150} start={56} x={1010} y={372} />
       <Confetti start={2} exclude={faceEx} n={170} rain={110} />
+      <RevealFX cx={fc[0]} cy={fc[1]} flareY={600} />
       <Flash at={0} len={18} />
       <Vignette strength={0.55} />
     </AbsoluteFill>
@@ -342,6 +230,47 @@ const LightLeak: React.FC = () => {
   return o > 0 ? (
     <AbsoluteFill style={{opacity: o * 0.75, background: 'radial-gradient(ellipse at 15% 40%, rgba(255,190,110,0.95) 0%, rgba(255,120,40,0.4) 35%, transparent 70%)', mixBlendMode: 'screen'}} />
   ) : null;
+};
+
+// Parallax 2.5D: latar (Thoriq dipadam) bergerak perlahan, Thoriq bergerak lebih -> rasa kedalaman.
+// Perkataan besar diletakkan DI BELAKANG Thoriq, jadi wajah tidak pernah dilitupi.
+const Parallax: React.FC<{P: (typeof PHOTOS)[string]; s: Extract<Shot, {kind: 'foto'}>; dur: number}> = ({P, s, dur}) => {
+  const fr = useCurrentFrame();
+  const p = ci(fr, 0, dur, 0, 1, easeInOut);
+  const L = kbLayout(P.iw, P.ih, P.face, s.z0 + (s.z1 - s.z0) * p, (s.fx0 + (s.fx1 - s.fx0) * p) * W, s.fy * H);
+  const fcx = (L.rect[0] + L.rect[2]) / 2;
+  const fcy = (L.rect[1] + L.rect[3]) / 2;
+  const dir = s.fx1 >= s.fx0 ? 1 : -1;
+  const bgShift = -dir * 28 * p;
+  const fgScale = 1.0 + 0.07 * p;
+  const fgShift = dir * 22 * p;
+  const name = P.src.replace('img/', '').replace('.jpg', '');
+  const word = s.kata;
+  const wp = ci(fr, 6, 22, 0, 1, easeOut);
+  const wsize = word ? Math.min(330, 1750 / (word.length * 0.78)) : 0;
+  return (
+    <AbsoluteFill style={{overflow: 'hidden', background: '#000'}}>
+      <Img src={staticFile(`img/bg_${name}.jpg`)} style={{position: 'absolute', left: L.left + bgShift, top: L.top, width: L.fw, height: L.fh, filter: 'brightness(0.82) saturate(0.95)'}} />
+      {word ? (
+        <div style={{position: 'absolute', left: 0, width: W, top: fcy + 40 - wsize * 0.55, display: 'flex', justifyContent: 'center', opacity: 0.92 * wp, transform: `translateX(${-dir * 40 * p}px) scale(${1.15 - 0.15 * wp})`}}>
+          <Gold size={wsize} spacing={wsize * 0.06}>{word}</Gold>
+        </div>
+      ) : null}
+      <Img
+        src={staticFile(`img/fg_${name}.png`)}
+        style={{
+          position: 'absolute',
+          left: L.left + fgShift,
+          top: L.top,
+          width: L.fw,
+          height: L.fh,
+          transformOrigin: `${fcx - L.left}px ${fcy - L.top}px`,
+          transform: `scale(${fgScale})`,
+          filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.55))',
+        }}
+      />
+    </AbsoluteFill>
+  );
 };
 
 const ShotFoto: React.FC<{s: Extract<Shot, {kind: 'foto'}>; dur: number}> = ({s, dur}) => {
@@ -358,13 +287,17 @@ const ShotFoto: React.FC<{s: Extract<Shot, {kind: 'foto'}>; dur: number}> = ({s,
   const bandTop = slot.v === 'top';
   return (
     <AbsoluteFill style={{transform: `scale(${punch})`}}>
-      <KenBurns src={P.src} iw={P.iw} ih={P.ih} face={P.face} dur={dur} z0={s.z0} z1={s.z1} fx0={s.fx0} fx1={s.fx1} fy={s.fy} />
+      {s.parallax ? (
+        <Parallax P={P} s={s} dur={dur} />
+      ) : (
+        <KenBurns src={P.src} iw={P.iw} ih={P.ih} face={P.face} dur={dur} z0={s.z0} z1={s.z1} fx0={s.fx0} fx1={s.fx1} fy={s.fy} />
+      )}
       <AbsoluteFill
         style={{
           background: `linear-gradient(${bandTop ? 180 : 0}deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.35) 28%, transparent 48%), linear-gradient(${slot.side === 'left' ? 90 : 270}deg, rgba(0,0,0,0.45) 0%, transparent 45%)`,
         }}
       />
-      {s.badge ? <Badge text={s.badge} x={badgeX} y={badgeY} /> : null}
+      {s.badge && !s.parallax ? <Badge text={s.badge} x={badgeX} y={badgeY} /> : null}
       <Caption slot={slot} kicker={s.kicker} title={s.title} sub={s.sub} />
     </AbsoluteFill>
   );
