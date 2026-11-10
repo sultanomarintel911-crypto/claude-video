@@ -29,6 +29,7 @@ PETUNJUK = [
     "Dia disayangi guru dan rakan-rakan...",
 ]
 MONTAJ = ["Johan Pidato Peringkat Negeri", "Ketua Pengawas Sekolah"]
+SILUET_GAYA = "asap"  # "asap" (bangkit dari abu) atau "lampu" (lampu pentas dari belakang)
 
 FONT_DIR = "/usr/share/fonts/opentype/inter/"
 
@@ -467,6 +468,149 @@ def s_silhouette(t, D):
     return fade(img, prog(t, 0, 0.3))
 
 
+# ------------------------------------------------------------------ SILUET: ASAP & ABU
+SIL_ASAP_D = 6.0
+FORM_A, FORM_B = 0.6, 3.6  # masa badan terbentuk daripada abu
+
+
+def fractal(h, w, seed, octaves=(3, 6, 12, 24, 48), pers=0.55):
+    r = np.random.default_rng(seed)
+    out, amp, tot = np.zeros((h, w), np.float32), 1.0, 0.0
+    for o in octaves:
+        gh = max(2, int(o * h / w)) + 2
+        small = Image.fromarray((r.random((gh, o + 2)) * 255).astype(np.uint8))
+        out += np.asarray(small.resize((w, h), Image.BICUBIC), np.float32) / 255 * amp
+        tot += amp
+        amp *= pers
+    out /= tot
+    return (out - out.min()) / (out.max() - out.min())
+
+
+def smoothstep(a, b, x):
+    x = np.clip((x - a) / (b - a), 0, 1)
+    return x * x * (3 - 2 * x)
+
+
+def th_at(t):
+    return lerp(1.03, -0.03, ease_io(prog(t, FORM_A, FORM_B)))
+
+
+SMOKE = [fractal(1500, W, s) for s in (21, 22, 23)]
+_yy = np.linspace(0, 1, H, dtype=np.float32)[:, None]
+SMOKE_PROF = (0.3 + 0.7 * _yy ** 1.3)
+WARM = np.clip((_yy - 0.35) / 0.65, 0, 1) ** 1.6
+SMOKE_COOL = np.array((112, 106, 112), np.float32)
+SMOKE_HOT = np.array((255, 125, 45), np.float32)
+SMOKE_BG = np.asarray(radial((150, 75, 30), (4, 3, 6), cy=0.55, sx=0.62, sy=0.85, power=0.6), np.float32)
+SMOKE_CTR = np.asarray(radial((255, 255, 255), (70, 70, 70), cy=0.5, sx=0.8, sy=1.0, power=0.9).convert("L"), np.float32)[..., None] / 255
+
+_fh, _fw = smask_p.height, smask_p.width
+FIG_M = np.asarray(SMASK_SOFT, np.float32) / 255
+_key = 0.55 * fractal(_fh, _fw, 31, octaves=(4, 8, 16, 32, 64)) + 0.45 * np.linspace(0, 1, _fh)[:, None]
+FIG_KEY = (_key - _key.min()) / (_key.max() - _key.min())
+FIG_RIM = np.asarray(_edge, np.float32) / 255
+FIG_PORT = np.asarray(PORT_S.filter(ImageFilter.GaussianBlur(4)), np.float32)
+FIG_X0, FIG_Y0 = W / 2 - _fw / 2, 425 - _fh / 2
+
+
+def _make_converge(n=170, seed=41):
+    r = random.Random(seed)
+    ys, xs = np.nonzero(np.asarray(smask_p) > 160)
+    tgrid = np.linspace(0, FORM_B + 0.5, 400)
+    ths = np.array([th_at(x) for x in tgrid])
+    out = []
+    for _ in range(n):
+        i = r.randrange(len(xs))
+        tx, ty = xs[i], ys[i]
+        ta = float(tgrid[np.argmax(ths <= FIG_KEY[ty, tx])])
+        ang = math.radians(r.uniform(15, 165))
+        rad = r.uniform(180, 480)
+        out.append((FIG_X0 + tx, FIG_Y0 + ty, math.cos(ang) * rad, math.sin(ang) * rad,
+                    ta, r.uniform(0.7, 1.2), r.choice((-1, 1)) * r.uniform(30, 90), r.uniform(1.4, 2.8)))
+    return out
+
+
+CONVERGE = _make_converge()
+_er = random.Random(55)
+EMBERS = [(_er.gauss(W / 2, 330), _er.uniform(0, H * 1.6), _er.uniform(45, 150), _er.uniform(0, 6.28),
+           _er.uniform(1.0, 2.8), _er.uniform(15, 45)) for _ in range(130)]
+ASH = [(_er.uniform(0, W), _er.uniform(0, H), _er.uniform(-25, 25), _er.uniform(-40, -10), _er.uniform(0, 6.28),
+        _er.uniform(2, 4.5)) for _ in range(55)]
+
+
+def ember_col(b):
+    return (int(255 * b), int(lerp(110, 220, b) * b), int(50 * b))
+
+
+def s_sil_asap(t, D):
+    # asap berkepul naik
+    ln = []
+    for k, sp in enumerate((55, 32, 85)):
+        o = int(t * sp) + k * 90
+        ln.append(SMOKE[k][o:o + H])
+    dens = smoothstep(0.22, 0.7, 0.5 * ln[0] + 0.3 * ln[1] + 0.2 * ln[2]) * SMOKE_PROF
+    dens *= lerp(0.55, 1.0, ease_out(t / 1.5))
+    warm = WARM * (0.75 + 0.25 * math.sin(t * 3.1) * math.sin(t * 1.7))
+    col = SMOKE_COOL * (1 - warm[..., None]) + SMOKE_HOT * warm[..., None]
+    lit = (0.55 + 0.9 * ln[2][..., None]) * SMOKE_CTR
+    a = (dens * 0.92)[..., None]
+    frame = SMOKE_BG * (1 - a) + np.clip(col * lit, 0, 255) * a
+
+    # badan terbentuk daripada abu
+    th = th_at(t)
+    vis = smoothstep(th, th + 0.02, FIG_KEY) * FIG_M
+    band = np.exp(-((FIG_KEY - th) / 0.035) ** 2) * FIG_M * (1.0 if th > -0.02 else 0.0)
+    q = ease_io(prog(t, 4.3, D))
+    body = np.array((9, 6, 6), np.float32) * (1 - q * 0.15) + FIG_PORT * (0.07 * q)
+    rimc = np.array((255, 140, 50), np.float32) * (FIG_RIM * (0.5 + 0.5 * vis))[..., None]
+    glow = np.array((255, 190, 90), np.float32) * band[..., None] * 1.4
+    fa = np.clip(np.maximum(vis, band), 0, 1)[..., None]
+    fig_rgb = np.clip(body * vis[..., None] + rimc * vis[..., None] + glow, 0, 255)
+    x0, y0 = int(FIG_X0), int(FIG_Y0)
+    hh = min(_fh, H - y0)
+    region = frame[y0:y0 + hh, x0:x0 + _fw]
+    region[:] = region * (1 - fa[:hh]) + fig_rgb[:hh] * fa[:hh]
+    # asap nipis di hadapan badan
+    fd = (smoothstep(0.4, 0.85, ln[1]) * SMOKE_PROF * 0.55)[..., None]
+    frame = frame * (1 - fd) + np.clip(col * lit, 0, 255) * fd
+    img = Image.fromarray(frame.astype(np.uint8))
+
+    # abu berterbangan
+    d = ImageDraw.Draw(img)
+    for x0_, y0_, vx, vy, ph, sz in ASH:
+        x, y = (x0_ + vx * t + 12 * math.sin(ph + t)) % W, (y0_ + vy * t) % H
+        f = math.cos(ph + 4 * t)
+        g = int(lerp(70, 140, abs(f)))
+        d.polygon([(x - sz, y), (x, y - sz * f * 0.6), (x + sz, y), (x, y + sz * f * 0.6)], fill=(g, g - 5, g - 8))
+
+    # bara api (tambahan cahaya)
+    P = Image.new("RGB", (W, H), (0, 0, 0))
+    pd = ImageDraw.Draw(P)
+    for x0_, y0_, vy, ph, sz, sw in EMBERS:
+        y = (y0_ - vy * t) % (H * 1.6) - H * 0.3
+        x = x0_ + sw * math.sin(ph + t * 1.3)
+        b = clamp(0.45 + 0.55 * math.sin(ph * 3 + t * 9) * math.sin(ph + t * 4)) * clamp(y / H + 0.2)
+        if b > 0.05:
+            pd.ellipse((x - sz, y - sz, x + sz, y + sz), fill=ember_col(b))
+    for tx, ty, dx, dy, ta, tr, sw, sz in CONVERGE:
+        u = (t - (ta - tr)) / tr
+        if 0 <= u <= 1:
+            e = u * u
+            px = tx + dx * (1 - e) + sw * math.sin(math.pi * u)
+            py = ty + dy * (1 - e)
+            b = 0.4 + 0.6 * u
+            pd.ellipse((px - sz, py - sz, px + sz, py + sz), fill=ember_col(b))
+    G = P.filter(ImageFilter.GaussianBlur(5)).point(lambda v: min(255, v * 3))
+    img = ImageChops.add(ImageChops.add(img, P), G)
+
+    paste(img, T_SIAPA, W / 2, 95, alpha=prog(t, FORM_B - 0.2, FORM_B + 0.5) * (0.8 + 0.2 * math.sin(t * 4)))
+    letterbox(img)
+    return fade(img, prog(t, 0, 0.35))
+
+
+SIL_SCENE = (SIL_ASAP_D, s_sil_asap) if SILUET_GAYA == "asap" else (5.0, s_silhouette)
+
+
 def s_count(t, D):
     n = 3 - min(2, int(t))
     u = t - int(t)
@@ -540,7 +684,7 @@ def s_end(t, D):
     return fade(img, 1 - prog(t, D - 1.0, D))
 
 
-SCENES = [(3.6, s_open), (CLUE_D * 3, s_clues), (5.0, s_silhouette), (3.0, s_count),
+SCENES = [(3.6, s_open), (CLUE_D * 3, s_clues), SIL_SCENE, (3.0, s_count),
           (5.5, s_reveal), (4.4, s_montage), (3.6, s_end)]
 STARTS = np.cumsum([0] + [d for d, _ in SCENES]).tolist()
 TOTAL = STARTS[-1]
@@ -560,6 +704,9 @@ def build_audio(path):
         n = min(len(sig), n_total - i)
         if n > 0:
             buf[i:i + n] += sig[:n] * gain
+
+    def prog_arr(x, a, b):
+        return np.clip((x - a) / (b - a), 0, 1)
 
     def lp(x, win):
         return np.convolve(x, np.ones(win) / win, "same")
@@ -604,11 +751,27 @@ def build_audio(path):
             if PETUNJUK[k][c] != " ":
                 add(hp_noise(0.012) * np.exp(-tt(0.012) * 350), t0 + 0.35 + 1.35 * c / n, 0.25)
 
-    # degupan jantung
-    for i in range(5):
-        b = s_sil + 0.3 + i * 0.95
-        add(boom(0.3, 95, 45, 16), b, 0.9)
-        add(boom(0.3, 85, 42, 18), b + 0.24, 0.6)
+    if SILUET_GAYA == "asap":
+        d = SIL_ASAP_D
+        tw = tt(d)
+        rumble = lp(nr.standard_normal(len(tw)), 300)
+        rumble = rumble / np.abs(rumble).max() * np.minimum(1, tw / 1.0) * (0.5 + 0.5 * prog_arr(tw, 0, FORM_B))
+        add(rumble, s_sil, 0.9)
+        add(boom(2.0, 60, 35, 1.8), s_sil + 0.2, 0.6)
+        for _ in range(int(d * 28)):  # api berdetak
+            add(hp_noise(0.006) * np.exp(-tt(0.006) * 600), s_sil + nr.uniform(0, d), nr.uniform(0.05, 0.3))
+        wd = 1.3
+        x = nr.standard_normal(int(wd * SR))
+        tw = tt(wd)
+        add((lp(x, 40) * (1 - tw / wd) + lp(x, 4) * (tw / wd)) * np.sin(np.pi * tw / wd) ** 2, s_sil + FORM_B - 1.0, 0.7)
+        for b in (FORM_B + 0.5, FORM_B + 1.4):
+            add(boom(0.3, 95, 45, 16), s_sil + b, 0.9)
+            add(boom(0.3, 85, 42, 18), s_sil + b + 0.24, 0.6)
+    else:
+        for i in range(5):
+            b = s_sil + 0.3 + i * 0.95
+            add(boom(0.3, 95, 45, 16), b, 0.9)
+            add(boom(0.3, 85, 42, 18), b + 0.24, 0.6)
 
     # kiraan detik + gendang
     for i in range(3):
