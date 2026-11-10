@@ -25,7 +25,6 @@ add(9.55, 'whoosh_panjang', 0.6);
 add(T.tajukHit - 1.6, 'sedutan', 0.6);
 add(T.tajukHit, 'braam', 0.95);
 add(T.tajukHit, 'impact_lembut', 0.7);
-add(T.tajukHit + 0.05, 'kilauan', 0.55);
 add(T.tajuk + 5.2, 'swish_teks', 0.55);
 add(T.tajuk + 5.2, 'sub_drop', 0.6);
 // petunjuk: dengung tegang + sedutan -> taiko pada kata kunci
@@ -39,9 +38,7 @@ CLUES.forEach((c, i) => {
   }
   add(s + 2.1 - 1.6, 'sedutan', 0.5);
   add(s + 2.1, 'taiko', 0.9);
-  add(s + 2.15, 'kilauan', 0.4);
   if (c.extra === 'kaunter') for (let k = 0; k < 6; k++) add(s + 2.2 + k * 0.18, 'blip', 0.7);
-  if (c.extra === 'bintang') for (let k = 0; k < 4; k++) add(s + 2.5 + (k * 7) / FPS, 'pop_bintang', 0.7);
 });
 // siluet
 add(T.siluet, 'sub_drop', 0.8);
@@ -72,12 +69,10 @@ add(T.reveal - 0.44 - 3.0, 'drumroll', 0.85);
 add(T.reveal, 'impact_besar', 0.7);
 add(T.reveal, 'braam', 0.65);
 add(T.reveal, 'sub_drop', 0.5);
-add(T.reveal + 0.05, 'kilauan', 0.7);
 add(T.reveal + 0.1, 'koir', 0.55);
 add(T.reveal + 0.6, 'tepukan', 0.55);
 add(T.reveal + 34 / FPS, 'swish_teks', 0.45);
 add(T.reveal + 41 / FPS, 'swish_teks', 0.4);
-add(T.reveal + 2.7, 'kilauan', 0.35);
 // montaj
 SHOTS.forEach((s, i) => {
   const m = T.montaj + i * T.shotLen;
@@ -86,7 +81,6 @@ SHOTS.forEach((s, i) => {
   if (s.kind === 'foto' || s.kind === 'video') add(m + 0.3, 'swish_teks', 0.35);
   if (s.kind === 'foto' && s.badge) {
     add(m + 26 / FPS, 'impact_lembut', 0.55);
-    add(m + 30 / FPS, 'kilauan', 0.45);
   }
   if (s.kind === 'statistik') for (let k = 0; k < 4; k++) for (let j = 0; j < 5; j++) add(m + (8 + k * 7 + j * 5) / FPS, 'blip', 0.45);
   if (s.kind === 'kebangsaan') for (let k = 0; k < 6; k++) add(m + (10 + k * 14.6 * 0.75) / FPS, 'swish_teks', 0.35);
@@ -96,9 +90,7 @@ add(T.finale - 1.6, 'sedutan', 0.5);
 add(T.finale, 'impact_lembut', 0.9);
 add(T.finale, 'braam', 0.6);
 add(T.finale + 0.1, 'koir', 0.45);
-add(T.finale + 0.05, 'kilauan', 0.7);
 add(T.finale + 0.2, 'tepukan', 0.65);
-add(T.finale + 1.4, 'kilauan', 0.4);
 
 // --------------------------------------------------------------- video utama
 export const TokohMurid: React.FC = () => {
