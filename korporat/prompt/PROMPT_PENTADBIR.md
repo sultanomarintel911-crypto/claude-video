@@ -1,357 +1,383 @@
-# Pakej Prompt: Perkenalan Pentadbir SKeSO (gaya "Objek Geganti")
+# Pakej Prompt: Perkenalan Barisan Pentadbir SKeSO
 
-Rujukan gaya: video Terafecta (Digital Luminaries Awards). Satu objek emblem 3D emas-hitam
-terbang dari seorang ke seorang dan dari lokasi ke lokasi. Setiap watak menangkap, memegang
-atau menghantar objek itu, dan nama mereka muncul sebagai lower-third emas.
+Setiap pentadbir mendapat **2 syot (±8 s)** yang sesuai dengan watak dan portfolio masing-masing:
+- **Syot A:** watak dan perkenalan
+- **Syot B:** aksi portfolio
 
-Untuk SKeSO, objek geganti ialah **"Teras SKeSO"**: sfera hitam-emas dengan emblem atom
-*SKeSO Be Excellent* bercahaya biru siber.
+Setiap syot ada dua bahagian:
+1. **Prompt imej permulaan.** Jana gambar dulu, dengan helaian karakter dilampirkan.
+2. **Prompt JSON video.** Image-to-video, guna imej permulaan tadi.
 
----
-
-## 0. Aliran kerja (ikut urutan)
-
-| Langkah | Alat dicadangkan | Hasil |
-|---|---|---|
-| 1. Jana **Teras SKeSO** sekali sahaja | Nano Banana (Gemini), Midjourney | `REF_TERAS.png`, latar putih/hitam |
-| 2. Jana **bingkai pertama** setiap syot, dengan lampiran helaian karakter | Nano Banana / Flux Kontext (paling konsisten wajah) | `GB_A_mula.png` dan lain-lain |
-| 3. (Pilihan) Jana **bingkai akhir** untuk syot hand-off | Sama | `GB_A_akhir.png` |
-| 4. **Image-to-video** guna prompt JSON | Veo 3, Kling 2.x, Runway Gen-4 | klip 5–8 s |
-| 5. Sunting, lower-third, gred warna, SFX | Saya (Remotion) / CapCut / Premiere | babak siap |
-
-**Peraturan konsistensi:**
-- Setiap prompt gambar **mesti dilampirkan**: helaian karakter pentadbir + `REF_TERAS.png` + gambar murid (jika ada).
-- Gunakan **BLOK GAYA GLOBAL** yang sama di setiap prompt. Jangan ubah.
-- Satu syot = satu aksi utama. Klip pendek (5–8 s) lebih stabil.
-- Teks nama **jangan dijana AI**. Saya tambah sebagai lower-third semasa suntingan.
+**Nota panel hologram:** semua panel dan skrin dibiarkan **kelabu gelap dan kosong**. Kandungan
+sebenar (SKeSO App, Google Classroom, data DELIMa, lencana Showcase dan lain-lain) akan saya
+masukkan semasa suntingan. Hasilnya tulisan tepat dan tidak herot.
 
 ---
 
-## 1. Blok tetap (salin ke setiap prompt)
+## Blok tetap (salin ke setiap prompt imej)
 
-**BLOK GAYA GLOBAL**
-```
-cinematic hyperreal photograph, shot on ARRI Alexa 35, anamorphic 40mm lens, golden-hour
-sunlight, teal-and-gold colour grade, soft volumetric haze, shallow depth of field,
-subtle film grain, Malaysian school setting in Dungun Terengganu, 16:9, 4K
-```
+**GAYA**
+> Foto sinematik fotorealistik 16:9, kanta 35–50mm, kedalaman medan cetek, cahaya semula jadi yang lembut, gred warna biru-teal dan hangat, butiran kulit semula jadi, suasana sekolah rendah di Dungun, Terengganu.
 
-**BLOK TERAS SKeSO** (objek geganti)
-```
-the "SKeSO Core": a floating glossy black sphere (about 25 cm) wrapped in polished gold
-rings, front face embossed with the SKeSO atom emblem (school crest at the centre, three
-electron orbits), emblem glowing cyan-blue, thin gold light trail behind it, levitating
-by itself — match REF_TERAS.png exactly
-```
-
-**PAKAIAN** (isi ikut helaian karakter; ini andaian daripada video lama)
-- Pentadbir lelaki: songkok hitam, sut gelap, kemeja putih, tali leher merah, tag nama.
-- Murid lelaki: kemeja putih, seluar biru tua, tali leher hijau sekolah.
+**PAKAIAN** (tukar ikut helaian karakter sebenar)
+- Pentadbir: ikut `[NAMA]_charsheet`: wajah, cermin mata, songkok, sut, tali leher, tanda nama.
+- Murid lelaki: kemeja putih, seluar biru tua, tali leher sekolah.
 - Murid perempuan: baju kurung putih, kain biru tua, tudung putih.
 - Murid sukan: baju-T ungu "PE", seluar trek gelap.
 
-**NEGATIF (semua prompt)**
-```
-no text, no captions, no watermark, no extra fingers, no distorted face, no logo other than
-the SKeSO emblem, no cartoon style, not plastic skin
-```
+**NEGATIF**
+> Tiada tulisan, tiada sari kata, tiada tera air, tiada logo tambahan, jari tidak herot, wajah tidak berubah, bukan gaya kartun.
 
 ---
 
-## 2. Senarai syot
+## 1. GURU BESAR: Encik Rusmadi bin Abdullah
+*Watak: peneraju visi digital, tenang, berwibawa.*
 
-| # | Pentadbir | Lokasi | Tema portfolio | Tempoh |
-|---|---|---|---|---|
-| 00 | Pembuka | Langit atas sekolah → gerbang 1956 | Teras dilancarkan | 6 s |
-| 1A/1B | **GB:** Rusmadi bin Abdullah | Gerbang 1956 → Microsoft Digital Hub | Peneraju visi digital, Showcase School | 8 + 6 s |
-| 2A/2B | **PK Pentadbiran:** Tn Hj Mohd Shffri @ Hafizzudin b. Abu Bakar | Be Excellent Hub | Pengurusan pintar, SKeSO App, jadual | 7 + 6 s |
-| 3A/3B | **PK HEM:** Razulddin bin Mustaffa | Dataran perhimpunan | Kebajikan murid, e-rekod kehadiran | 7 + 6 s |
-| 4A/4B | **PK Kokurikulum:** Abu Seman bin Mat Salleh | Padang sekolah | Sukan, dron, analisis teknik | 7 + 6 s |
-| 5A/5B | **PK Pendidikan Khas:** Baharudin bin Ismail | Hub Digital PPKI | Inklusif, iPad, Chromebook | 7 + 6 s |
-| 99 | Penutup | Gerbang 1956, senja | Kelima-lima bersama, Teras meletup jadi logo | 7 s |
+### 1A · Berjalan di koridor
+**Imej permulaan**
+> [GAYA] Syot sederhana luas. Guru Besar (rujuk GB_charsheet) berjalan di koridor sekolah bertiang kuning pada waktu pagi, cahaya matahari masuk dari sisi. Di belakangnya pintu bilik bertanda "Microsoft Digital Hub". Riak wajah yakin dan mesra. Lampirkan: GB_charsheet, foto koridor sekolah.
 
-Jumlah ±85 s mentah. Selepas suntingan menjadi ±55–65 s.
-
----
-
-## 3. Prompt setiap syot
-
-### 00 · PEMBUKA: Teras dilancarkan
-
-**Gambar (bingkai pertama)**
-```
-[BLOK GAYA GLOBAL] Aerial drone view at golden hour above SK Sultan Omar Dungun, red-roofed
-school blocks and green field below, wispy clouds. High in the sky the [BLOK TERAS SKeSO]
-streaks downward like a small comet with a long gold-and-cyan light trail.
-Attach: REF_TERAS.png, school drone still (korporat 0:18).
-```
-**Video (JSON)**
 ```json
 {
-  "shot_id": "00_pembuka",
-  "duration_s": 6,
-  "start_frame": "00_mula.png",
-  "action": "The SKeSO Core descends fast from the sky over the school, leaving a gold-cyan trail, then dives toward the school entrance arch.",
-  "camera": {"movement": "drone tilt-down then fast push-in following the orb", "lens": "24mm", "speed": "accelerating", "stabilisation": "smooth gimbal"},
-  "lighting": "golden hour, sun flare behind clouds",
-  "style": "cinematic hyperreal, teal and gold grade",
-  "physics": "orb keeps the same size and emblem, trail stays consistent",
-  "audio_hint": "whoosh + deep impact on arrival",
-  "negative": "no text, no extra objects, no logo change"
+  "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan.",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, cermin mata, songkok, pakaian dan tanda nama Guru Besar serta susun atur koridor.",
+  "urutan": [
+    {
+      "masa": "0–3 saat",
+      "aksi": "Guru Besar berjalan perlahan ke arah kamera di sepanjang koridor dengan langkah yakin. Cahaya pagi menyinari sisi wajahnya.",
+      "kamera": "Kamera bergerak ke belakang secara perlahan (dolly mundur), mengekalkan jarak yang sama dengan Guru Besar."
+    },
+    {
+      "masa": "3–5 saat",
+      "aksi": "Guru Besar berhenti, menoleh sedikit ke arah pintu Digital Hub, kemudian kembali memandang lensa.",
+      "kamera": "Kamera berhenti dan melengkung sedikit ke kanan untuk menampakkan pintu di belakangnya."
+    },
+    {
+      "masa": "5–8 saat",
+      "aksi": "Guru Besar tersenyum kecil dan mengangguk sekali dengan berwibawa. Tangan dirapatkan di hadapan.",
+      "kamera": "Tolak masuk perlahan ke syot separuh badan. Tahan komposisi akhir selama dua saat."
+    }
+  ],
+  "suasana": "Tenang, berwibawa, inspirasi."
 }
 ```
 
----
+### 1B · Di bilik Guru Besar, memandang masa depan
+**Imej permulaan**
+> [GAYA] Bilik Guru Besar yang kemas, tingkap besar menghadap padang sekolah. Guru Besar berdiri di tepi tingkap memegang tablet. Di atas meja ada piala dan bingkai sijil (kabur). Lampirkan: GB_charsheet.
 
-### 1A · GURU BESAR: menerima Teras di gerbang 1956
-
-**Gambar**
-```
-[BLOK GAYA GLOBAL] Medium-wide shot. Encik Rusmadi bin Abdullah, the headmaster (match
-GB_charsheet.png: face, glasses, build), wearing [PAKAIAN pentadbir lelaki], stands confidently
-under the school entrance arch marked "1956" at sunset. He raises his right hand palm-up as
-the [BLOK TERAS SKeSO] arrives and hovers just above his palm, gold sparks around it.
-Calm, proud, visionary expression.
-Attach: GB_charsheet.png, REF_TERAS.png, arch photo (korporat 0:28).
-```
-**Video (JSON)**
 ```json
 {
-  "shot_id": "1A_gb_terima",
-  "duration_s": 8,
-  "start_frame": "1A_mula.png",
-  "subject": "Headmaster Encik Rusmadi bin Abdullah (keep identity from reference)",
-  "action": "The orb glides in and settles above his palm; he looks at it, then lifts his gaze to camera with a confident smile.",
-  "camera": {"movement": "slow arc right 30 degrees with gentle push-in to medium close-up", "lens": "50mm anamorphic", "speed": "slow", "focus": "rack focus from orb to face"},
-  "lighting": "warm backlight sunset, rim light on shoulders",
-  "style": "cinematic hyperreal, teal and gold",
-  "negative": "no face morphing, no extra hands, no text"
-}
-```
-
-### 1B · GURU BESAR: Microsoft Digital Hub (hand-off ke PK Pentadbiran)
-
-**Gambar**
-```
-[BLOK GAYA GLOBAL, interior variant: cool daylight mixed with warm practicals] Inside the
-Microsoft Digital Hub: white walls, blue accents, round tables, Minecraft Education poster.
-The headmaster (GB_charsheet.png) stands beside a large touchscreen showing a glowing
-"Showcase School" badge hologram. Year 5 pupils in [PAKAIAN murid] work on laptops behind
-him. He gently pushes the [BLOK TERAS SKeSO] forward toward the exit door.
-Attach: GB_charsheet.png, REF_TERAS.png, murid_charsheet.png, Digital Hub photo.
-```
-**Video (JSON)**
-```json
-{
-  "shot_id": "1B_gb_hub",
-  "duration_s": 6,
-  "start_frame": "1B_mula.png",
-  "end_frame": "1B_akhir.png (orb exits through the doorway, blurred corridor)",
-  "action": "He taps the screen; the hologram badge brightens; he releases the orb, which flies past camera out of the room.",
-  "camera": {"movement": "dolly left past pupils, then whip-pan following the orb", "lens": "35mm", "speed": "medium then fast whip"},
-  "transition_out": "whip-pan blur to match next shot",
-  "negative": "no text on screens except the badge, no distorted children faces"
+  "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan.",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, pakaian, tanda nama, kedudukan tingkap dan meja.",
+  "urutan": [
+    {
+      "masa": "0–3 saat",
+      "aksi": "Guru Besar memandang ke luar tingkap ke arah padang sekolah, termenung seketika.",
+      "kamera": "Bermula dari belakang bahu Guru Besar, padang kelihatan kabur di luar tingkap."
+    },
+    {
+      "masa": "3–5 saat",
+      "aksi": "Guru Besar berpaling ke dalam bilik dan mengetik tablet sekali. Bingkai hologram biru muncul di hadapannya.",
+      "kamera": "Melengkung perlahan ke hadapan Guru Besar sehingga wajah dan tablet kelihatan."
+    },
+    {
+      "masa": "5–8 saat",
+      "aksi": "Bingkai hologram terbuka menjadi panel segi empat kelabu gelap yang kosong. Guru Besar memandang panel dengan yakin.",
+      "kamera": "Alih fokus dari wajah ke panel. Kekalkan keseluruhan bingkai hologram dalam syot dan tahan dua saat."
+    }
+  ],
+  "panel": "Bahagian dalam panel kekal kelabu gelap dan kosong, tanpa tulisan, ikon atau logo. Cahaya biru hanya pada bingkai luar."
 }
 ```
 
 ---
 
-### 2A · PK PENTADBIRAN: menangkap Teras di Be Excellent Hub
+## 2. PK PENTADBIRAN: Tn Hj Mohd Shffri @ Hafizzudin bin Abu Bakar
+*Watak: pengurus sistem, teliti, cekap. Pengurusan pintar dan data.*
 
-**Gambar**
-```
-[BLOK GAYA GLOBAL, interior] Be Excellent Hub: marble-textured feature wall, wall-mounted TV,
-round wooden tables with teal chairs, Google "Future Classroom" wall sign. Tuan Haji Mohd
-Shffri @ Hafizzudin bin Abu Bakar (match PKP_charsheet.png), wearing [PAKAIAN pentadbir lelaki],
-catches the [BLOK TERAS SKeSO] in one hand while holding a tablet in the other.
-Attach: PKP_charsheet.png, REF_TERAS.png, Be Excellent Hub photo.
-```
-**Video (JSON)**
+### 2A · Di meja pentadbiran
+**Imej permulaan**
+> [GAYA] PK Pentadbiran (rujuk PKP_charsheet) duduk di meja pejabat yang kemas, tablet di atas meja, rak fail tersusun di belakang (kabur). Cahaya tingkap lembut. Lampirkan: PKP_charsheet.
+
 ```json
 {
-  "shot_id": "2A_pkp_tangkap",
-  "duration_s": 7,
-  "start_frame": "2A_mula.png",
-  "action": "Orb enters frame from left with whip blur; he catches it smoothly, places it above the tablet; the orb projects a translucent cyan dashboard hologram (timetable grid, attendance chart, app icons) above the table.",
-  "camera": {"movement": "whip-pan settle, then slow push-in over his shoulder onto the hologram", "lens": "35mm to 50mm feel", "speed": "fast settle then slow"},
-  "hologram_note": "abstract UI shapes only, no readable text",
-  "negative": "no text, no glitchy hands"
+  "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan.",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, pakaian dan tanda nama guru serta kedudukan meja dan tablet.",
+  "urutan": [
+    {
+      "masa": "0–2 saat",
+      "aksi": "Guru duduk di mejanya dan memandang lensa seketika dengan yakin. Guru kembali memandang tablet lalu mengetik skrin sekali. Bingkai hologram biru muncul di atas tablet.",
+      "kamera": "Mulakan dari sudut serong dengan fokus pada wajah guru. Alih fokus ke jari ketika guru mengetik."
+    },
+    {
+      "masa": "2–4 saat",
+      "aksi": "Guru meleret jari pada skrin fizikal tablet. Bingkai hologram terbuka sepenuhnya menjadi panel segi empat dengan permukaan kelabu gelap yang rata dan kosong.",
+      "kamera": "Bergerak melengkung secara perlahan sehingga kamera hampir tegak menghadap panel."
+    },
+    {
+      "masa": "4–8 saat",
+      "aksi": "Guru menurunkan tangan ke atas meja dan memandang panel. Panel kekal stabil dan keempat-empat penjurunya jelas.",
+      "kamera": "Bergerak lurus ke arah panel sambil mengalihkan fokus daripada guru ke panel. Kekalkan keseluruhan bingkai hologram dalam syot dan tahan komposisi akhir selama dua saat."
+    }
+  ],
+  "panel": "Bahagian dalam panel kekal kelabu gelap dan kosong, tanpa tulisan, ikon atau logo. Cahaya biru hanya pada bingkai luar."
 }
 ```
+*(Panel ini akan diisi dengan paparan SKeSO App atau jadual waktu digital.)*
 
-### 2B · PK PENTADBIRAN: SKeSO App di hujung jari
+### 2B · Taklimat di Be Excellent Hub
+**Imej permulaan**
+> [GAYA] Be Excellent Hub: dinding bercorak marmar, TV besar di dinding, meja bulat kayu dan kerusi teal. PK Pentadbiran berdiri di sebelah TV sambil menunjuk ke skrin; dua orang guru duduk mendengar. Skrin TV gelap. Lampirkan: PKP_charsheet, foto Be Excellent Hub.
 
-**Gambar**
-```
-[BLOK GAYA GLOBAL, interior] Close-up: his hand (PKP_charsheet.png sleeve and watch) swipes
-across the floating hologram panels arranged in a ring; the [BLOK TERAS SKeSO] sits at the
-centre like a core. In the soft background two teachers in formal attire nod.
-```
-**Video (JSON)**
 ```json
 {
-  "shot_id": "2B_pkp_app",
-  "duration_s": 6,
-  "action": "Panels rotate around the orb like orbits; he flicks one panel and the orb launches upward through the ceiling light.",
-  "camera": {"movement": "orbit 90 degrees around the hologram, then tilt up following the orb", "lens": "50mm macro feel", "speed": "smooth"},
-  "transition_out": "flash of light upward"
-}
-```
-
----
-
-### 3A · PK HAL EHWAL MURID: dataran perhimpunan
-
-**Gambar**
-```
-[BLOK GAYA GLOBAL, morning sunlight] School assembly square, pupils in neat rows wearing
-[PAKAIAN murid lelaki & perempuan], school flags on poles. Encik Razulddin bin Mustaffa
-(match PKHEM_charsheet.png), wearing [PAKAIAN pentadbir lelaki], stands in front with a
-tablet. The [BLOK TERAS SKeSO] descends from the sky toward him.
-Attach: PKHEM_charsheet.png, REF_TERAS.png, murid_charsheet.png.
-```
-**Video (JSON)**
-```json
-{
-  "shot_id": "3A_hem_dataran",
-  "duration_s": 7,
-  "action": "The orb lands above his tablet; a cyan scanning wave sweeps across the rows of pupils and small green check icons float above each row (digital attendance). Pupils smile.",
-  "camera": {"movement": "crane down from high angle to eye level behind him, revealing the rows", "lens": "28mm", "speed": "slow majestic"},
-  "negative": "no text, no distorted children, consistent uniforms"
-}
-```
-
-### 3B · PK HEM: kebajikan murid
-
-**Gambar**
-```
-[BLOK GAYA GLOBAL] Medium shot: he kneels to eye level with two Year 3 pupils
-(murid_charsheet.png), showing them a NILAM reading app on the tablet; the [BLOK TERAS SKeSO]
-floats beside them, glowing softly. Warm, caring mood.
-```
-**Video (JSON)**
-```json
-{
-  "shot_id": "3B_hem_murid",
-  "duration_s": 6,
-  "action": "A pupil taps the screen and laughs; he gives a thumbs-up; he tosses the orb gently toward the sports field in the background.",
-  "camera": {"movement": "slow lateral truck right, then rack focus to the field as the orb flies away", "lens": "85mm", "speed": "slow"},
-  "transition_out": "orb flies into the distance (match cut to 4A)"
+  "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan.",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, pakaian dan tanda nama PK Pentadbiran, susun atur bilik dan kedudukan TV.",
+  "urutan": [
+    {
+      "masa": "0–3 saat",
+      "aksi": "PK Pentadbiran menerangkan sesuatu sambil menunjuk ke skrin TV. Dua guru mengangguk.",
+      "kamera": "Syot luas dari belakang guru yang duduk, bergerak perlahan ke kanan (truck)."
+    },
+    {
+      "masa": "3–6 saat",
+      "aksi": "PK Pentadbiran berpaling kepada guru dan tersenyum, tangan terbuka seolah-olah menjemput pandangan.",
+      "kamera": "Tolak masuk perlahan ke arah PK Pentadbiran, fokus pada wajahnya."
+    },
+    {
+      "masa": "6–8 saat",
+      "aksi": "PK Pentadbiran memandang lensa seketika dengan yakin.",
+      "kamera": "Tahan komposisi separuh badan dengan skrin TV kelihatan di sebelah."
+    }
+  ],
+  "skrin": "Skrin TV kekal kelabu gelap rata, tanpa tulisan atau imej, keempat-empat penjuru jelas."
 }
 ```
 
 ---
 
-### 4A · PK KOKURIKULUM: padang sekolah
+## 3. PK HAL EHWAL MURID: Encik Razulddin bin Mustaffa
+*Watak: penyayang, tegas tetapi mesra. Kebajikan dan disiplin murid.*
 
-**Gambar**
-```
-[BLOK GAYA GLOBAL, late afternoon] School field with goal posts and running track. Encik Abu
-Seman bin Mat Salleh (match PKKO_charsheet.png), in [PAKAIAN sukan/kokurikulum per charsheet],
-controls a drone remote; a white drone hovers above. Pupils in purple "PE" sports shirts
-stand ready behind him. The [BLOK TERAS SKeSO] arrives and docks onto the drone.
-Attach: PKKO_charsheet.png, REF_TERAS.png, murid_sukan_charsheet.png.
-```
-**Video (JSON)**
+### 3A · Dataran perhimpunan
+**Imej permulaan**
+> [GAYA, cahaya pagi keemasan] Dataran perhimpunan sekolah. Murid (rujuk murid_charsheet) berbaris kemas, tiang bendera di belakang. PK HEM (rujuk PKHEM_charsheet) berdiri di hadapan barisan memegang tablet. Lampirkan: PKHEM_charsheet, murid_charsheet.
+
 ```json
 {
-  "shot_id": "4A_koko_dron",
-  "duration_s": 7,
-  "action": "The drone with the orb rises; the view switches to an FPV dive over the pupils sprinting on the track, with cyan motion-analysis lines tracing their strides.",
-  "camera": {"movement": "start ground-level low angle, then FPV drone rise and dive", "lens": "16mm FPV", "speed": "dynamic, energetic"},
-  "negative": "no text, no extra drones"
+  "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan.",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, pakaian, tanda nama PK HEM, pakaian seragam murid dan susunan barisan.",
+  "urutan": [
+    {
+      "masa": "0–3 saat",
+      "aksi": "PK HEM memandang barisan murid, kemudian mengetik tablet sekali. Bingkai hologram biru kecil muncul di atas tablet.",
+      "kamera": "Mulakan dari sudut tinggi di atas barisan murid (crane), turun perlahan ke paras mata di belakang bahu PK HEM."
+    },
+    {
+      "masa": "3–5 saat",
+      "aksi": "Bingkai hologram terbuka menjadi panel segi empat kelabu gelap yang kosong. Murid di barisan hadapan tersenyum.",
+      "kamera": "Kamera berhenti di belakang bahu, panel dan barisan murid kelihatan serentak."
+    },
+    {
+      "masa": "5–8 saat",
+      "aksi": "PK HEM menoleh ke lensa dan tersenyum mesra.",
+      "kamera": "Melengkung perlahan ke hadapan PK HEM. Tahan dua saat."
+    }
+  ],
+  "panel": "Panel kelabu gelap dan kosong, tanpa tulisan atau ikon. Cahaya biru hanya pada bingkai luar."
 }
 ```
+*(Panel ini akan diisi dengan e-rekod kehadiran atau data HEM.)*
 
-### 4B · PK KOKURIKULUM: analisis teknik
+### 3B · Bersama murid di koridor
+**Imej permulaan**
+> [GAYA] Koridor sekolah yang terang. PK HEM membongkok ke paras mata dua murid Tahun 3 (seorang lelaki, seorang perempuan); seorang murid memegang tablet. Suasana mesra dan penyayang. Lampirkan: PKHEM_charsheet, murid_charsheet.
 
-**Gambar**
-```
-[BLOK GAYA GLOBAL] Beside the field, he stands next to a large transparent hologram screen
-showing a pupil's softball swing as glowing skeleton lines; pupils watch excitedly; the
-[BLOK TERAS SKeSO] hovers at the top corner of the screen.
-```
-**Video (JSON)**
 ```json
 {
-  "shot_id": "4B_koko_analisis",
-  "duration_s": 6,
-  "action": "He draws a curved trajectory with his finger; the hologram replays the swing; he throws the orb like a pass toward the school building.",
-  "camera": {"movement": "push-in through the hologram screen, then follow the throw", "lens": "35mm", "speed": "medium"},
-  "transition_out": "orb passes through a classroom window"
-}
-```
-
----
-
-### 5A · PK PENDIDIKAN KHAS: Hub Digital PPKI
-
-**Gambar**
-```
-[BLOK GAYA GLOBAL, soft warm interior] Special-education digital hub: bright classroom, colourful
-tiled floor, Smart TV on the wall, iPads and Chromebooks on low tables. Encik Baharudin bin
-Ismail (match PKPK_charsheet.png), wearing [PAKAIAN pentadbir lelaki], sits at pupil height
-beside a smiling pupil with special needs (respectful, dignified, match murid_PPKI_charsheet.png).
-The [BLOK TERAS SKeSO] floats in gently through the window, glowing soft cyan.
-Attach: PKPK_charsheet.png, REF_TERAS.png, murid_PPKI_charsheet.png, Hub PPKI photo.
-```
-**Video (JSON)**
-```json
-{
-  "shot_id": "5A_ppki_hub",
-  "duration_s": 7,
-  "action": "The orb slows and lowers in front of the pupil; the pupil reaches out and touches it; soft colourful light shapes (letters, numbers, stars) bloom from the iPad. The teacher smiles warmly.",
-  "camera": {"movement": "slow dolly-in at child eye level, gentle", "lens": "50mm", "speed": "very slow, tender"},
-  "tone": "warm, inclusive, joyful; never pitying",
-  "negative": "no text, no exaggerated features, respectful portrayal"
-}
-```
-
-### 5B · PK PENDIDIKAN KHAS: menghantar Teras pulang
-
-**Gambar**
-```
-[BLOK GAYA GLOBAL] He and the pupil hold the [BLOK TERAS SKeSO] together, both looking up
-as it begins to rise; classmates clap in the background.
-```
-**Video (JSON)**
-```json
-{
-  "shot_id": "5B_ppki_lepas",
-  "duration_s": 6,
-  "action": "Together they release the orb; it rises and flies out the window toward the sunset.",
-  "camera": {"movement": "tilt up from their hands to the window, light flare", "lens": "35mm", "speed": "slow then lift"},
-  "transition_out": "sun flare white-out"
+  "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan.",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah dan pakaian PK HEM serta kedua-dua murid.",
+  "urutan": [
+    {
+      "masa": "0–3 saat",
+      "aksi": "Murid menunjukkan skrin tablet kepada PK HEM dengan gembira. PK HEM mendengar dengan teliti.",
+      "kamera": "Syot sederhana pada paras mata murid, bergerak perlahan ke kiri."
+    },
+    {
+      "masa": "3–6 saat",
+      "aksi": "PK HEM tersenyum dan memberi isyarat ibu jari ke atas. Murid ketawa kecil.",
+      "kamera": "Alih fokus dari tablet ke wajah PK HEM."
+    },
+    {
+      "masa": "6–8 saat",
+      "aksi": "PK HEM menepuk bahu murid dengan lembut dan berdiri.",
+      "kamera": "Tilt naik perlahan mengikut PK HEM berdiri. Tahan komposisi akhir."
+    }
+  ],
+  "skrin": "Skrin tablet dipalingkan dari kamera atau kelihatan gelap, tiada tulisan."
 }
 ```
 
 ---
 
-### 99 · PENUTUP: barisan pentadbir bersatu
+## 4. PK KOKURIKULUM: Encik Abu Seman bin Mat Salleh
+*Watak: bertenaga, sukan, membina bakat. Kokurikulum dan sukan.*
 
-**Gambar**
-```
-[BLOK GAYA GLOBAL, blue-hour sunset] Wide hero shot in front of the "1956" school arch. All
-five administrators standing in a V formation: headmaster (GB_charsheet.png) centre, PK
-Pentadbiran and PK HEM on his left, PK Kokurikulum and PK Pendidikan Khas on his right,
-all in [PAKAIAN pentadbir lelaki]. The [BLOK TERAS SKeSO] hovers above the headmaster.
-Attach: all five charsheets, REF_TERAS.png, arch photo.
-```
-**Video (JSON)**
+### 4A · Di padang sekolah
+**Imej permulaan**
+> [GAYA, cahaya petang keemasan] Padang sekolah dengan trek larian. PK Kokurikulum (rujuk PKKO_charsheet, pakaian sukan/kokurikulum mengikut helaian) berdiri di tepi trek memegang tablet. Murid berbaju-T ungu "PE" bersedia di garisan permulaan. Lampirkan: PKKO_charsheet, murid_sukan_charsheet.
+
 ```json
 {
-  "shot_id": "99_penutup",
-  "duration_s": 7,
-  "action": "The orb rises, spins, and bursts into a ring of gold and cyan particles that form a large glowing SKeSO atom emblem in the sky; the five look up, then turn to camera.",
-  "camera": {"movement": "slow pull-back and crane up to reveal the emblem above the arch", "lens": "24mm", "speed": "slow epic"},
-  "negative": "no text, keep all five faces consistent, no extra people"
+  "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan.",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah dan pakaian PK Kokurikulum, baju sukan murid dan susun atur padang.",
+  "urutan": [
+    {
+      "masa": "0–2 saat",
+      "aksi": "PK Kokurikulum mengangkat tangan memberi isyarat mula. Murid mula berlari.",
+      "kamera": "Sudut rendah dari tepi trek, PK Kokurikulum di latar depan."
+    },
+    {
+      "masa": "2–5 saat",
+      "aksi": "PK Kokurikulum merakam larian murid menggunakan tablet, mengikut gerakan mereka.",
+      "kamera": "Pan perlahan mengikut murid berlari, kemudian kembali kepada PK Kokurikulum."
+    },
+    {
+      "masa": "5–8 saat",
+      "aksi": "PK Kokurikulum menurunkan tablet, memandang lensa dan tersenyum bangga.",
+      "kamera": "Tolak masuk ke syot separuh badan. Tahan dua saat."
+    }
+  ],
+  "suasana": "Bertenaga, ceria, cahaya petang keemasan."
+}
+```
+
+### 4B · Analisis teknik bersama murid
+**Imej permulaan**
+> [GAYA] Di bawah khemah tepi padang. PK Kokurikulum berdiri di sebelah panel hologram besar berbingkai biru, tiga murid berbaju PE memerhati dengan teruja. Lampirkan: PKKO_charsheet, murid_sukan_charsheet.
+
+```json
+{
+  "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan.",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah dan pakaian semua watak serta kedudukan panel hologram.",
+  "urutan": [
+    {
+      "masa": "0–3 saat",
+      "aksi": "PK Kokurikulum menunjuk ke arah panel hologram sambil menerangkan. Murid mengangguk.",
+      "kamera": "Syot luas dari sisi, bergerak melengkung perlahan ke hadapan panel."
+    },
+    {
+      "masa": "3–6 saat",
+      "aksi": "PK Kokurikulum melukis garis lengkung di udara dengan jarinya di hadapan panel. Seorang murid meniru gerakan memukul.",
+      "kamera": "Kamera hampir tegak menghadap panel, watak di sisi."
+    },
+    {
+      "masa": "6–8 saat",
+      "aksi": "Semua berpaling ke panel. Panel kekal stabil.",
+      "kamera": "Tolak masuk perlahan ke panel. Kekalkan keseluruhan bingkai dalam syot dan tahan dua saat."
+    }
+  ],
+  "panel": "Panel kelabu gelap dan kosong, tanpa tulisan atau ikon. Cahaya biru hanya pada bingkai luar."
+}
+```
+*(Panel ini akan diisi dengan analisis gerakan sukan.)*
+
+---
+
+## 5. PK PENDIDIKAN KHAS: Encik Baharudin bin Ismail
+*Watak: penyabar, penyayang, inklusif. Pendidikan khas digital.*
+
+### 5A · Membimbing murid di Hub Digital PPKI
+**Imej permulaan**
+> [GAYA, cahaya hangat dalam bilik] Hub Digital PPKI: lantai berwarna-warni, Smart TV di dinding, iPad dan Chromebook di atas meja rendah. PK Pendidikan Khas (rujuk PKPK_charsheet) duduk di paras murid di sebelah seorang murid berkeperluan khas yang tersenyum (rujuk murid_PPKI_charsheet), menggambarkannya dengan penuh hormat dan bermaruah. Lampirkan: PKPK_charsheet, murid_PPKI_charsheet, foto Hub PPKI.
+
+```json
+{
+  "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan.",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, pakaian dan tanda nama PK Pendidikan Khas, wajah dan pakaian murid serta susun atur bilik.",
+  "urutan": [
+    {
+      "masa": "0–3 saat",
+      "aksi": "Murid menyentuh skrin iPad. PK Pendidikan Khas membimbing tangan murid dengan lembut.",
+      "kamera": "Syot dekat pada tangan dan iPad, paras mata murid."
+    },
+    {
+      "masa": "3–6 saat",
+      "aksi": "Murid tersenyum gembira melihat skrin. PK Pendidikan Khas tersenyum memandang murid.",
+      "kamera": "Tilt naik perlahan dan alih fokus dari tangan ke wajah kedua-duanya."
+    },
+    {
+      "masa": "6–8 saat",
+      "aksi": "PK Pendidikan Khas memandang lensa dengan senyuman hangat.",
+      "kamera": "Tolak masuk sangat perlahan. Tahan dua saat."
+    }
+  ],
+  "skrin": "Skrin iPad dipalingkan sedikit dari kamera, tiada tulisan kelihatan.",
+  "nada": "Hangat, inklusif, gembira. Bukan simpati berlebihan."
+}
+```
+
+### 5B · Kelas PPKI yang ceria
+**Imej permulaan**
+> [GAYA] Kelas PPKI yang terang. PK Pendidikan Khas berdiri di tengah kelas di sebelah Smart TV; empat murid PPKI di meja masing-masing menggunakan Chromebook. Smart TV gelap. Lampirkan: PKPK_charsheet, murid_PPKI_charsheet.
+
+```json
+{
+  "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan.",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah dan pakaian semua watak serta kedudukan Smart TV dan meja.",
+  "urutan": [
+    {
+      "masa": "0–3 saat",
+      "aksi": "Murid-murid menggunakan Chromebook dengan tekun. PK Pendidikan Khas berjalan perlahan di antara meja.",
+      "kamera": "Syot luas, bergerak perlahan ke hadapan (dolly in) di antara meja."
+    },
+    {
+      "masa": "3–6 saat",
+      "aksi": "Seorang murid mengangkat tangan dengan gembira. PK Pendidikan Khas menghampiri dan memberi pujian.",
+      "kamera": "Melengkung perlahan ke kanan mengikut PK Pendidikan Khas."
+    },
+    {
+      "masa": "6–8 saat",
+      "aksi": "PK Pendidikan Khas berdiri tegak di sebelah Smart TV dan memandang lensa.",
+      "kamera": "Tahan syot separuh badan dengan Smart TV kelihatan di sebelah."
+    }
+  ],
+  "skrin": "Smart TV kekal kelabu gelap rata, tanpa tulisan atau imej, keempat-empat penjuru jelas."
 }
 ```
 
 ---
 
-## 4. Tip penjanaan
-- **Wajah lari?** Jana bingkai pertama semula dengan helaian karakter + 1 foto wajah jelas. Untuk video, guna mod *image-to-video*, bukan text-to-video.
-- **Teras berubah rupa?** Sentiasa lampirkan `REF_TERAS.png`. Untuk syot hand-off, jana *bingkai akhir* juga (Veo / Kling first+last frame).
-- **Kontinuiti:** objek keluar kiri bingkai di satu syot, mesti masuk dari kanan di syot berikutnya.
-- Jana 2–4 versi setiap syot, pilih yang terbaik.
+## 6. PENUTUP: barisan pentadbir bersama
+
+**Imej permulaan**
+> [GAYA, cahaya senja keemasan] Pintu gerbang sekolah bertanda "1956". Kelima-lima pentadbir berdiri sebaris: Guru Besar di tengah, PK Pentadbiran dan PK HEM di kiri, PK Kokurikulum dan PK Pendidikan Khas di kanan. Lampirkan: kelima-lima charsheet, foto gerbang 1956.
+
+```json
+{
+  "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan, gerak perlahan (slow motion).",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, pakaian dan kedudukan kelima-lima pentadbir serta pintu gerbang.",
+  "urutan": [
+    {
+      "masa": "0–4 saat",
+      "aksi": "Kelima-lima pentadbir berjalan serentak keluar dari pintu gerbang ke arah kamera dengan yakin.",
+      "kamera": "Sudut rendah, kamera bergerak mundur perlahan pada kelajuan yang sama dengan langkah mereka."
+    },
+    {
+      "masa": "4–8 saat",
+      "aksi": "Mereka berhenti serentak dan memandang lensa. Guru Besar tersenyum kecil.",
+      "kamera": "Kamera berhenti dan naik perlahan (crane up) untuk menampakkan pintu gerbang dan langit senja. Tahan dua saat."
+    }
+  ],
+  "suasana": "Megah, bersatu, cahaya matahari terbenam di belakang (rim light)."
+}
+```
+
+---
+
+## Tip
+- Jana imej permulaan **dulu**. Pastikan wajah tepat sebelum tukar ke video.
+- Jika wajah berubah dalam video, pendekkan tempoh atau kurangkan pergerakan kamera.
+- Jana 2–3 versi setiap syot, pilih yang terbaik.
+- Lower-third nama dan jawatan saya tambah semasa suntingan.
