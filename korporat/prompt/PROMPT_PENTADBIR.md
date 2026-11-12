@@ -21,10 +21,10 @@ masukkan semasa suntingan. Hasilnya tulisan tepat dan tidak herot.
 
 **PAKAIAN** (tukar ikut helaian karakter sebenar)
 - Pentadbir: ikut `[NAMA]_charsheet`: wajah, cermin mata, songkok, sut, tali leher, tanda nama.
-- Murid lelaki: blazer **merah marun** (2 butang, kolar lapel), kemeja berkolar terang, tali leher marun, seluar panjang biru tua. Rujuk `CHARSHEET_MURID.md` (M1, M3).
-- Murid perempuan: blazer **merah marun**, kemeja biru muda, tali leher marun, kain labuh biru tua, tudung bawal **biru tua**. Rujuk M2, M4.
-- Murid aktiviti / sukan: baju-T **ungu-magenta** bertulisan skrip putih "SKeSO" di belakang, seluar trek gelap. Rujuk M5.
-- Murid PPKI: seragam blazer marun, digambarkan dengan hormat. Rujuk M6.
+- Murid (harian, paling biasa): lelaki berkemeja putih lengan pendek, lencana perisai hijau, tali leher hijau tua, seluar biru tua. Perempuan berbaju kurung putih labuh dan tudung labuh putih. Rujuk `CHARSHEET_MURID.md` blok HARIAN.
+- Murid (blazer, untuk Digital Hub / podcast / majlis): blazer merah marun. Rujuk blok BLAZER.
+- Murid aktiviti / sukan: baju-T ungu-magenta bertulisan "SKeSO". Rujuk blok AKTIVITI.
+- Murid PPKI: seragam harian, digambarkan dengan hormat. Rujuk M6.
 
 **NEGATIF**
 > Tiada tulisan, tiada sari kata, tiada tera air, tiada logo tambahan, jari tidak herot, wajah tidak berubah, bukan gaya kartun.
