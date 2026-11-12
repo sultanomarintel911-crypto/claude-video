@@ -228,8 +228,8 @@ def bingkai_bintik(fr, t):  # kesan "beku" ala rakaman lama
 # (masa_mula, masa_tamat, baris kapsyen)
 KAPSYEN = [
     (5.0, 9.6, ["Hari bergambar kelas.", "Murid dah beratur, cikgu dah duduk."]),
-    (9.8, 12.8, ["“Okey cikgu-cikgu, tangan atas lutut ya!”", "— jurugambar"]),
-    (13.0, 19.6, ["Maka semua cikgu pun... semak lutut masing-masing.", "Serentak. Penuh dedikasi."]),
+    (9.8, 12.8, ["“Okey cikgu-cikgu, pandang kamera ya!”", "— jurugambar"]),
+    (13.0, 19.6, ["Maka semua cikgu pun... tengok kasut masing-masing.", "Serentak. Kasut kena berkilat, baru sah masuk gambar."]),
     (19.8, 24.8, ["Cikgu yang ini? Cermin mata hitam.", "Pandang mana pun, rahsia negara."]),
     (25.0, 27.4, ["Dan di hujung sana..."]),
     (28.2, 33.8, ["Kamera: “Satu... dua...”", "Cikgu: masih butangkan kot."]),
@@ -344,7 +344,7 @@ def adegan(t):
     if 13.0 <= t < 19.8:
         for i, p in enumerate(DUDUK_TUNDUK):
             sp = ke_skrin((p[0], p[1] - 8), g)
-            label(fr, sp, "LUTUT ✓" if False else "LUTUT OK", 13.6 + i * 0.55, t, saiz=22)
+            label(fr, sp, "KASUT OK", 13.6 + i * 0.55, t, saiz=22)
         if t >= 17.0:
             sp = ke_skrin((CIKGU_KIRI[0] + 40, CIKGU_KIRI[1] + 40), g)
             label(fr, sp, "YANG INI JE PANDANG KAMERA", 17.0, t, warna=(120, 230, 140), saiz=20, atas=False)
