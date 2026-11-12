@@ -21,9 +21,10 @@ masukkan semasa suntingan. Hasilnya tulisan tepat dan tidak herot.
 
 **PAKAIAN** (tukar ikut helaian karakter sebenar)
 - Pentadbir: ikut `[NAMA]_charsheet`: wajah, cermin mata, songkok, sut, tali leher, tanda nama.
-- Murid lelaki: kemeja putih, seluar biru tua, tali leher sekolah.
-- Murid perempuan: baju kurung putih, kain biru tua, tudung putih.
-- Murid sukan: baju-T ungu "PE", seluar trek gelap.
+- Murid lelaki: blazer **merah marun** (2 butang, kolar lapel), kemeja berkolar terang, tali leher marun, seluar panjang biru tua. Rujuk `CHARSHEET_MURID.md` (M1, M3).
+- Murid perempuan: blazer **merah marun**, kemeja biru muda, tali leher marun, kain labuh biru tua, tudung bawal **biru tua**. Rujuk M2, M4.
+- Murid aktiviti / sukan: baju-T **ungu-magenta** bertulisan skrip putih "SKeSO" di belakang, seluar trek gelap. Rujuk M5.
+- Murid PPKI: seragam blazer marun, digambarkan dengan hormat. Rujuk M6.
 
 **NEGATIF**
 > Tiada tulisan, tiada sari kata, tiada tera air, tiada logo tambahan, jari tidak herot, wajah tidak berubah, bukan gaya kartun.
@@ -226,7 +227,7 @@ masukkan semasa suntingan. Hasilnya tulisan tepat dan tidak herot.
 
 ### 4A · Di padang sekolah
 **Imej permulaan**
-> [GAYA, cahaya petang keemasan] Padang sekolah dengan trek larian. PK Kokurikulum (rujuk PKKO_charsheet, pakaian sukan/kokurikulum mengikut helaian) berdiri di tepi trek memegang tablet. Murid berbaju-T ungu "PE" bersedia di garisan permulaan. Lampirkan: PKKO_charsheet, murid_sukan_charsheet.
+> [GAYA, cahaya petang keemasan] Padang sekolah dengan trek larian. PK Kokurikulum (rujuk PKKO_charsheet, pakaian sukan/kokurikulum mengikut helaian) berdiri di tepi trek memegang tablet. Murid berbaju-T ungu-magenta "SKeSO" (rujuk M5) bersedia di garisan permulaan. Lampirkan: PKKO_charsheet, charsheet M5.
 
 ```json
 {
@@ -255,7 +256,7 @@ masukkan semasa suntingan. Hasilnya tulisan tepat dan tidak herot.
 
 ### 4B · Analisis teknik bersama murid
 **Imej permulaan**
-> [GAYA] Di bawah khemah tepi padang. PK Kokurikulum berdiri di sebelah panel hologram besar berbingkai biru, tiga murid berbaju PE memerhati dengan teruja. Lampirkan: PKKO_charsheet, murid_sukan_charsheet.
+> [GAYA] Di bawah khemah tepi padang. PK Kokurikulum berdiri di sebelah panel hologram besar berbingkai biru, tiga murid berbaju-T ungu "SKeSO" (rujuk M5) memerhati dengan teruja. Lampirkan: PKKO_charsheet, charsheet M5.
 
 ```json
 {
