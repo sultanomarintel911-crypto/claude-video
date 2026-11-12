@@ -10,7 +10,7 @@ ditampal di atasnya.
 | Fail | Kegunaan |
 |---|---|
 | `00_mula.png` | Bingkai pertama: emblem kecil jauh di langit kanan atas, ekor cahaya |
-| `00_akhir.png` | Bingkai akhir: emblem besar terapung di langit kiri, bangunan dan papan tanda jelas |
+| `00_akhir.png` | Bingkai akhir: emblem **kecil** menjauh di langit kiri (arah gerbang) |
 | `emblem_SKeSO_potong.png` | Emblem sahaja (latar telus), untuk rujukan tambahan |
 
 Muat naik **00_mula.png sebagai first frame** dan **00_akhir.png sebagai last frame**.
@@ -25,23 +25,23 @@ Kling dan Veo kedua-duanya ada pilihan ini.
   "urutan": [
     {
       "masa": "0–2 saat",
-      "aksi": "Emblem SKeSO kelihatan kecil jauh di langit kanan atas, berputar perlahan dengan ekor cahaya emas dan biru.",
-      "kamera": "Kamera hampir statik, sedikit dongak ke langit."
+      "aksi": "Emblem SKeSO bersaiz sederhana terapung di langit kanan atas bangunan, berputar perlahan dengan ekor cahaya emas dan biru.",
+      "kamera": "Kamera statik, sedikit dongak ke langit."
     },
     {
-      "masa": "2–4.5 saat",
-      "aksi": "Emblem meluncur melengkung merentasi langit di atas bumbung bangunan ke arah kiri, semakin besar dan dekat, ekor cahaya memanjang.",
-      "kamera": "Pan perlahan ke kiri mengikut emblem, dengan sedikit tolak masuk."
+      "masa": "2–5 saat",
+      "aksi": "Emblem meluncur melengkung merentasi langit ke arah kiri dan menjauh dari kamera, SEMAKIN KECIL, ekor cahaya memanjang di belakangnya.",
+      "kamera": "Pan perlahan ke kiri mengikut emblem."
     },
     {
-      "masa": "4.5–6 saat",
-      "aksi": "Emblem berhenti dan terapung di langit kiri, menghadap kamera, cahaya biru berdenyut sekali. Bangunan dan mural kekal jelas.",
-      "kamera": "Berhenti perlahan dan tahan komposisi akhir sama seperti imej akhir."
+      "masa": "5–6 saat",
+      "aksi": "Emblem menjadi kecil di langit kiri seperti bintang bercahaya, terus bergerak menjauh. Bangunan dan mural kekal jelas.",
+      "kamera": "Berhenti dan tahan komposisi seperti imej akhir."
     }
   ],
-  "emblem": "Kekalkan rupa emblem tepat seperti dalam imej: cincin logam gelap dan emas, simbol atom biru, lencana sekolah di tengah, tulisan 'SKeSO · Be Excellent' dan 'Merentas Kecemerlangan'. Jangan ubah tulisan atau ikon.",
+  "emblem": "Saiz emblem TIDAK melebihi satu perlima tinggi bingkai pada bila-bila masa, dan semakin kecil sepanjang syot. Kekalkan rupa emblem seperti imej: cincin logam gelap dan emas, simbol atom biru, lencana sekolah di tengah.",
   "pencahayaan": "Siang cerah, langit biru berawan seperti foto asal.",
-  "negatif": "Jangan ubah bangunan, jangan tambah bangunan lain, jangan herotkan tulisan pada mural atau emblem, tiada orang tambahan."
+  "negatif": "Jangan besarkan emblem, jangan ubah bangunan, jangan tambah bangunan lain, jangan herotkan tulisan pada mural, tiada orang tambahan."
 }
 ```
 

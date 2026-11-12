@@ -1,7 +1,8 @@
 # 1A · Guru Besar menyambut di Gerbang 1956
 
 **Bingkai pertama:** `bingkai/1A_gb_gerbang_mula.png`. Foto gerbang sebenar, dan GB ditampal
-daripada lembaran watak (pandangan hadapan).
+daripada lembaran watak (pandangan hadapan). Emblem SKeSO **kecil** terapung di atas
+papan "1956", bersambung daripada syot pembuka.
 
 ## Langkah 1 (disyorkan): kemaskan bingkai dengan AI imej
 Muat naik `1A_gb_gerbang_mula.png` + lembaran watak RUSMADI ke Nano Banana / Gemini, prompt:
@@ -22,7 +23,7 @@ Muat naik `1A_gb_gerbang_mula.png` + lembaran watak RUSMADI ke Nano Banana / Gem
   "urutan": [
     {
       "masa": "0–2 saat",
-      "aksi": "Guru Besar berdiri tegak di hadapan pintu gerbang, memandang lensa dengan tenang dan berwibawa.",
+      "aksi": "Guru Besar berdiri tegak di hadapan pintu gerbang, memandang lensa dengan tenang dan berwibawa. Emblem SKeSO kecil turun perlahan dari kiri dan berhenti di atas papan '1956'.",
       "kamera": "Syot separuh badan hingga lutut, kamera statik pada paras mata."
     },
     {
@@ -32,13 +33,14 @@ Muat naik `1A_gb_gerbang_mula.png` + lembaran watak RUSMADI ke Nano Banana / Gem
     },
     {
       "masa": "5–8 saat",
-      "aksi": "Guru Besar menurunkan tangan, merapatkan kedua-dua tangan di hadapan, dan kekal tersenyum memandang lensa. Pintu gerbang dan papan '1956' kekal jelas di belakang.",
+      "aksi": "Guru Besar menurunkan tangan, merapatkan kedua-dua tangan di hadapan, dan kekal tersenyum memandang lensa. Emblem kecil berdenyut cahaya biru sekali, kemudian lebur menjadi kilauan halus pada papan '1956'. Pintu gerbang dan papan '1956' kekal jelas di belakang.",
       "kamera": "Berhenti perlahan dan tahan komposisi akhir selama dua saat."
     }
   ],
   "pencahayaan": "Siang cerah, langit biru berawan, cahaya semula jadi lembut, bayang lembut di kaki.",
+  "emblem": "Emblem sentiasa KECIL (lebih kecil daripada kepala Guru Besar) dan berada di latar belakang, tidak menutup wajah atau papan nama sekolah.",
   "suasana": "Mesra, berwibawa, mengalu-alukan.",
-  "negatif": "Jangan ubah wajah, jangan tambah orang lain, jangan herotkan tulisan pada gerbang, jangan ubah pakaian, tiada tulisan tambahan."
+  "negatif": "Jangan besarkan emblem, jangan ubah wajah, jangan tambah orang lain, jangan herotkan tulisan pada gerbang, jangan ubah pakaian, tiada tulisan tambahan."
 }
 ```
 
