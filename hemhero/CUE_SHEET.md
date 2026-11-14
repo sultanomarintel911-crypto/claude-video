@@ -74,3 +74,48 @@ npm run final   # -> out/the_hem_hero_4k.mp4
 | 0:29.6 | | Potong ke hitam | |
 
 **Had:** sama seperti Babak 1. Gerakan datang daripada kamera, bukan watak; murid tidak benar-benar berjalan dan PK HEM tidak benar-benar menoleh ke kamera (panel papan cerita menunjukkan matanya tertutup).
+
+---
+
+# Babak 3–5 (`src/Scene345.tsx`, `scripts/audio345.py`, `scripts/prep345.py`, `scripts/pesawat.py`)
+
+Render: `scripts/render.sh <Komposisi> <NAMA>` → `out/<NAMA>.mp4` (4K, 30 fps, 30 s).
+
+## Babak 3 – BEHIND THE SMILE (`BehindTheSmile`)
+| Masa | Syot | Visual | Bunyi |
+|---|---|---|---|
+| 0:00 | 1 Koridor | Jalan perlahan (goyang langkah), suar lensa emas, tajuk | Langkah bergema, angin, piano C major |
+| 0:06 | 2 Imbas kembali | 4 kenangan × 1.5 s (bimbing murid, perhimpunan, kebajikan, sukan), gred memori + kelipan filem | Whoosh lembut + kilauan, rentetan masuk |
+| 0:12 | 3 Rakan guru | Syot sederhana → close-up | Kertas dokumen |
+| 0:15.5 | 4 Kad | Murid hulur kad → close-up kad & tangan | Kertas/kad |
+| 0:20.5 | 5 Close-up | Wajah membaca kad, bokeh emas | Kad dibuka, degupan lembut |
+| 0:25.5 | 6 Kenangan terakhir | Kamera menjauh di koridor, cahaya emas memenuhi bingkai, pudar | Kemuncak rentetan, kilauan |
+
+## Babak 4 – THE NEXT CHAPTER (`NextChapter`)
+| Masa | Syot | Visual | Bunyi |
+|---|---|---|---|
+| 0:00 | 1 Perpisahan | Pan dari murid bertepuk ke PK HEM melambai, tajuk | Tepukan, piano D major |
+| 0:05 | 2 Jabat tangan | Sederhana → close-up jabat tangan (7.3 s) | Pakaian, jabat tangan |
+| 0:09.5 | 3 Selamat tinggal | Tangan di kepala murid, rakan sebak | Angin lembut |
+| 0:13.5 | 4 Berjalan pergi | Ikut dari belakang ke pintu pagar, waktu emas, cahaya memutih | Langkah, angin, tepukan jauh |
+| 0:18 | Peralihan | Kilat cahaya emas | Riser + whoosh |
+| 0:18.3 | 5 SK Batu 48 | Dari papan tanda (teks sahaja) ke wajah penuh harapan | Burung, muzik lebih terang |
+| 0:23 | 6 Kad penghargaan | Hitam-emas, zarah emas, teks tepat (lihat di bawah) | Hentakan dalam, kord D major, pudar |
+
+Teks kad (tepat): TERIMA KASIH / ENCIK RAZULDDIN BIN MUSTAFFA / 1 DISEMBER 2017 – 14 NOVEMBER 2026 / SK SULTAN OMAR / 15 NOVEMBER 2026 / SELAMAT MENERUSKAN PERKHIDMATAN / DI SK BATU 48 / JASAMU DIKENANG. / PENGORBANANMU MENJADI INSPIRASI.
+
+## Babak 5 – THE FINAL FAREWELL (`FinalFarewell`) — kesan bunyi sahaja, tiada muzik, tiada teks
+| Masa | Syot | Bunyi |
+|---|---|---|
+| 0:00 | Berdiri di pintu masuk SK Sultan Omar | Angin pagi, burung, suasana sekolah jauh |
+| 0:03.5 | Wajah berat hati | Angin |
+| 0:06.5 | Menyeka air mata | Pakaian bergerak |
+| 0:09.5 | Murid melambai | Tepukan perlahan |
+| 0:12.5 | Membalas lambaian | Pakaian |
+| 0:15 | Berjalan pergi (zum keluar, sekolah menjauh) | Langkah berat, angin |
+| 0:18 | Ke pesawat dengan beg | Suasana lapangan terbang, roda beg, enjin jauh |
+| 0:21 | Menoleh buat kali terakhir | Angin |
+| 0:23.5 | Menaiki tangga, pintu ditutup (25.7 s) | Tangga logam, pintu pesawat |
+| 0:26 | Pesawat berlepas di atas pintu masuk sekolah, mengecil | Enjin jet meningkat lalu menjauh |
+
+Pesawat dipisahkan dari panel (`scripts/pesawat.py`): plat langit bersih + sprite beralfa yang digerakkan.
