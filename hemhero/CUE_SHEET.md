@@ -45,3 +45,32 @@ npm run final   # -> out/the_hem_hero_4k.mp4
 - Ini **bukan** video AI generatif: wajah tidak bergerak, dia tidak benar-benar berjalan, dan murid tidak bergerak. Gerakan datang daripada kamera (zum, pan, tilt, gegaran), cahaya dan suntingan.
 - Panel papan cerita asal hanya ~530 px lebar; dalam 4K ia kelihatan lembut (kesan "cetek kedalaman medan" membantu, tetapi tidak setajam rakaman sebenar).
 - Wajah dalam panel papan cerita (pejabat, ECU, wira, koridor) ialah lukisan AI daripada papan cerita, bukan foto sebenar. Syot bangun, tilt-up dan penutup menggunakan foto sebenar.
+
+---
+
+# Helaian Isyarat: MISSION – STUDENT AFFAIRS (Babak 2)
+
+**Komposisi:** `MissionHem` · 4K, 30 fps, 30 s · `npm run final2` → `out/MISSION_STUDENT_AFFAIRS_4K.mp4`
+**Bahan:** `bahan/scene2.webp` → `scripts/prep2.py` → `public/img/s2_*.jpg`; audio `scripts/audio2.py` → `public/sfx/runut2.wav`
+
+| Masa | Syot | Visual | Bunyi |
+|---|---|---|---|
+| 0:00 | Tajuk | Potret sebenar + "MISSION: STUDENT AFFAIRS" dicop masuk | Whoosh, cop + hentakan |
+| 0:02.0 | 1 Fail misi | Fail "MISI HEM" diangkat, push-in ke kulit fail | Fail berdentum, riser, groove misi bermula |
+| 0:03.8 | | Close-up halaman diselak pantas (3D), cop merah | 16 selakan kertas |
+| 0:06.0 | 2 Perhimpunan | Tracking barisan murid | Suasana perhimpunan, wisel, tapak kaki |
+| 0:08.0 | | Zum ke PK HEM menulis di papan klip | Pen, klik papan klip |
+| 0:09.35 | | Snap-zoom ke murid di hujung barisan (reaksi lawak) | "Boing", slide-whistle |
+| 0:11.0 | 3 Kantin | Kantin riuh, dulang lauk | Suasana kantin, sudu garpu |
+| 0:12.35 | | Snap-zoom murid potong barisan (terkejut) | "Boing" menurun |
+| 0:13.5 | | PK HEM menunjuk dengan senyuman tegas | Whoosh + cop |
+| 0:14.9 | | Tarik balik ke barisan | Slide-whistle turun, langkah pantas, sting lawak |
+| 0:16.0 | 4 Pemeriksaan | Pan sepanjang sinki, kilauan bersih | Tapak kaki bergema, air halus |
+| 0:18.4 | | Punch-in ibu jari "bagus", tanda ✓ bersinar hijau | Jingle kejayaan, cop |
+| 0:20.4 | 5 Kebajikan | Dari plaster di lutut tarik keluar ke PK HEM & murid, cahaya hangat | Muzik lembut F major, plaster, tepukan |
+| 0:24.4 | 6 Pejabat | Bersandar santai, push-in | Fail ditutup, kerusi, jingle kejayaan |
+| 0:26.6 | | **Telefon berdering kuat**: snap-zoom ke telefon, gegaran | Deringan telefon ×4 |
+| 0:27.6 | | Close-up wajah "penat", gegaran ikut deringan | Trombon sedih lawak |
+| 0:29.6 | | Potong ke hitam | |
+
+**Had:** sama seperti Babak 1. Gerakan datang daripada kamera, bukan watak; murid tidak benar-benar berjalan dan PK HEM tidak benar-benar menoleh ke kamera (panel papan cerita menunjukkan matanya tertutup).

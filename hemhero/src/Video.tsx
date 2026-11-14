@@ -14,14 +14,14 @@ import '@fontsource/cinzel/700.css';
 import '@fontsource/cinzel/900.css';
 import {f, H, T, W} from './data';
 
-const ease = Easing.bezier(0.45, 0, 0.25, 1);
-const lerp = (fr: number, a: number, b: number, v0: number, v1: number, e = ease) =>
+export const ease = Easing.bezier(0.45, 0, 0.25, 1);
+export const lerp = (fr: number, a: number, b: number, v0: number, v1: number, e = ease) =>
   interpolate(fr, [a, b], [v0, v1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: e});
 
 type Cam = {s: number; x: number; y: number; ox?: number; oy?: number; r?: number};
 
 /** Gambar penuh skrin dengan gerakan kamera (zum ke titik fokus + anjakan). */
-const Shot: React.FC<{
+export const Shot: React.FC<{
   src: string;
   dur: number;
   from: Cam;
@@ -57,7 +57,7 @@ const Shot: React.FC<{
 };
 
 /** Kilauan cahaya merentas kanta cermin mata. */
-const Glint: React.FC<{at: number; x0: number; x1: number; y0: number; y1: number; len?: number}> = ({
+export const Glint: React.FC<{at: number; x0: number; x1: number; y0: number; y1: number; len?: number}> = ({
   at,
   x0,
   x1,
@@ -143,7 +143,7 @@ const Glint: React.FC<{at: number; x0: number; x1: number; y0: number; y1: numbe
   );
 };
 
-const Flash: React.FC<{at: number; len?: number; color?: string; peak?: number}> = ({
+export const Flash: React.FC<{at: number; len?: number; color?: string; peak?: number}> = ({
   at,
   len = 8,
   color = '#fff',
@@ -158,7 +158,7 @@ const Flash: React.FC<{at: number; len?: number; color?: string; peak?: number}>
 };
 
 /** Sinar cahaya wira di belakang watak. */
-const HeroRays: React.FC<{cx?: string; cy?: string; intensity: number}> = ({cx = '50%', cy = '35%', intensity}) => {
+export const HeroRays: React.FC<{cx?: string; cy?: string; intensity: number}> = ({cx = '50%', cy = '35%', intensity}) => {
   const fr = useCurrentFrame();
   return (
     <AbsoluteFill style={{opacity: intensity, mixBlendMode: 'screen'}}>
@@ -180,7 +180,7 @@ const HeroRays: React.FC<{cx?: string; cy?: string; intensity: number}> = ({cx =
 };
 
 /** Habuk terapung dalam cahaya. */
-const Dust: React.FC<{n?: number; color?: string}> = ({n = 40, color = '255,235,200'}) => {
+export const Dust: React.FC<{n?: number; color?: string}> = ({n = 40, color = '255,235,200'}) => {
   const fr = useCurrentFrame();
   return (
     <AbsoluteFill style={{mixBlendMode: 'screen', pointerEvents: 'none'}}>
@@ -312,7 +312,7 @@ const EndCard: React.FC<{dur: number}> = ({dur}) => {
   );
 };
 
-const Grain: React.FC = () => {
+export const Grain: React.FC = () => {
   const fr = useCurrentFrame();
   return (
     <AbsoluteFill
@@ -328,14 +328,14 @@ const Grain: React.FC = () => {
   );
 };
 
-const Letterbox: React.FC<{h: number}> = ({h}) => (
+export const Letterbox: React.FC<{h: number}> = ({h}) => (
   <>
     <div style={{position: 'absolute', left: 0, right: 0, top: 0, height: h, background: '#000'}} />
     <div style={{position: 'absolute', left: 0, right: 0, bottom: 0, height: h, background: '#000'}} />
   </>
 );
 
-const Vignette: React.FC = () => (
+export const Vignette: React.FC = () => (
   <AbsoluteFill
     style={{background: 'radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%)', pointerEvents: 'none'}}
   />

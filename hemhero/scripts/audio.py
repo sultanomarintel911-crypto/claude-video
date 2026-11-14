@@ -303,71 +303,72 @@ def music():
     return reverb(m, rt=2.0, wet=0.22, tone=5000)
 
 
-# ================= Susunan =================
-# Babak 1: loceng
-for k in range(7):
-    put(reverb(bell_strike(640 + rng.uniform(-4, 4)), rt=1.8, wet=0.25), T["s1"] + 0.15 + k * 0.42, 0.55 if k else 0.7, 0.1)
-put(crowd(4.0, 0.6), T["s1"] + 1.4, 0.12)
+if __name__ == "__main__":
+    # ================= Susunan =================
+    # Babak 1: loceng
+    for k in range(7):
+        put(reverb(bell_strike(640 + rng.uniform(-4, 4)), rt=1.8, wet=0.25), T["s1"] + 0.15 + k * 0.42, 0.55 if k else 0.7, 0.1)
+    put(crowd(4.0, 0.6), T["s1"] + 1.4, 0.12)
 
-# Babak 2: kekecohan
-put(whip(), T["s2"] - 0.15, 0.6)
-put(crowd(4.6, 1.4), T["s2"], 0.32)
-for k in range(18):
-    put(footstep(), T["s2"] + k * 0.22 + rng.uniform(0, 0.05), 0.45, np.sin(k) * 0.7)
-put(whistle(0.35), T["s2"] + 2.3, 0.35, 0.4)
-put(whistle(0.8), T["s2"] + 2.75, 0.4, 0.4)
-put(whip(), T["s3a"] - 0.18, 0.5)
+    # Babak 2: kekecohan
+    put(whip(), T["s2"] - 0.15, 0.6)
+    put(crowd(4.6, 1.4), T["s2"], 0.32)
+    for k in range(18):
+        put(footstep(), T["s2"] + k * 0.22 + rng.uniform(0, 0.05), 0.45, np.sin(k) * 0.7)
+    put(whistle(0.35), T["s2"] + 2.3, 0.35, 0.4)
+    put(whistle(0.8), T["s2"] + 2.75, 0.4, 0.4)
+    put(whip(), T["s3a"] - 0.18, 0.5)
 
-# Babak 3a: pejabat sunyi
-for k in range(6):
-    put(clock_tick(), T["s3a"] + 0.25 + k * 0.5, 0.25, -0.5)
-put(crowd(2.8, 0.3), T["s3a"], 0.03)  # riuh jauh di luar
-put(chair_creak(0.8), T["s3a"] + 1.4, 0.35, 0.2)
+    # Babak 3a: pejabat sunyi
+    for k in range(6):
+        put(clock_tick(), T["s3a"] + 0.25 + k * 0.5, 0.25, -0.5)
+    put(crowd(2.8, 0.3), T["s3a"], 0.03)  # riuh jauh di luar
+    put(chair_creak(0.8), T["s3a"] + 1.4, 0.35, 0.2)
 
-# Babak 3b: cermin mata
-put(whoosh(0.6, 200, 1500), T["s3b"] - 0.3, 0.35)
-put(glint(), T["s3b"] + 1.35, 0.6, 0.3)
-put(impact(2.0, 40), T["s3b"] + 1.4, 0.45)
+    # Babak 3b: cermin mata
+    put(whoosh(0.6, 200, 1500), T["s3b"] - 0.3, 0.35)
+    put(glint(), T["s3b"] + 1.35, 0.6, 0.3)
+    put(impact(2.0, 40), T["s3b"] + 1.4, 0.45)
 
-# Babak 4: transformasi
-put(chair_creak(0.6), T["s4a"] + 0.05, 0.4, -0.2)
-put(whoosh(1.1, 150, 5000, 0.7), T["s4a"] + 0.2, 0.75)
-put(riser(2.2), T["s4a"] + 0.2, 0.45)
-put(impact(3.0, 44), T["s4b"], 0.8)
-put(whoosh(0.9, 300, 6000, 0.5), T["s4b"] + 0.05, 0.4)
+    # Babak 4: transformasi
+    put(chair_creak(0.6), T["s4a"] + 0.05, 0.4, -0.2)
+    put(whoosh(1.1, 150, 5000, 0.7), T["s4a"] + 0.2, 0.75)
+    put(riser(2.2), T["s4a"] + 0.2, 0.45)
+    put(impact(3.0, 44), T["s4b"], 0.8)
+    put(whoosh(0.9, 300, 6000, 0.5), T["s4b"] + 0.05, 0.4)
 
-# Babak 5: tapak kaki dalam (gerak perlahan)
-put(whip(), T["s5"] - 0.15, 0.35)
-for k in range(6):
-    put(reverb(footstep(dark=True), rt=1.4, wet=0.35, tone=2500), T["s5"] + 0.25 + k * 0.8, 0.9, (-1) ** k * 0.15)
+    # Babak 5: tapak kaki dalam (gerak perlahan)
+    put(whip(), T["s5"] - 0.15, 0.35)
+    for k in range(6):
+        put(reverb(footstep(dark=True), rt=1.4, wet=0.35, tone=2500), T["s5"] + 0.25 + k * 0.8, 0.9, (-1) ** k * 0.15)
 
-# Babak 6: kekecohan sekejap -> barisan tersusun (lawak)
-put(whip(), T["s6a"] - 0.12, 0.6)
-put(crowd(1.0, 2.0), T["s6a"], 0.4)
-put(footstep(dark=True), T["s6a"] + 0.25, 1.0)
-put(slide_whistle(0.3, 1400, 400), T["s6b"] - 0.32, 0.35)
-put(comedy_sting(), T["s6b"], 0.55)
-for k in range(10):  # kasut berhenti serentak
-    put(footstep(), T["s6b"] + 0.02 + rng.uniform(0, 0.06), 0.25, rng.uniform(-0.9, 0.9))
-put(glint(), T["s6b"] + 2.4, 0.5, 0.2)
+    # Babak 6: kekecohan sekejap -> barisan tersusun (lawak)
+    put(whip(), T["s6a"] - 0.12, 0.6)
+    put(crowd(1.0, 2.0), T["s6a"], 0.4)
+    put(footstep(dark=True), T["s6a"] + 0.25, 1.0)
+    put(slide_whistle(0.3, 1400, 400), T["s6b"] - 0.32, 0.35)
+    put(comedy_sting(), T["s6b"], 0.55)
+    for k in range(10):  # kasut berhenti serentak
+        put(footstep(), T["s6b"] + 0.02 + rng.uniform(0, 0.06), 0.25, rng.uniform(-0.9, 0.9))
+    put(glint(), T["s6b"] + 2.4, 0.5, 0.2)
 
-# Penutup
-put(impact(3.0, 40), T["end"], 0.7)
-put(glint(), T["end"] + 0.9, 0.45)
+    # Penutup
+    put(impact(3.0, 40), T["end"], 0.7)
+    put(glint(), T["end"] + 0.9, 0.45)
 
-MIX += music()[:, : MIX.shape[1]] * 0.9
+    MIX += music()[:, : MIX.shape[1]] * 0.9
 
-# Duck semua di hujung, potong 30 s
-out = MIX[:, :N]
-fade = int(0.6 * SR)
-out[:, -fade:] *= np.linspace(1, 0, fade) ** 2
-out = hp(out, 25)
-peak = np.abs(out).max()
-out = np.tanh(out / peak * 1.6) / np.tanh(1.6) * 0.89
-pcm = (out.T * 32767).astype(np.int16)
-with wave.open(os.path.join(OUT, "runut.wav"), "wb") as w:
-    w.setnchannels(2)
-    w.setsampwidth(2)
-    w.setframerate(SR)
-    w.writeframes(pcm.tobytes())
-print("runut.wav", out.shape[1] / SR, "s")
+    # Duck semua di hujung, potong 30 s
+    out = MIX[:, :N]
+    fade = int(0.6 * SR)
+    out[:, -fade:] *= np.linspace(1, 0, fade) ** 2
+    out = hp(out, 25)
+    peak = np.abs(out).max()
+    out = np.tanh(out / peak * 1.6) / np.tanh(1.6) * 0.89
+    pcm = (out.T * 32767).astype(np.int16)
+    with wave.open(os.path.join(OUT, "runut.wav"), "wb") as w:
+        w.setnchannels(2)
+        w.setsampwidth(2)
+        w.setframerate(SR)
+        w.writeframes(pcm.tobytes())
+    print("runut.wav", out.shape[1] / SR, "s")
