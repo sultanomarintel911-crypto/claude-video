@@ -142,32 +142,41 @@ SKeSO App → kad nama "TN HJ MOHD SHFFRI @ HAFIZZUDIN BIN ABU BAKAR / PENOLONG 
 menghentam pada rentak → whip pan keluar.*
 
 ### 4.3 · PK HEM: arahan diterima di koridor (dolly zoom)
-Bingkai pertama: `bingkai/3A_hem_mula.png`
+Bingkai pertama: `bingkai/3_hem_hero_mula.webp` (hero shot sedia ada: koridor mural Israk dan
+Mikraj di kiri, papan kenyataan di kanan, tablet di bawah lengan kanan).
 ```json
 {
   "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan, gaya trailer filem aksi.",
-  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, cermin mata, sut hitam, kemeja jalur biru, tali leher merah dan tanda nama ROAZMI. Koridor kuning lokasi sebenar dan MESTI kekal sama. Jangan tambah songkok.",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, cermin mata, rambut tanpa songkok, sut hitam, kemeja jalur biru, tali leher merah bercorak, tanda nama ROAZMI dan tablet hitam. Koridor ini lokasi sebenar dan MESTI kekal sama: mural Israk dan Mikraj di dinding kiri, papan kenyataan dan bingkai visi sekolah di kanan, bangku kayu.",
   "urutan": [
     {
-      "masa": "0–2 saat",
-      "aksi": "Guru berdiri di koridor; tablet di tangannya bergetar dan menyala biru. Dia memandangnya, terkejut.",
-      "kamera": "Dolly zoom (kesan vertigo): kamera ke hadapan sambil zum keluar, koridor di belakang meregang memanjang."
+      "masa": "0–1.5 saat",
+      "aksi": "Guru berdiri tegak dengan tablet di bawah lengan. Satu jalur cahaya biru-emas meluncur masuk dari hujung koridor di belakangnya dan menyambar tablet; tablet bergetar dan memancarkan cahaya biru.",
+      "kamera": "Kamera statik, sudut rendah (low-angle hero shot) seperti imej permulaan."
     },
     {
-      "masa": "2–6 saat",
-      "aksi": "Guru mengangguk tegas, menyelitkan tablet di bawah lengan dan berjalan laju di sepanjang koridor dengan penuh tekad.",
-      "kamera": "Sudut rendah dari lantai (low-angle hero shot), kamera mundur pantas di hadapannya."
+      "masa": "1.5–3.5 saat",
+      "aksi": "Guru mengangkat tablet ke paras dada dan memandang skrin yang menyala; matanya membesar, terkejut membaca arahan.",
+      "kamera": "Dolly zoom (kesan vertigo): kamera bergerak ke hadapan sambil zum keluar; wajah guru kekal sama saiz manakala koridor di belakang meregang memanjang."
     },
     {
-      "masa": "6–8 saat",
-      "aksi": "Guru berhenti di hadapan pintu kelas kuning dan memandang lensa.",
-      "kamera": "Tahan sekejap, kemudian whip pan pantas ke kanan dengan kabur gerak."
+      "masa": "3.5–6.5 saat",
+      "aksi": "Guru mengangguk tegas, menyelitkan tablet kembali di bawah lengan dan mula berjalan laju ke arah kamera dengan penuh tekad.",
+      "kamera": "Sudut rendah dari paras pinggang, kamera mundur pantas seiring langkahnya."
+    },
+    {
+      "masa": "6.5–8 saat",
+      "aksi": "Guru berhenti dekat dengan kamera dan memandang lensa dengan yakin.",
+      "kamera": "Tahan sekejap, kemudian whip pan pantas ke kanan dengan kabur gerak yang kuat."
     }
   ],
+  "pencahayaan": "Cahaya siang lembut dari hujung koridor, pantulan biru dari tablet pada wajah, gred teal-oren.",
   "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
-  "negatif": "Jangan ubah wajah atau koridor, tiada tulisan."
+  "negatif": "Jangan ubah wajah atau tanda nama, jangan tambah songkok, jangan ubah mural atau koridor, tiada orang tambahan, tiada tulisan tambahan."
 }
 ```
+*Suntingan: whip pan masuk dari PKP → jalur cahaya → dolly zoom (digital jika AI gagal) → speed ramp
+pada langkah pertama → kad nama "ROAZMI ... / PENOLONG KANAN HAL EHWAL MURID" → whip pan keluar.*
 
 ### 4.4 · PK KOKURIKULUM: sepakan (speed ramp semasa suntingan)
 Imej permulaan: jana seperti `PROMPT_4_PK_KO.md` (4A).
