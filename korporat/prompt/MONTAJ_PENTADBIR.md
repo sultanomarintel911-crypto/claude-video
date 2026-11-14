@@ -176,7 +176,7 @@ Mikraj di kiri, papan kenyataan di kanan, tablet di bawah lengan kanan).
 }
 ```
 *Suntingan: whip pan masuk dari PKP → jalur cahaya → dolly zoom (digital jika AI gagal) → speed ramp
-pada langkah pertama → kad nama "ROAZMI ... / PENOLONG KANAN HAL EHWAL MURID" → whip pan keluar.*
+pada langkah pertama → kad nama "ROAZMI BIN MOHAMAD / PENOLONG KANAN HAL EHWAL MURID" → whip pan keluar.*
 
 ### 4.4 · PK KOKURIKULUM: sepakan (speed ramp semasa suntingan)
 Imej permulaan: jana seperti `PROMPT_4_PK_KO.md` (4A).

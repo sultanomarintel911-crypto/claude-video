@@ -1,4 +1,4 @@
-# 3 · PK Hal Ehwal Murid: Cikgu Roazmi (PK HEM baharu)
+# 3 · PK Hal Ehwal Murid: Encik Roazmi bin Mohamad (PK HEM baharu)
 
 **Watak:** penyayang, tegas tetapi mesra. Kebajikan, disiplin dan rekod kehadiran murid.
 **Rupa (lembaran watak):** tanpa songkok, rambut hitam pendek, cermin mata berbingkai hitam
@@ -100,6 +100,5 @@ harian) + latar `3A_latar_koridor.jpg`.
 
 ---
 
-## Perlu disahkan
-- **Nama penuh Cikgu Roazmi** untuk lower-third (contoh: "ROAZMI BIN ... · PENOLONG KANAN HAL EHWAL MURID").
-- Ada foto **dataran perhimpunan** sebenar? Jika ada, saya buat versi 3A di dataran (barisan murid + imbasan kehadiran).
+## Kad nama
+ROAZMI BIN MOHAMAD · PENOLONG KANAN HAL EHWAL MURID
