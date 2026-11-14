@@ -41,23 +41,12 @@ menerimanya di lokasi masing-masing → **dolly zoom** (terkejut) → terus bert
 
 ## 3. Kad nama (dibuat semasa suntingan)
 
-Setiap watak dapat kad gaya "fail ejen":
+Ringkas dan rasmi: **nama + jawatan sahaja**, tiada baris tambahan.
 
 ```
-[ JAWATAN ]            PENOLONG KANAN PENTADBIRAN
-[ NAMA ]               TN HJ MOHD SHFFRI @ HAFIZZUDIN BIN ABU BAKAR
-[ KEPAKARAN ]          ⏳ untuk dipersetujui
+RUSMADI BIN ABDULLAH
+GURU BESAR
 ```
-
-Cadangan baris "kepakaran". Sila pilih, ubah atau buang:
-
-| Watak | Cadangan |
-|---|---|
-| Guru Besar | Peneraju Visi Digital |
-| PK Pentadbiran | Arkitek Sistem Pintar |
-| PK HEM | Pelindung Kebajikan Murid |
-| PK Kokurikulum | Penggerak Bakat Juara |
-| PK Pendidikan Khas | Jambatan Pendidikan Inklusif |
 
 ---
 
@@ -67,32 +56,38 @@ Gunakan bingkai/latar yang sudah disediakan dalam `bingkai/`. Langkah 1 (kemaska
 Nano Banana) sama seperti fail prompt setiap watak.
 
 ### 4.1 · GURU BESAR: arahan dihantar
-Bingkai pertama: `bingkai/1A_gb_gerbang_mula.png`
+**Klip sedia ada:** `Man_animating_hovering_object` (7.8 s). GB di gerbang senja, emblem SKeSO
+terapung di tapak tangan, kamera tolak masuk ke syot dekat.
+**Sambungan (4.1b):** bingkai pertama = `bingkai/1B_gb_sambungan_mula.png` (bingkai terakhir klip
+tadi, dengan tulisan "Teras" yang dijana AI dibuang).
+
 ```json
 {
-  "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan, gaya trailer filem aksi.",
-  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, cermin mata, songkok, sut hitam, tali leher merah dan tanda nama Guru Besar. Pintu gerbang 'SK SULTAN OMAR 1956' lokasi sebenar dan MESTI kekal sama.",
+  "format": "Video fotorealistik sinematik 16:9, sekitar 6 saat, satu syot berterusan, gaya trailer filem aksi, sambungan terus daripada imej permulaan.",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, cermin mata, songkok, sut hitam, kemeja putih dan tali leher merah Guru Besar, emblem bulat biru-emas di atas tapak tangannya, cahaya senja dan pintu gerbang kabur di latar.",
   "urutan": [
     {
-      "masa": "0–4 saat",
-      "aksi": "Guru Besar berjalan perlahan dan berwibawa melalui pintu gerbang ke arah kamera, angin meniup lembut hujung kotnya.",
-      "kamera": "Sudut sangat rendah dari paras lutut (low-angle hero shot), kamera mundur perlahan seiring langkahnya. Gerak perlahan."
+      "masa": "0–2 saat",
+      "aksi": "Guru Besar menurunkan pandangan daripada emblem dan memandang terus ke lensa dengan tegas dan yakin. Emblem terus berputar perlahan di atas tapak tangannya.",
+      "kamera": "Kamera statik pada syot dekat, sedikit dari bawah (low-angle)."
+    },
+    {
+      "masa": "2–4 saat",
+      "aksi": "Guru Besar menolak tapak tangannya ke hadapan dengan tegas. Emblem memancar terang dan berpecah menjadi empat jalur cahaya biru-emas yang meluncur laju ke empat arah berbeza, meninggalkan ekor cahaya di udara senja.",
+      "kamera": "Tarik ke belakang (pull back) dengan pantas ke syot separuh badan, menampakkan jalur cahaya terbang keluar dari bingkai."
     },
     {
       "masa": "4–6 saat",
-      "aksi": "Guru Besar berhenti, mengangkat tablet dan mengetik skrin dengan tegas sekali. Bingkai hologram biru kecil memancar dari tablet.",
-      "kamera": "Tolak masuk pantas ke syot dada."
-    },
-    {
-      "masa": "6–8 saat",
-      "aksi": "Guru Besar mengangkat pandangan ke lensa dengan senyuman yakin.",
-      "kamera": "Tahan sekejap, kemudian whip pan pantas ke kanan dengan kabur gerak."
+      "aksi": "Guru Besar menurunkan tangan, berdiri tegak memerhati jalur cahaya terakhir hilang ke kanan, kemudian tersenyum kecil.",
+      "kamera": "Whip pan pantas ke kanan mengikut jalur cahaya terakhir, dengan kabur gerak yang kuat."
     }
   ],
-  "pencahayaan": "Cahaya petang keemasan dari belakang (rim light), kontras tinggi, gred teal-oren.",
-  "negatif": "Jangan ubah wajah atau gerbang, tiada orang tambahan, tiada tulisan."
+  "pencahayaan": "Matahari terbenam di belakang, rim light keemasan, kontras tinggi, gred teal-oren.",
+  "negatif": "Jangan ubah wajah, jangan tambah tulisan atau label di atas emblem, jangan tambah orang lain, jangan herotkan tangan."
 }
 ```
+*Empat jalur cahaya = arahan kepada empat Penolong Kanan. Setiap scene PK seterusnya dibuka
+dengan jalur cahaya itu tiba (saya tambah semasa suntingan) sebelum dolly zoom.*
 
 ### 4.2 · PK PENTADBIRAN: arahan diterima (dolly zoom)
 Bingkai pertama: `bingkai/2A_pkp_mula.png`
