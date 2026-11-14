@@ -90,32 +90,54 @@ tadi, dengan tulisan "Teras" yang dijana AI dibuang).
 dengan jalur cahaya itu tiba (saya tambah semasa suntingan) sebelum dolly zoom.*
 
 ### 4.2 · PK PENTADBIRAN: arahan diterima (dolly zoom)
-Bingkai pertama: `bingkai/2A_pkp_mula.png`
+
+**Langkah 1: imej permulaan (Nano Banana / Gemini)**
+Lampirkan `bingkai/2A_pkp_mula.png` + lembaran watak CIKGU SHFFRI:
+
+> Gunakan bilik dalam gambar ini (Be Excellent Hub: dinding marmar, TV hitam, panel kayu berlampu,
+> tulisan Google Future Classroom, meja bulat dan kerusi teal) dan kekalkan sepenuhnya. Jadikan
+> **syot sederhana dekat (paras pinggang ke atas)**: Cikgu Shffri berdiri di sebelah kanan TV,
+> badan serong 45°, memegang tablet hitam dengan kedua-dua tangan di paras dada sambil membaca
+> skrin dengan tenang. Kekalkan wajah, cermin mata, rambut tanpa songkok, sut hitam, kemeja biru
+> muda, tali leher merah bercorak dan tanda nama SHFFRI tepat seperti lembaran watak. Kamera
+> sedikit dari bawah. Pencahayaan dalam bilik lembut, gred teal-oren sinematik. Fotorealistik
+> 16:9. Tiada tulisan tambahan.
+
+**Langkah 2: image-to-video**
 ```json
 {
   "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan, gaya trailer filem aksi.",
-  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, cermin mata, sut hitam, kemeja biru muda, tali leher merah bercorak dan tanda nama. Be Excellent Hub lokasi sebenar dan MESTI kekal sama. Jangan tambah songkok.",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, cermin mata, rambut, sut hitam, kemeja biru muda, tali leher merah bercorak dan tanda nama guru. Be Excellent Hub lokasi sebenar dan MESTI kekal sama: dinding marmar, TV, panel kayu berlampu, tulisan Google Future Classroom. Jangan tambah songkok.",
   "urutan": [
     {
-      "masa": "0–2 saat",
-      "aksi": "Guru memandang tablet; skrin tablet menyala biru tiba-tiba. Matanya membesar, terkejut.",
-      "kamera": "Dolly zoom (kesan vertigo): kamera bergerak ke hadapan sambil zum keluar, wajah guru kekal sama saiz manakala latar bilik meregang ke belakang."
+      "masa": "0–1.5 saat",
+      "aksi": "Satu jalur cahaya biru-emas meluncur masuk dari kiri bingkai dan menyambar tablet di tangan guru. Skrin tablet menyala terang, memancarkan cahaya biru ke wajahnya.",
+      "kamera": "Kamera statik, syot sederhana dekat."
     },
     {
-      "masa": "2–5 saat",
-      "aksi": "Riak terkejut bertukar menjadi senyuman yakin. Guru meleret jari pada tablet dengan pantas; panel hologram segi empat besar terbuka di hadapan TV, permukaan kelabu gelap dan kosong.",
-      "kamera": "Melengkung pantas ke sisi sehingga panel dan guru dalam satu bingkai."
+      "masa": "1.5–3.5 saat",
+      "aksi": "Mata guru membesar dan keningnya terangkat, terkejut membaca arahan pada skrin.",
+      "kamera": "Dolly zoom (kesan vertigo): kamera bergerak ke hadapan sambil zum keluar; wajah guru kekal sama saiz manakala TV dan dinding marmar di belakang meregang menjauh."
     },
     {
-      "masa": "5–8 saat",
-      "aksi": "Guru berdiri tegak di sebelah panel, memandang lensa.",
-      "kamera": "Sudut rendah (low-angle), tahan sekejap, kemudian whip pan pantas ke kanan dengan kabur gerak."
+      "masa": "3.5–6 saat",
+      "aksi": "Riak terkejut bertukar menjadi senyuman yakin. Guru meleret jari pada tablet dengan pantas ke arah TV; panel hologram segi empat besar terbuka di hadapan TV, permukaan kelabu gelap dan kosong.",
+      "kamera": "Melengkung pantas ke kiri sehingga guru dan panel berada dalam satu bingkai."
+    },
+    {
+      "masa": "6–8 saat",
+      "aksi": "Guru berdiri tegak di sebelah panel dan memandang lensa dengan yakin.",
+      "kamera": "Turun ke sudut rendah (low-angle hero shot), tahan sekejap, kemudian whip pan pantas ke kanan dengan kabur gerak yang kuat."
     }
   ],
-  "panel": "Panel kelabu gelap dan kosong, cahaya biru hanya pada bingkai luar.",
-  "negatif": "Jangan ubah wajah atau bilik, tiada tulisan."
+  "panel": "Bahagian dalam panel kekal kelabu gelap dan kosong, tanpa tulisan, ikon atau logo. Cahaya biru hanya pada bingkai luar.",
+  "pencahayaan": "Cahaya dalam bilik lembut, lampu jalur kayu hangat, pantulan biru dari tablet pada wajah, gred teal-oren.",
+  "negatif": "Jangan ubah wajah atau bilik, jangan tambah songkok, jangan tambah orang lain, tiada tulisan."
 }
 ```
+*Suntingan: whip pan masuk dari klip GB → jalur cahaya tiba → dolly zoom → panel diisi paparan
+SKeSO App → kad nama "TN HJ MOHD SHFFRI @ HAFIZZUDIN BIN ABU BAKAR / PENOLONG KANAN PENTADBIRAN"
+menghentam pada rentak → whip pan keluar.*
 
 ### 4.3 · PK HEM: arahan diterima di koridor (dolly zoom)
 Bingkai pertama: `bingkai/3A_hem_mula.png`
