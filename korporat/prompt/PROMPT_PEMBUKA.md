@@ -41,6 +41,7 @@ Kling dan Veo kedua-duanya ada pilihan ini.
   ],
   "emblem": "Saiz emblem TIDAK melebihi satu perlima tinggi bingkai pada bila-bila masa, dan semakin kecil sepanjang syot. Kekalkan rupa emblem seperti imej: cincin logam gelap dan emas, simbol atom biru, lencana sekolah di tengah.",
   "pencahayaan": "Siang cerah, langit biru berawan seperti foto asal.",
+  "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
   "negatif": "Jangan besarkan emblem, jangan ubah bangunan, jangan tambah bangunan lain, jangan herotkan tulisan pada mural, tiada orang tambahan."
 }
 ```

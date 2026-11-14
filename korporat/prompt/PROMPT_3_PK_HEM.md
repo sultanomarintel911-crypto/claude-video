@@ -48,6 +48,7 @@ Lampirkan `3A_hem_mula.png` + lembaran watak CIKGU ROAZMI:
   ],
   "panel": "Bahagian dalam panel kekal kelabu gelap dan kosong, tanpa tulisan atau ikon. Cahaya biru hanya pada bingkai luar.",
   "pencahayaan": "Cahaya pagi semula jadi dari sisi kiri, langit cerah.",
+  "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
   "negatif": "Jangan ubah wajah, jangan tambah songkok, jangan ubah warna kemeja atau tali leher, jangan ubah koridor, tiada tulisan tambahan."
 }
 ```
@@ -92,6 +93,7 @@ harian) + latar `3A_latar_koridor.jpg`.
     }
   ],
   "skrin": "Skrin tablet dipalingkan dari kamera, tiada tulisan kelihatan.",
+  "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
   "negatif": "Jangan ubah wajah, jangan herotkan murid, pakaian seragam konsisten, tiada tulisan."
 }
 ```

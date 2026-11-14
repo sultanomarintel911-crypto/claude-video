@@ -48,6 +48,7 @@ Lampirkan `2A_pkp_mula.png` + lembaran watak CIKGU SHFFRI:
   ],
   "panel": "Bahagian dalam panel kekal kelabu gelap dan kosong, tanpa tulisan, ikon atau logo. Cahaya biru hanya pada bingkai luar.",
   "pencahayaan": "Cahaya dalam bilik yang lembut, lampu jalur pada panel kayu menyala hangat.",
+  "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
   "negatif": "Jangan ubah wajah, jangan tambah songkok, jangan ubah warna kemeja atau tali leher, jangan ubah bilik, tiada orang tambahan, tiada tulisan."
 }
 ```
@@ -94,6 +95,7 @@ Lampirkan `2B_latar_be_excellent_hub_meja.jpg` + lembaran watak CIKGU SHFFRI:
   ],
   "skrin": "Skrin laptop dipalingkan dari kamera; skrin TV kekal hitam.",
   "suasana": "Profesional, kolaboratif, mesra.",
+  "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
   "negatif": "Jangan ubah wajah, jangan tambah songkok, jangan ubah bilik, tiada tulisan tambahan."
 }
 ```

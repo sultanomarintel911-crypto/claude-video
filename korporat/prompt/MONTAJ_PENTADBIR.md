@@ -83,6 +83,7 @@ tadi, dengan tulisan "Teras" yang dijana AI dibuang).
     }
   ],
   "pencahayaan": "Matahari terbenam di belakang, rim light keemasan, kontras tinggi, gred teal-oren.",
+  "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
   "negatif": "Jangan ubah wajah, jangan tambah tulisan atau label di atas emblem, jangan tambah orang lain, jangan herotkan tangan."
 }
 ```
@@ -132,6 +133,7 @@ Lampirkan `bingkai/2A_pkp_mula.png` + lembaran watak CIKGU SHFFRI:
   ],
   "panel": "Bahagian dalam panel kekal kelabu gelap dan kosong, tanpa tulisan, ikon atau logo. Cahaya biru hanya pada bingkai luar.",
   "pencahayaan": "Cahaya dalam bilik lembut, lampu jalur kayu hangat, pantulan biru dari tablet pada wajah, gred teal-oren.",
+  "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
   "negatif": "Jangan ubah wajah atau bilik, jangan tambah songkok, jangan tambah orang lain, tiada tulisan."
 }
 ```
@@ -162,6 +164,7 @@ Bingkai pertama: `bingkai/3A_hem_mula.png`
       "kamera": "Tahan sekejap, kemudian whip pan pantas ke kanan dengan kabur gerak."
     }
   ],
+  "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
   "negatif": "Jangan ubah wajah atau koridor, tiada tulisan."
 }
 ```
@@ -195,6 +198,7 @@ Imej permulaan: jana seperti `PROMPT_4_PK_KO.md` (4A).
     }
   ],
   "fizik": "Hanya satu bola, bergerak realistik dan masuk ke dalam gawang.",
+  "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
   "negatif": "Jangan ubah wajah, jangan tambah bola kedua, jangan herotkan kaki, tiada tulisan."
 }
 ```
@@ -224,6 +228,7 @@ Imej permulaan: jana seperti `PROMPT_4_PK_KO.md` (4A).
     }
   ],
   "nada": "Hangat, inklusif, bermaruah. Bukan simpati berlebihan.",
+  "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
   "negatif": "Jangan herotkan wajah murid, tiada tulisan."
 }
 ```
@@ -247,6 +252,7 @@ Imej permulaan: jana dengan kelima-lima lembaran watak + `lokasi/01_gerbang_1956
     }
   ],
   "pencahayaan": "Matahari terbenam di belakang (rim light kuat), suar kanta, gred teal-oren.",
+  "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
   "negatif": "Jangan ubah wajah, tiada orang tambahan, tiada tulisan."
 }
 ```

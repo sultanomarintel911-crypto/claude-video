@@ -40,6 +40,7 @@ Muat naik `1A_gb_gerbang_mula.png` + lembaran watak RUSMADI ke Nano Banana / Gem
   "pencahayaan": "Siang cerah, langit biru berawan, cahaya semula jadi lembut, bayang lembut di kaki.",
   "emblem": "Emblem sentiasa KECIL (lebih kecil daripada kepala Guru Besar) dan berada di latar belakang, tidak menutup wajah atau papan nama sekolah.",
   "suasana": "Mesra, berwibawa, mengalu-alukan.",
+  "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
   "negatif": "Jangan besarkan emblem, jangan ubah wajah, jangan tambah orang lain, jangan herotkan tulisan pada gerbang, jangan ubah pakaian, tiada tulisan tambahan."
 }
 ```

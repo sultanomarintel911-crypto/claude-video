@@ -54,6 +54,7 @@ Lampirkan rujukan rupa + foto dron padang:
   ],
   "fizik": "Hanya satu bola. Bola bergerak secara realistik dan masuk ke dalam gawang, bukan melantun keluar.",
   "pencahayaan": "Cahaya petang keemasan dari belakang (rim light), langit cerah.",
+  "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
   "negatif": "Jangan ubah wajah, jangan tambah bola kedua, jangan herotkan kaki atau tangan, jangan herotkan tulisan SKeSO, tiada tulisan tambahan."
 }
 ```
@@ -92,6 +93,7 @@ Lampirkan rujukan rupa + foto dron padang:
     }
   ],
   "skrin": "Skrin laptop dipalingkan dari kamera.",
+  "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
   "negatif": "Jangan ubah wajah, jangan ubah bilik, tiada tulisan tambahan."
 }
 ```
