@@ -26,19 +26,22 @@ const SHOTS: Shot[] = [
   [76.2, 'lift_opens_basement', 0, 7.85, 0.7],
   [84.05, 'man_walking_office', 0, 7.85, 0], // suara Inggeris dibuang -> GB_02
   // 91.9 - 97.0 kad tajuk
-  [97.0, 'woman_reading_hologram', 0, 3.4, 0.7], // dipotong sebelum teks Inggeris muncul
-  [100.4, 'woman_touching_earpiece', 0, 5.97, 2.4], // "Baik tuan, saya uruskan."
-  [106.37, 'two_teachers_glowing', 1.4, 6.6, 0.5], // dipotong supaya wajah tidak kelihatan
-  [112.97, 'teacher_wearing_headset', 0, 5.0, 0.5],
-  [117.97, 'teachers_invisible_a', 2.5, 5.5, 0.5],
-  [123.47, 'visor_reflections', 3.0, 7.0, 0.6], // berakhir dengan "?" pada 128.77
-  [130.47, 'hands_opening_box', 0, 7.85, 0.6],
-  [138.32, 'fingers_lifting_photo', 0, 7.85, 0.6],
+  [97.0, 'woman_reading_hologram', 0, 5.97, 0.7], // teks Inggeris ditutup dengan hologram Melayu
+  [102.97, 'woman_touching_earpiece', 0, 5.97, 2.4], // "Baik tuan, saya uruskan."
+  // mesyuarat penuh (tiada had tempoh)
+  [108.94, 'two_teachers_glowing', 0, 8.04, 0.5], // syot mesyuarat ramai-ramai (visor VR menutup wajah)
+  [116.98, 'teacher_wearing_headset', 0, 10.0, 0.5],
+  [126.98, 'teachers_invisible_a', 0, 8.04, 0.5],
+  [135.02, 'teachers_invisible_b', 2.6, 4.1, 0.5], // tangan menyapu hologram
+  [139.12, 'visor_reflections', 0, 10.0, 0.6], // berakhir dengan "?" pada 147.42
+  // kotak kenangan: penutup dibuka (klip pertama), kemudian gambar dikeluarkan (klip penuh)
+  [149.12, 'hands_opening_box', 0, 2.8, 0.6],
+  [151.92, 'fingers_lifting_photo', 0, 7.85, 0.6],
 ];
 const TAJUK = 91.9;
-const SOAL = 128.77; // "?" dalam visor
-const KOTAK = 130.0; // muzik Princesses Heart
-const AKHIR = 150.0;
+const SOAL = 147.42; // "?" dalam visor
+const KOTAK = 148.7; // muzik Princesses Heart
+const AKHIR = 164.0;
 
 // VO prolog: [mula, fail, teks sari kata]
 const VO: Array<[number, string, string]> = [
@@ -57,7 +60,7 @@ const DIALOG: Array<[number, string, string]> = [
   [84.75, 'GB_02', 'Adakan mesyuarat segera. Cari Tokoh Murid tahun ini.'],
 ];
 const DIALOG_LEN: Record<string, number> = {GB_01: 3.0, GB_02: 4.86};
-const SUB_ASAL: Array<[number, number, string]> = [[103.9, 106.0, 'Baik, tuan. Saya uruskan.']];
+const SUB_ASAL: Array<[number, number, string]> = [[106.47, 108.6, 'Baik, tuan. Saya uruskan.']];
 
 // ------------------------------------------------------------------ komponen kecil
 const Sub: React.FC<{text: string; len: number}> = ({text, len}) => {
@@ -79,6 +82,61 @@ const Klip: React.FC<{name: string; from: number; len: number; rate?: number; zo
       <AbsoluteFill style={{transform: `scale(${z})`, opacity: fadeIn}}>
         <OffthreadVideo src={staticFile(name)} muted trimBefore={f(from)} playbackRate={rate} />
       </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
+
+// ------------------------------------------------------------------ hologram Melayu menutup teks Inggeris
+// kedudukan panel dijejak daripada klip asal (saat -> x0,y0,x1,y1)
+const PANEL: Array<[number, number, number, number, number]> = [
+  [3.9, 868, 215, 1484, 579],
+  [4.0, 883, 205, 1527, 595],
+  [4.2, 888, 204, 1551, 612],
+  [4.6, 899, 198, 1583, 631],
+  [5.0, 924, 198, 1604, 627],
+  [5.5, 928, 197, 1624, 636],
+  [5.97, 927, 195, 1636, 645],
+];
+const HologramMelayu: React.FC = () => {
+  const fr = useCurrentFrame();
+  const t = fr / FPS;
+  if (t < 3.82) return null;
+  const k = (i: number) => interpolate(t, PANEL.map((p) => p[0]), PANEL.map((p) => p[i]), {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const [x0, y0, x1, y1] = [k(1), k(2), k(3), k(4)];
+  const w = x1 - x0;
+  const h = y1 - y0;
+  // tutup kawasan teks sahaja (bahagian tengah panel)
+  const cx0 = x0 + w * 0.09;
+  const cy0 = y0 + h * 0.2;
+  const cw = w * 0.82;
+  const ch = h * 0.58;
+  const o = ci(fr, f(3.82), f(4.05));
+  return (
+    <AbsoluteFill style={{opacity: o}}>
+      <div
+        style={{
+          position: 'absolute',
+          left: cx0,
+          top: cy0,
+          width: cw,
+          height: ch,
+          borderRadius: 10,
+          background: 'rgba(131,180,187,0.97)',
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)',
+          backgroundSize: '22px 22px',
+          boxShadow: '0 0 22px 10px rgba(131,180,187,0.95)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <div style={{fontFamily: SANS, fontWeight: 700, fontSize: Math.min(ch * 0.22, cw * 0.078), lineHeight: 1.15, color: '#effffd', textAlign: 'center', whiteSpace: 'nowrap', textShadow: '0 0 12px rgba(220,255,255,0.9)'}}>
+          Cari Tokoh Murid
+          <br />
+          tahun ini, segera.
+        </div>
+      </div>
     </AbsoluteFill>
   );
 };
@@ -203,7 +261,7 @@ const SFX: Sfx[] = [
   [38.78, 'sfx/taiko', 0.55],
   [39.44, 'sfx/taiko', 0.55],
   [40.28, 'sfx/braam', 0.6],
-  [146.17, 'sfx/whoosh_panjang', 0.4],
+  [159.77, 'sfx/whoosh_panjang', 0.4],
 ];
 // whoosh pada setiap potongan
 SHOTS.forEach(([t]) => {
@@ -226,13 +284,14 @@ export const TrailerBahagian1: React.FC = () => {
       {SHOTS.map(([t, name, from, len], i) => (
         <Sequence key={i} from={f(t)} durationInFrames={f(len)}>
           <Klip name={`v8/flow/${name}.mp4`} from={from} len={len} />
+          {name === 'woman_reading_hologram' ? <HologramMelayu /> : null}
           <Vignette strength={0.45} />
         </Sequence>
       ))}
       <Sequence from={f(TAJUK)} durationInFrames={f(5.1)}>
         <KadTajuk />
       </Sequence>
-      <Sequence from={f(146.17)} durationInFrames={f(AKHIR - 146.17)}>
+      <Sequence from={f(159.77)} durationInFrames={f(AKHIR - 159.77)}>
         <AkhirBahagian />
       </Sequence>
       {/* sari kata dialog */}
