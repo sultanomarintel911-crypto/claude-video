@@ -28,8 +28,8 @@ def load(n):
 
 # (nombor gambar, rawatan, titik Thoriq (x,y dinormal), pecahan kepala daripada tinggi badan)
 ITEMS = [
-    (103, "jelas", None, 0),
-    (95, "jelas", None, 0),
+    (103, "asli", None, 0),  # gambar kecil: tidak dikaburkan
+    (95, "asli", None, 0),  # gambar kecil: tidak dikaburkan
     (100, "jelas", None, 0),
     (94, "jelas", None, 0),
     (90, "jelas", None, 0),
@@ -107,6 +107,10 @@ for i, (n, mode, pt, headf) in enumerate(ITEMS):
     im = load(n)
     im.thumbnail((2000, 2000), Image.LANCZOS)
     a = np.asarray(im).astype(np.float32)
+    if mode == "asli":
+        Image.fromarray(a.astype(np.uint8)).save(f"{OUT}/h{i + 1:02d}.jpg", quality=92)
+        print(f"h{i + 1:02d} <- #{n:03d} asli (tidak dikaburkan)")
+        continue
     a, nf = blur_faces(a)
     # lapisan keselamatan: kaburkan bahagian kepala SETIAP orang (wajah kecil yang terlepas)
     pm = (np.asarray(remove(im, session=sess, only_mask=True, post_process_mask=True)) > 128).astype(np.uint8)
@@ -138,11 +142,9 @@ for i, (n, mode, pt, headf) in enumerate(ITEMS):
     out.save(f"{OUT}/h{i + 1:02d}.jpg", quality=92)
     print(f"h{i + 1:02d} <- #{n:03d} {mode} {out.size} wajah={nf}")
 
-# gambar terawal (hujung kotak kenangan): wajah dikaburkan juga
-aw = np.asarray(load(101)).astype(np.float32)
-aw, _ = blur_faces(aw)
-Image.fromarray(np.clip(aw, 0, 255).astype(np.uint8)).save(os.path.join(IMG, "awal.jpg"), quality=92)
-print("awal.jpg dikaburkan")
+# gambar terawal (hujung kotak kenangan)
+load(101).save(os.path.join(IMG, "awal.jpg"), quality=92)  # gambar kecil: tidak dikaburkan
+print("awal.jpg asli")
 
 # fail misi: papan tanda sahaja (tiada orang, tiada skuasy)
 for n, name, box in ((57, "istanbul", (0.12, 0.0, 0.98, 0.42)), (60, "birmingham", (0.0, 0.0, 1.0, 0.44))):

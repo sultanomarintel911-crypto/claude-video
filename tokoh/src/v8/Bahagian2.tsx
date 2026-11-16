@@ -43,7 +43,7 @@ bab('BAB III', 'MULA DIKENALI');
 ['h07', 'h08', 'h09'].forEach(foto);
 sulit('JOHAN ███', 'PERINGKAT NEGERI');
 bab('BAB IV', '█████████');
-['h10', 'h11', 'h12'].forEach(foto);
+['h10', 'h12'].forEach(foto); // h11 (lari berpagar) dipindah ke montaj selepas pendedahan, penuh skrin
 const MORPH = tt; // 59.2
 const PETA = MORPH + 17.7; // 76.9
 const KLIMAKS = 112.0;
@@ -243,7 +243,7 @@ const KImg: React.FC<{src: string; len: number; z?: [number, number]}> = ({src, 
 // kelipan kenangan pantas sebelum kiraan detik
 const Kelipan: React.FC<{len: number}> = ({len}) => {
   const fr = useCurrentFrame();
-  const list = ['h10', 'h05', 'h11', 'h08', 'h02', 'h12', 'h07', 'h04', 'h09', 'h01', 'h06', 'h03'];
+  const list = ['h10', 'h05', 'h08', 'h02', 'h12', 'h07', 'h04', 'h09', 'h01', 'h06', 'h03'];
   const k = Math.floor(fr / 6) % list.length;
   const flash = fr % 6 < 1 ? 0.5 : 0;
   return (
@@ -301,15 +301,23 @@ SFX.push([KLIMAKS + 12.5, 'sfx/stinger', 0.4], [KLIMAKS + 18.5, 'sfx/riser', 0.6
 {
   let tb = KLIMAKS + 23.5;
   let gap = 0.9;
-  while (tb < DROP - 1.2) {
-    SFX.push([tb, 'sfx/degupan', 0.8]);
+  while (tb < DROP - 1.9) {
+    SFX.push([tb, 'sfx/degupan', tb > KLIMAKS + 29.5 ? 0.45 : 0.7]);
     tb += gap;
     gap = Math.max(0.45, gap * 0.88);
   }
 }
 [0, 1, 2].forEach((k) => SFX.push([KLIMAKS + 27 + k, 'sfx/taiko', 0.7], [KLIMAKS + 27 + k, 'sfx/detik', 0.7]));
 // pendedahan
-SFX.push([DROP, 'sfx/impact_besar', 0.75], [DROP, 'sfx/braam', 0.65], [DROP + 0.1, 'sfx/koir', 0.5], [DROP + 0.6, 'sfx/tepukan', 0.55]);
+SFX.push([DROP - 1.5 - 1.55, 'sfx/sedutan', 0.7]);
+SFX.push(
+  [DROP, 'sfx/impact_besar', 1.0],
+  [DROP, 'sfx/braam', 0.95],
+  [DROP, 'sfx/sub_drop', 0.9],
+  [DROP, 'sfx/taiko', 0.9],
+  [DROP + 0.1, 'sfx/koir', 0.6],
+  [DROP + 0.4, 'sfx/tepukan', 0.75],
+);
 
 export const TrailerBahagian2: React.FC = () => {
   const [h] = useState(() => delayRender('fon'));
@@ -365,9 +373,9 @@ export const TrailerBahagian2: React.FC = () => {
       <Sequence from={f(kStart + 27.0)} durationInFrames={f(3.0)}>
         <SceneKira />
       </Sequence>
-      <Sequence from={f(kStart + 30.0)} durationInFrames={f(DROP - kStart - 30.0 - 1.0)}>
+      <Sequence from={f(kStart + 30.0)} durationInFrames={f(DROP - kStart - 30.0 - 1.5)}>
         <AbsoluteFill style={{background: '#000'}} />
-        <Teks text="TOKOH MURID 2026 IALAH..." len={DROP - kStart - 31.0} size={60} />
+        <Teks text="TOKOH MURID 2026 IALAH..." len={DROP - kStart - 31.5} size={60} />
       </Sequence>
       {/* E. PENDEDAHAN */}
       <Sequence from={f(DROP)} durationInFrames={f(AKHIR - DROP)}>
@@ -382,14 +390,14 @@ export const TrailerBahagian2: React.FC = () => {
         <Audio src={staticFile('v8/muzik/midnight_breach.mp3')} trimBefore={f(72)} volume={vol([0, 1, KLIMAKS - PETA - 1.5, KLIMAKS - PETA + 0.5], [0, 0.75, 0.75, 0])} />
       </Sequence>
       <Sequence from={f(KLIMAKS)} durationInFrames={f(AKHIR - KLIMAKS)}>
-        <Audio src={staticFile('v8/muzik/shore_beyond_rain.mp3')} trimBefore={f(95)} volume={vol([0, 1, DROP - KLIMAKS - 5, AKHIR - KLIMAKS - 2, AKHIR - KLIMAKS], [0.6, 0.8, 0.85, 0.85, 0])} />
+        <Audio src={staticFile('v8/muzik/shore_beyond_rain.mp3')} trimBefore={f(95)} volume={vol([0, 1, DROP - KLIMAKS - 1.6, DROP - KLIMAKS - 1.5, DROP - KLIMAKS, DROP - KLIMAKS + 4, DROP - KLIMAKS + 6, AKHIR - KLIMAKS - 2, AKHIR - KLIMAKS], [0.6, 0.8, 0.8, 0, 1.0, 1.0, 0.85, 0.85, 0])} />
       </Sequence>
       <Sequence from={f(kStart + 1.0)}>
         <Audio src={staticFile('v8/vo/GB_03.wav')} volume={1} />
       </Sequence>
       {SFX.map(([t, file, v], i) => (
         <Sequence key={'x' + i} from={Math.max(0, f(t))}>
-          <Audio src={staticFile(`${file}.wav`)} volume={(fr) => (f(t) + fr >= f(DROP - 1.0) && f(t) < f(DROP - 1.0) ? 0 : v)} />
+          <Audio src={staticFile(`${file}.wav`)} volume={(fr) => (f(t) + fr >= f(DROP - 1.5) && f(t) < f(DROP - 1.5) ? 0 : v)} />
         </Sequence>
       ))}
     </AbsoluteFill>
