@@ -23,10 +23,10 @@ const RED = '#ff4d5e';
 type Item = {t: number; len: number; kind: 'bab' | 'foto' | 'sulit'; a: string; b?: string};
 const G: Item[] = [];
 let tt = 0;
-// setiap potongan jatuh TEPAT pada rentak lagu Princesses Heart (lagu bermula pada 15.3 s dalam fail)
-const PH0 = 15.3;
+// setiap potongan jatuh TEPAT pada rentak lagu The Last Strike (bermula pada 1:52 dalam fail - sambungan terus dari hujung Bahagian 1)
+const PH0 = 112.0;
 const add = (kind: Item['kind'], len: number, a: string, b?: string) => {
-  const end = snapBeat('princesses_heart', tt + len + PH0) - PH0;
+  const end = snapBeat('last_strike', tt + len + PH0) - PH0;
   G.push({t: tt, len: end - tt, kind, a, b});
   tt = end;
 };
@@ -44,7 +44,8 @@ sulit('JOHAN ███', 'PERINGKAT NEGERI');
 bab('BAB IV', '█████████');
 ['h10', 'h12'].forEach(foto); // h11 (lari berpagar) dipindah ke montaj selepas pendedahan, penuh skrin
 const MORPH = tt; // 59.2
-const PETA = MORPH + 17.7; // 76.9
+const PETA = MORPH + 17.7;
+const CW_PETA = 21.0; // Clockwork untuk peta misi // 76.9
 const KLIMAKS = 112.0;
 const DROP = 146.5; // senyap muzik Shore berakhir -> pendedahan
 const AKHIR = 160.0;
@@ -71,7 +72,7 @@ const KadBab: React.FC<{a: string; b: string; len: number}> = ({a, b, len}) => {
 const Foto: React.FC<{src: string; len: number; i: number; music: number}> = ({src, len, i, music}) => {
   const fr = useCurrentFrame();
   // hentakan zum ikut rentak: subjek 'menolak' ke hadapan pada setiap beat
-  const p = usePulse('princesses_heart', music, 0.28, 0.6);
+  const p = usePulse('last_strike', music, 0.28, 0.6);
   const L = f(len);
   const u = fr / L;
   const dir = random('d' + i) > 0.5 ? 1 : -1;
@@ -310,7 +311,7 @@ G.forEach((g) => {
     SFX.push([g.t + 0.9, 'sfx/impact_lembut', 0.5]);
   }
 });
-SFX.push([MORPH, 'sfx/sub_drop', 0.5], [MORPH + 11.0, 'sfx/swish_teks', 0.4]);
+SFX.push([MORPH, 'sfx/dengung', 0.45], [MORPH, 'sfx/sub_drop', 0.5], [MORPH + 11.0, 'sfx/swish_teks', 0.4]);
 SFX.push([PETA, 'sfx/hud_boot', 0.6], [PETA + 0.3, 'sfx/data', 0.25]);
 MISI.forEach((m) => {
   SFX.push([PETA + m.t, 'sfx/whoosh_pendek', 0.45], [PETA + m.t + 0.6, 'sfx/imbasan', 0.4]);
@@ -406,11 +407,13 @@ export const TrailerBahagian2: React.FC = () => {
       <FilmLook />
 
       {/* ---------------- muzik ---------------- */}
-      <Sequence from={0} durationInFrames={f(PETA + 1)}>
-        <Audio src={staticFile('v8/muzik/princesses_heart.mp3')} trimBefore={f(15.3)} volume={vol([0, MORPH, PETA - 2, PETA + 0.5], [0.7, 0.7, 0.55, 0])} />
+      {/* perjalanan pembesaran: The Last Strike (1:52 -> outro), reput ke dalam siluet */}
+      <Sequence from={0} durationInFrames={f(PETA)}>
+        <Audio src={staticFile('v8/muzik/last_strike.mp3')} trimBefore={f(PH0)} volume={vol([0, 1.0, MORPH, PETA - 1], [0.6, 0.9, 0.9, 0])} />
       </Sequence>
-      <Sequence from={f(PETA)} durationInFrames={f(KLIMAKS - PETA + 1)}>
-        <Audio src={staticFile('v8/muzik/midnight_breach.mp3')} trimBefore={f(72)} volume={vol([0, 1, KLIMAKS - PETA - 1.5, KLIMAKS - PETA + 0.5], [0, 0.75, 0.75, 0])} />
+      {/* peta misi: The Clockwork Collapse (0:21 -> 0:59) */}
+      <Sequence from={f(PETA)} durationInFrames={f(KLIMAKS - PETA + 0.5)}>
+        <Audio src={staticFile('v8/muzik/clockwork_collapse.mp3')} trimBefore={f(CW_PETA)} volume={vol([0, 1.2, KLIMAKS - PETA - 1.5, KLIMAKS - PETA + 0.3], [0, 0.8, 0.8, 0])} />
       </Sequence>
       {/* The Clockwork Collapse untuk klimaks: berakhir pada senyapnya sendiri (0:99) tepat bila The Last Strike masuk */}
       <Sequence from={f(KLIMAKS)} durationInFrames={f(DROP - KLIMAKS)}>

@@ -34,6 +34,8 @@ export const pulseAt = (track: string, mt: number, decay = 0.22, accent = 0.65) 
 /** rentak terdekat (masa muzik) */
 export const snapBeat = (track: string, mt: number) => {
   const tr = B[track];
+  // di luar julat rentak (intro/outro tanpa beat): jangan dianjak
+  if (mt < tr.t[0] - 0.3 || mt > tr.t[tr.t.length - 1] + 0.3) return mt;
   const i = Math.max(0, lastIdx(tr, mt));
   const a = tr.t[i];
   const b = tr.t[Math.min(tr.t.length - 1, i + 1)];

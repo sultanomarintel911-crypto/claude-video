@@ -43,6 +43,13 @@ const TAJUK = 91.9;
 const SOAL = 147.42; // "?" dalam visor
 const KOTAK = 148.7; // muzik Princesses Heart
 const AKHIR = 164.0;
+// muzik: The Clockwork Collapse + The Last Strike mendominasi
+const CW1_END = 105.0; // Clockwork 0:00-1:00 (komposisi 45-105)
+const MESY = 108.94; // mesyuarat VR bermula
+const CW_HIT = 104.5; // hentakan besar Clockwork
+const LS_KOTAK = 96.7; // The Last Strike untuk kotak kenangan (berakhir ~1:52, Bahagian 2 menyambung dari situ)
+// masa dalam lagu Clockwork pada masa komposisi t (-1 jika tiada)
+const cwAt = (t: number) => (t < CW1_END ? t - PANG : t >= MESY && t < KOTAK ? t - MESY + CW_HIT : -1);
 
 // VO prolog: [mula, fail, teks sari kata]
 const VO: Array<[number, string, string]> = [
@@ -76,7 +83,7 @@ const Sub: React.FC<{text: string; len: number}> = ({text, len}) => {
   );
 };
 
-const Klip: React.FC<{name: string; from: number; len: number; rate?: number; zoom?: number; music?: number; track?: string}> = ({name, from, len, rate = 1, zoom = 0.04, music = -1, track = 'midnight_breach'}) => {
+const Klip: React.FC<{name: string; from: number; len: number; rate?: number; zoom?: number; music?: number; track?: string}> = ({name, from, len, rate = 1, zoom = 0.04, music = -1, track = 'clockwork_collapse'}) => {
   const fr = useCurrentFrame();
   // hentakan zum kecil pada rentak kuat muzik (beat)
   const bp = music >= 0 ? pulseAt(track, music + fr / FPS, 0.2, 1.0) : 0;
@@ -288,7 +295,7 @@ export const TrailerBahagian1: React.FC = () => {
       </Sequence>
       {SHOTS.map(([t, name, from, len], i) => (
         <Sequence key={i} from={f(t)} durationInFrames={f(len)}>
-          <Klip name={`v8/flow/${name}.mp4`} from={from} len={len} music={t < KOTAK ? t - PANG : -1} />
+          <Klip name={`v8/flow/${name}.mp4`} from={from} len={len} music={cwAt(t)} />
           {name === 'woman_reading_hologram' ? <HologramMelayu /> : null}
           <Vignette strength={0.45} />
         </Sequence>
@@ -312,14 +319,21 @@ export const TrailerBahagian1: React.FC = () => {
       ))}
 
       {/* ---------------- muzik ---------------- */}
+      {/* The Last Strike (intro senyap -> binaan) di bawah VO prolog */}
       <Sequence from={0} durationInFrames={f(PANG + 0.5)}>
-        <Audio src={staticFile('v8/muzik/videodrome.mp3')} volume={vol([0, 2, 22, 24, 41, 43.5, 45.5], [0, 0.32, 0.32, 0.4, 0.5, 0.5, 0])} />
+        <Audio src={staticFile('v8/muzik/last_strike.mp3')} volume={vol([0, 1.5, 28, 32, 43.5, 45.5], [0, 0.9, 0.9, 0.75, 0.75, 0])} />
       </Sequence>
-      <Sequence from={f(PANG)} durationInFrames={f(KOTAK + 1.5 - PANG)}>
-        <Audio src={staticFile('v8/muzik/midnight_breach.mp3')} volume={vol([0, 1, KOTAK - PANG - 1.5, KOTAK - PANG + 1.5], [0.75, 0.75, 0.75, 0])} />
+      {/* The Clockwork Collapse bahagian 1 (0:00-1:00): pangkalan, GB, kad tajuk, hologram */}
+      <Sequence from={f(PANG)} durationInFrames={f(CW1_END - PANG)}>
+        <Audio src={staticFile('v8/muzik/clockwork_collapse.mp3')} volume={vol([0, CW1_END - PANG - 2.5, CW1_END - PANG], [0.85, 0.85, 0])} />
       </Sequence>
+      {/* The Clockwork Collapse hentakan besar (1:44.5) TEPAT pada mesyuarat VR; senyap sendiri pada "?" visor */}
+      <Sequence from={f(MESY)} durationInFrames={f(KOTAK + 1 - MESY)}>
+        <Audio src={staticFile('v8/muzik/clockwork_collapse.mp3')} trimBefore={f(CW_HIT)} volume={vol([0, KOTAK - MESY - 1, KOTAK - MESY + 1], [0.85, 0.85, 0])} />
+      </Sequence>
+      {/* kotak kenangan: The Last Strike (bahagian penuh) */}
       <Sequence from={f(KOTAK)} durationInFrames={f(AKHIR - KOTAK)}>
-        <Audio src={staticFile('v8/muzik/princesses_heart.mp3')} volume={vol([0, 2, AKHIR - KOTAK - 2, AKHIR - KOTAK], [0, 0.7, 0.7, 0])} />
+        <Audio src={staticFile('v8/muzik/last_strike.mp3')} trimBefore={f(LS_KOTAK)} volume={vol([0, 1.5, AKHIR - KOTAK - 2, AKHIR - KOTAK], [0, 0.85, 0.85, 0])} />
       </Sequence>
       {/* VO & dialog */}
       {VO.map(([t, file], i) => (
