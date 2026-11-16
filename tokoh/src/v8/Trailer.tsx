@@ -27,7 +27,7 @@ const SHOTS: Shot[] = [
   [84.05, 'man_walking_office', 0, 7.85, 0], // suara Inggeris dibuang -> GB_02
   // 91.9 - 97.0 kad tajuk
   [97.0, 'woman_reading_hologram', 0, 3.4, 0.7], // dipotong sebelum teks Inggeris muncul
-  [100.4, 'woman_touching_earpiece', 0, 5.97, 1.0], // "Baik tuan, saya uruskan."
+  [100.4, 'woman_touching_earpiece', 0, 5.97, 2.4], // "Baik tuan, saya uruskan."
   [106.37, 'two_teachers_glowing', 1.4, 6.6, 0.5], // dipotong supaya wajah tidak kelihatan
   [112.97, 'teacher_wearing_headset', 0, 5.0, 0.5],
   [117.97, 'teachers_invisible_a', 2.5, 5.5, 0.5],
