@@ -51,6 +51,7 @@ const DROP = 146.5; // senyap muzik Shore berakhir -> pendedahan
 const AKHIR = 160.0;
 const LS_GAH = 60.05; // saat dalam The Last Strike bila muzik jadi gah
 const LS_PRE = 7.0; // lagu bermula 7 s sebelum pendedahan
+const CC_SENYAP = 99.0; // saat The Clockwork Collapse menjadi senyap (sebelum hentakannya pada 104.5)
 
 // ------------------------------------------------------------------ komponen
 const KadBab: React.FC<{a: string; b: string}> = ({a, b}) => {
@@ -404,8 +405,9 @@ export const TrailerBahagian2: React.FC = () => {
       <Sequence from={f(PETA)} durationInFrames={f(KLIMAKS - PETA + 1)}>
         <Audio src={staticFile('v8/muzik/midnight_breach.mp3')} trimBefore={f(72)} volume={vol([0, 1, KLIMAKS - PETA - 1.5, KLIMAKS - PETA + 0.5], [0, 0.75, 0.75, 0])} />
       </Sequence>
-      <Sequence from={f(KLIMAKS)} durationInFrames={f(AKHIR - KLIMAKS)}>
-        <Audio src={staticFile('v8/muzik/shore_beyond_rain.mp3')} trimBefore={f(95)} volume={vol([0, 1, DROP - KLIMAKS - 7.6, DROP - KLIMAKS - 6.4], [0.6, 0.8, 0.8, 0])} />
+      {/* The Clockwork Collapse untuk klimaks: berakhir pada senyapnya sendiri (0:99) tepat bila The Last Strike masuk */}
+      <Sequence from={f(KLIMAKS)} durationInFrames={f(DROP - KLIMAKS)}>
+        <Audio src={staticFile('v8/muzik/clockwork_collapse.mp3')} trimBefore={f(CC_SENYAP - (DROP - LS_PRE + 0.2 - KLIMAKS))} volume={vol([0, 1.0, DROP - KLIMAKS - LS_PRE - 0.3, DROP - KLIMAKS - LS_PRE + 0.6], [0, 0.85, 0.85, 0])} />
       </Sequence>
       {/* The Last Strike: masuk pada 0:53 (binaan perlahan dari 0:54) -> 1:00 bunyi gah tepat pada PENDEDAHAN */}
       <Sequence from={f(DROP - LS_PRE)} durationInFrames={f(AKHIR - DROP + LS_PRE)}>
