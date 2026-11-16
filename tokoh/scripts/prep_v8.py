@@ -26,7 +26,7 @@ COVER = "scale=1920:1080:force_original_aspect_ratio=increase:flags=lanczos,crop
 CLIPS = ["drones_rise_roof", "drones_taking_off", "drone_wall_opening", "to_the_basement", "lift_opens_basement",
          "man_walking_office", "woman_reading_hologram", "woman_touching_earpiece", "two_teachers_glowing",
          "teacher_wearing_headset", "visor_reflections", "teachers_invisible_a", "teachers_invisible_b",
-         "hands_opening_box", "fingers_lifting_photo"]
+         "hands_opening_box", "fingers_lifting_photo", "gb_pentas"]
 for c in CLIPS:
     src = f"{B}/flow/{c}.mp4"
     ff("-i", src, "-an", "-vf", COVER, "-r", "30", "-c:v", "libx264", "-crf", "17", "-pix_fmt", "yuv420p", f"{P}/flow/{c}.mp4")
@@ -75,8 +75,22 @@ for i in range(len(cuts) - 1):
 # suara GB
 for i in (1, 2, 3):
     ff("-i", f"{B}/gb/GB_0{i}.mp3", "-af", "loudnorm=I=-16:TP=-1.5", "-ar", "48000", f"{P}/vo/GB_0{i}.wav")
+# GB_02 dipecah dua frasa supaya sama dengan gerak mulut dalam klip
+ff("-i", f"{P}/vo/GB_02.wav", "-t", "1.8", f"{P}/vo/GB_02a.wav")
+ff("-ss", "2.1", "-i", f"{P}/vo/GB_02.wav", f"{P}/vo/GB_02b.wav")
 
 # gambar K
 for k in ("K1", "K2", "K3", "K4"):
     ff("-i", f"{B}/gb/{k}.jpg", "-vf", "scale=2560:-2:flags=lanczos", "-q:v", "2", f"{P}/img/{k}.jpg")
 print("siap")
+
+# ---------------------------------------------------------------- butiran filem (grain) untuk lapisan FilmLook
+import numpy as np  # noqa: E402
+from PIL import Image  # noqa: E402
+os.makedirs(f"{P}/grain", exist_ok=True)
+rng = np.random.default_rng(35)
+for k in range(8):
+    n = rng.normal(0, 1, (540, 960)).astype(np.float32)
+    n = (n - n.mean()) / n.std()
+    Image.fromarray(np.clip(128 + n * 38, 0, 255).astype(np.uint8)).save(f"{P}/grain/g{k}.png")
+print("grain siap")

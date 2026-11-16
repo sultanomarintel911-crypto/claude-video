@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Bahan Bahagian 2: gambar perjalanan pembesaran (jelas / wajah kabur / siluet) & potongan fail misi.
+"""Bahan Bahagian 2: gambar perjalanan pembesaran (sinematik 16:9, wajah sahaja dikaburkan) & potongan fail misi.
 
 Rawatan wajah:
   - 'jelas'  : gambar asal
@@ -26,26 +26,32 @@ def load(n):
     return ImageOps.exif_transpose(Image.open(FS[n - 1])).convert("RGB")
 
 
-# (nombor gambar, rawatan, titik Thoriq (x,y dinormal), pecahan kepala daripada tinggi badan)
+# (nombor gambar, rawatan, titik Thoriq (x,y dinormal), pecahan kepala daripada tinggi badan, kabur tanda nama?)
+#   asli  : tiada kabur (gambar kecil)
+#   jelas : wajah semua orang dikaburkan (wajah sahaja - badan, pingat & sijil kekal jelas)
+#   kabur : seperti 'jelas' + kepala Thoriq dikaburkan lebih kuat (topeng orang)
+# bingkai: (fokus x, fokus y, zum) - zum 1 = tinggi penuh gambar kelihatan (sisi dilanjutkan dengan latar kabur)
+FRAME = {7: (0.45, 0.6, 1.3), 8: (0.5, 0.62, 1.25), 9: (0.5, 0.55, 1.45), 10: (0.58, 0.58, 1.2), 5: (0.45, 0.45, 1.15), 12: (0.5, 0.5, 1.25), 3: (0.55, 0.45, 1.5)}
 ITEMS = [
-    (103, "asli", None, 0),  # gambar kecil: tidak dikaburkan
-    (95, "asli", None, 0),  # gambar kecil: tidak dikaburkan
-    (100, "jelas", None, 0),
-    (94, "jelas", None, 0),
-    (90, "jelas", None, 0),
-    (88, "jelas", None, 0),
-    (85, "kabur", (0.62, 0.45), 0.45),
-    (87, "kabur", (0.5, 0.45), 0.42),
-    (91, "kabur", (0.55, 0.6), 0.2),
-    (80, "siluet", (0.45, 0.32), 0),
-    (1, "siluet", (0.45, 0.42), 0),
-    (73, "siluet", (0.5, 0.5), 0),
+    (103, "asli", None, 0, False),
+    (95, "asli", None, 0, False),
+    (100, "jelas", None, 0, False),
+    (94, "jelas", None, 0, True),
+    (90, "jelas", None, 0, True),
+    (88, "jelas", None, 0, True),
+    (85, "kabur", (0.62, 0.45), 0.36, True),
+    (87, "kabur", (0.5, 0.45), 0.34, False),
+    (91, "kabur", (0.55, 0.6), 0.16, False),
+    (80, "kabur", (0.45, 0.32), 0.16, False),
+    (1, "jelas", None, 0, False),
+    (73, "kabur", (0.5, 0.5), 0.15, False),
 ]
 
 from rembg import new_session, remove  # noqa: E402
 
 sess = new_session("u2net_human_seg")
 YUNET = os.path.join(HERE, "model", "yunet.onnx")
+CW, CH = 1920, 1080  # bingkai sinematik 16:9
 
 
 def faces(img):
@@ -63,25 +69,72 @@ def faces(img):
     return out
 
 
-def blur_region(a, mask, sigma=26, pix=14):
-    """Kabur kuat + piksel pada kawasan topeng (0..1)."""
+def blur_region(a, mask, sigma=22, pix=12):
+    """Kabur + piksel pada kawasan topeng (0..1)."""
     H, W = a.shape[:2]
     small = cv2.resize(a, (max(1, W // pix), max(1, H // pix)), interpolation=cv2.INTER_AREA)
     px = cv2.resize(small, (W, H), interpolation=cv2.INTER_NEAREST)
     bl = cv2.GaussianBlur(px, (0, 0), sigma)
-    m = cv2.GaussianBlur(mask.astype(np.float32), (0, 0), 10)[..., None]
+    m = cv2.GaussianBlur(mask.astype(np.float32), (0, 0), 6)[..., None]
     return a * (1 - m) + bl * m
 
 
-def blur_faces(a):
-    """Kaburkan setiap wajah + kawasan dada di bawahnya (tanda nama)."""
+def blur_faces(a, tag):
+    """Kaburkan wajah sahaja (+ tanda nama kecil di dada jika diminta)."""
     H, W = a.shape[:2]
     m = np.zeros((H, W), np.float32)
-    for x, y, w, h in faces(a.astype(np.uint8)):
+    fl = faces(a.astype(np.uint8))
+    for x, y, w, h in fl:
         cx, cy = x + w / 2, y + h / 2
-        cv2.ellipse(m, (int(cx), int(cy)), (int(w * 0.95), int(h * 1.05)), 0, 0, 360, 1, -1)
-        cv2.rectangle(m, (int(cx - w * 1.3), int(y + h * 0.9)), (int(cx + w * 1.3), int(y + h * 2.9)), 1, -1)
-    return blur_region(a, m), int(m.sum() > 0)
+        cv2.ellipse(m, (int(cx), int(cy - h * 0.08)), (int(w * 0.72), int(h * 0.95)), 0, 0, 360, 1, -1)
+        if tag:  # tanda nama: jalur sempit di dada atas
+            cv2.rectangle(m, (int(cx - w * 1.15), int(y + h * 1.55)), (int(cx + w * 1.15), int(y + h * 2.35)), 1, -1)
+    return blur_region(a, m), fl
+
+
+def grade(a):
+    """Gred filem neutral: lengkung-S lembut, hitam diangkat sedikit, ketepuan dikurang sedikit."""
+    x = a / 255.0
+    x = x + 0.10 * (x - 0.5) * (1 - np.abs(2 * x - 1))  # kontras lembut
+    x = 0.025 + x * 0.955  # hitam pudar ala filem
+    g = x.mean(axis=2, keepdims=True)
+    x = g + (x - g) * 0.88
+    x = x * np.array([1.015, 1.0, 0.985])  # sorotan sedikit hangat (bukan teal/amber)
+    return np.clip(x * 255, 0, 255)
+
+
+def place(arr, focus, z, ext=None):
+    """Letak gambar dalam bingkai 16:9: skala = tinggi penuh x zum; sisi kosong diisi 'ext' (latar kabur)."""
+    H, W = arr.shape[:2]
+    sc = max(CH / H * z, min(CW / W, CH / H) if ext is None else 0)
+    if W * sc >= CW and H * sc >= CH or ext is None:
+        sc = max(sc, CW / W, CH / H)
+    nw, nh = int(round(W * sc)), int(round(H * sc))
+    r = cv2.resize(arr, (nw, nh), interpolation=cv2.INTER_CUBIC if sc > 1 else cv2.INTER_AREA)
+    x0 = int(np.clip(focus[0] * nw - CW / 2, min(0, nw - CW), max(0, nw - CW))) if nw > CW else -(CW - nw) // 2
+    y0 = int(np.clip(focus[1] * nh - CH / 2, 0, nh - CH))
+    ch = arr.shape[2]
+    out = np.zeros((CH, CW, ch), np.float32) if ext is None else ext.astype(np.float32).copy()
+    sx0, dx0 = max(0, x0), max(0, -x0)
+    w = min(nw - sx0, CW - dx0)
+    piece = r[y0:y0 + CH, sx0:sx0 + w].astype(np.float32)
+    if ext is None or nw >= CW:
+        out[:, dx0:dx0 + w] = piece
+    else:  # tepi lembut ke dalam latar lanjutan
+        ramp = np.clip(np.minimum(np.arange(w), np.arange(w)[::-1]) / 170.0, 0, 1)[None, :, None]
+        out[:, dx0:dx0 + w] = out[:, dx0:dx0 + w] * (1 - ramp) + piece * ramp
+    return out
+
+
+def cover(arr, focus, interp=cv2.INTER_AREA):
+    """Potong 'cover' 16:9 berpusat pada titik fokus."""
+    H, W = arr.shape[:2]
+    sc = max(CW / W, CH / H)
+    nw, nh = int(round(W * sc)), int(round(H * sc))
+    r = cv2.resize(arr, (nw, nh), interpolation=interp)
+    x0 = int(np.clip(focus[0] * nw - CW / 2, 0, nw - CW))
+    y0 = int(np.clip(focus[1] * nh - CH / 2, 0, nh - CH))
+    return r[y0:y0 + CH, x0:x0 + CW]
 
 
 def person_mask(im, pt):
@@ -103,44 +156,62 @@ def person_mask(im, pt):
     return (lab == k).astype(np.uint8)
 
 
-for i, (n, mode, pt, headf) in enumerate(ITEMS):
+for i, (n, mode, pt, headf, tag) in enumerate(ITEMS):
     im = load(n)
-    im.thumbnail((2000, 2000), Image.LANCZOS)
+    im.thumbnail((2400, 2400), Image.LANCZOS)
     a = np.asarray(im).astype(np.float32)
-    if mode == "asli":
-        Image.fromarray(a.astype(np.uint8)).save(f"{OUT}/h{i + 1:02d}.jpg", quality=92)
-        print(f"h{i + 1:02d} <- #{n:03d} asli (tidak dikaburkan)")
-        continue
-    a, nf = blur_faces(a)
-    # lapisan keselamatan: kaburkan bahagian kepala SETIAP orang (wajah kecil yang terlepas)
+    H, W = a.shape[:2]
     pm = (np.asarray(remove(im, session=sess, only_mask=True, post_process_mask=True)) > 128).astype(np.uint8)
-    nlab, lab, stats, _ = cv2.connectedComponentsWithStats(pm, 8)
-    hm = np.zeros(pm.shape, np.float32)
-    for c in range(1, nlab):
-        x, y, w, h, area = stats[c]
-        if h < 0.12 * pm.shape[0]:
-            continue
-        top = (lab == c)
-        top[int(y + h * 0.22):] = False
-        hm = np.maximum(hm, top.astype(np.float32))
-    hm = cv2.dilate(hm, np.ones((25, 25), np.uint8))
-    a = blur_region(a, hm)
-    if mode == "kabur":
+    fl = []
+    if mode != "asli":
+        a, fl = blur_faces(a, tag)
+        # lapisan keselamatan: kepala orang yang wajahnya tidak dikesan
+        nlab, lab, stats, _ = cv2.connectedComponentsWithStats(pm, 8)
+        hm = np.zeros(pm.shape, np.float32)
+        for c in range(1, nlab):
+            x, y, w, h, area = stats[c]
+            if h < 0.12 * H:
+                continue
+            ytop = y + h * 0.15
+            if any(x <= fx + fw / 2 <= x + w and y - fh <= fy + fh / 2 <= ytop + fh for fx, fy, fw, fh in fl):
+                continue
+            top = lab == c
+            top[int(ytop):] = False
+            hm = np.maximum(hm, top.astype(np.float32))
+        a = blur_region(a, cv2.dilate(hm, np.ones((15, 15), np.uint8)))
+    if mode == "kabur":  # kepala Thoriq: lebih kuat, tepat ikut topeng
         m = person_mask(im, pt)
-        m = cv2.dilate(m, np.ones((31, 31), np.uint8))
-        a = blur_region(a, m, sigma=30, pix=18)
-    elif mode == "siluet":
-        m = person_mask(im, pt).astype(np.float32)
-        m = cv2.GaussianBlur(m, (0, 0), 1.2)
-        edge = np.clip(m - cv2.erode(m, np.ones((7, 7), np.uint8)), 0, 1)
-        rim = cv2.GaussianBlur(edge, (0, 0), 2)[..., None]
-        glow = cv2.GaussianBlur(m, (0, 0), 25)[..., None]
-        bg = cv2.GaussianBlur(a, (0, 0), 3) * 0.55
-        bg = bg + glow * (1 - m[..., None]) * np.array([255, 210, 140]) * 0.45
-        a = bg * (1 - m[..., None]) + np.array([6, 6, 8]) * m[..., None] + rim * np.array([255, 225, 170]) * 0.9
-    out = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
-    out.save(f"{OUT}/h{i + 1:02d}.jpg", quality=92)
-    print(f"h{i + 1:02d} <- #{n:03d} {mode} {out.size} wajah={nf}")
+        ys, xs = np.nonzero(m)
+        top = m.copy()
+        top[int(ys.min() + (ys.max() - ys.min()) * headf):] = 0
+        a = blur_region(a, cv2.dilate(top, np.ones((21, 21), np.uint8)), sigma=28, pix=16)
+    # titik fokus: pusat orang (condong ke atas supaya kepala tidak terpotong)
+    if pm.sum() > 0:
+        ys, xs = np.nonzero(pm)
+        focus = (xs.mean() / W, (ys.min() * 0.6 + ys.mean() * 0.4) / H)
+    else:
+        focus = (0.5, 0.5)
+    a = grade(a)
+    # kedalaman medan cetek: latar dikaburkan, subjek tajam (+ lapisan untuk paralaks)
+    pmf = cv2.GaussianBlur(cv2.dilate(pm, np.ones((5, 5), np.uint8)).astype(np.float32), (0, 0), 2.5)
+    hole = cv2.dilate(pm, np.ones((41, 41), np.uint8))
+    small = cv2.resize(a.astype(np.uint8), (W // 4, H // 4), interpolation=cv2.INTER_AREA)
+    inp = cv2.inpaint(small, cv2.resize(hole, (W // 4, H // 4), interpolation=cv2.INTER_NEAREST), 9, cv2.INPAINT_TELEA)
+    inp = cv2.resize(inp, (W, H), interpolation=cv2.INTER_CUBIC).astype(np.float32)
+    bg_src = a * (1 - hole[..., None]) + inp * hole[..., None]
+    bg = cv2.GaussianBlur(bg_src, (0, 0), max(4, W / 260))
+    comp = bg * (1 - pmf[..., None]) + a * pmf[..., None]
+    fx, fy, z = FRAME.get(i + 1, (focus[0], focus[1], 1.35))
+    # latar lanjutan sisi: latar kabur lebih kuat & malap (ala lensa anamorfik)
+    ext = cv2.GaussianBlur(cover(bg.astype(np.uint8), (fx, fy)).astype(np.float32), (0, 0), 30) * 0.55
+    full = place(comp, (fx, fy), z, ext)
+    bgl = place(bg, (fx, fy), z, ext)
+    rgba = np.dstack([np.clip(a, 0, 255), pmf * 255]).astype(np.float32)
+    fgl = place(rgba, (fx, fy), z, np.zeros((CH, CW, 4), np.float32))
+    Image.fromarray(np.clip(full, 0, 255).astype(np.uint8)).save(f"{OUT}/h{i + 1:02d}.jpg", quality=92)
+    Image.fromarray(np.clip(bgl, 0, 255).astype(np.uint8)).save(f"{OUT}/h{i + 1:02d}_bg.jpg", quality=90)
+    Image.fromarray(np.clip(fgl, 0, 255).astype(np.uint8), "RGBA").save(f"{OUT}/h{i + 1:02d}_fg.png", compress_level=3)
+    print(f"h{i + 1:02d} <- #{n:03d} {mode} {W}x{H} wajah={len(fl)} fokus=({focus[0]:.2f},{focus[1]:.2f})")
 
 # gambar terawal (hujung kotak kenangan)
 load(101).save(os.path.join(IMG, "awal.jpg"), quality=92)  # gambar kecil: tidak dikaburkan

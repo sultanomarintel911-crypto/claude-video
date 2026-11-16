@@ -8,7 +8,7 @@ import '@fontsource/montserrat/600.css';
 import '@fontsource/montserrat/700.css';
 import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/700.css';
-import {ci, easeInOut, easeOut, Gold, GOLD, GOLD_GRAD, SANS, SERIF, Vignette} from '../components';
+import {ci, easeInOut, easeOut, FilmLook, Gold, GOLD, GOLD_GRAD, SANS, SERIF, Vignette} from '../components';
 import {SceneKira, SceneReveal} from '../scenes';
 import {Scramble} from '../scifi';
 import {BANDAR, City, DUNGUN, Globe, lerpRot} from './Globe';
@@ -64,30 +64,25 @@ const KadBab: React.FC<{a: string; b: string}> = ({a, b}) => {
   );
 };
 
-// gambar bercetak di atas latar kabur gambar sama
+// syot sinematik penuh skrin: paralaks 2.5D (subjek tajam di hadapan, latar kabur bergerak perlahan)
 const Foto: React.FC<{src: string; len: number; i: number}> = ({src, len, i}) => {
   const fr = useCurrentFrame();
-  const p = ci(fr, 0, 12, 0, 1, Easing.out(Easing.cubic));
-  const out = 1 - ci(fr, f(len) - 6, f(len));
-  const rot = (random('r' + i) - 0.5) * 6;
-  const dx = (random('x' + i) - 0.5) * 120;
+  const L = f(len);
+  const u = fr / L;
+  const dir = random('d' + i) > 0.5 ? 1 : -1;
+  const inn = ci(fr, 0, 10);
+  const out = 1 - ci(fr, L - 8, L);
+  const bgS = 1.06 + 0.03 * u;
+  const fgS = 1.06 + 0.075 * u;
+  const bgX = dir * 18 * u;
+  const fgX = -dir * 26 * u;
+  const base = src.replace('.jpg', '');
+  const st: React.CSSProperties = {position: 'absolute', width: 1920, height: 1080, left: 0, top: 0};
   return (
-    <AbsoluteFill style={{background: '#000', opacity: out}}>
-      <Img src={staticFile(src)} style={{position: 'absolute', width: 1920, height: 1080, objectFit: 'cover', filter: 'blur(36px) brightness(0.35)', transform: 'scale(1.2)'}} />
-      <AbsoluteFill style={{justifyContent: 'center', alignItems: 'center'}}>
-        <div
-          style={{
-            background: '#f4efe4',
-            padding: '18px 18px 56px',
-            boxShadow: '0 30px 80px rgba(0,0,0,0.75)',
-            transform: `translateX(${dx * (1 - p) * 3}px) rotate(${rot * (0.4 + 0.6 * (1 - p))}deg) scale(${1.15 - 0.15 * p + 0.035 * (fr / f(len))})`,
-            opacity: p,
-          }}
-        >
-          <Img src={staticFile(src)} style={{maxHeight: 840, maxWidth: 1300, display: 'block'}} />
-        </div>
-      </AbsoluteFill>
-      <Vignette strength={0.6} />
+    <AbsoluteFill style={{background: '#000', opacity: inn * out, overflow: 'hidden'}}>
+      <Img src={staticFile(base + '_bg.jpg')} style={{...st, transform: `translateX(${bgX}px) scale(${bgS})`}} />
+      <Img src={staticFile(base + '_fg.png')} style={{...st, transform: `translateX(${fgX}px) scale(${fgS})`, filter: `blur(${(1 - ci(fr, 0, 14, 0, 1, easeOut)) * 8}px)`}} />
+      <Vignette strength={0.55} />
     </AbsoluteFill>
   );
 };
@@ -256,6 +251,24 @@ const Kelipan: React.FC<{len: number}> = ({len}) => {
   );
 };
 
+const GbPentas: React.FC<{len: number}> = ({len}) => {
+  const fr = useCurrentFrame();
+  const L = f(len);
+  const z = interpolate(fr, [0, L], [1.0, 1.1]);
+  const o = ci(fr, 0, 6) * (1 - ci(fr, L - 5, L));
+  // kad bercahaya semakin terang sebelum gelap
+  const glow = ci(fr, L * 0.3, L * 0.9);
+  return (
+    <AbsoluteFill style={{background: '#000', overflow: 'hidden', opacity: o}}>
+      <AbsoluteFill style={{transform: `scale(${z})`, transformOrigin: '50% 35%'}}>
+        <OffthreadVideo src={staticFile('v8/flow/gb_pentas.mp4')} muted playbackRate={1.25} />
+      </AbsoluteFill>
+      <AbsoluteFill style={{background: `radial-gradient(circle at 50% 46%, rgba(255,214,120,${0.25 * glow}) 0%, transparent 22%)`, mixBlendMode: 'screen'}} />
+      <Teks text="TOKOH MURID 2026 IALAH..." len={len} size={54} y={700} />
+    </AbsoluteFill>
+  );
+};
+
 const Teks: React.FC<{text: string; len: number; size?: number; y?: number}> = ({text, len, size = 64, y = 0}) => {
   const fr = useCurrentFrame();
   const p = ci(fr, 0, 12, 0, 1, easeOut) * (1 - ci(fr, f(len) - 10, f(len)));
@@ -373,14 +386,15 @@ export const TrailerBahagian2: React.FC = () => {
       <Sequence from={f(kStart + 27.0)} durationInFrames={f(3.0)}>
         <SceneKira />
       </Sequence>
+      {/* GB di pentas memegang kad bercahaya: "Tokoh Murid 2026 ialah..." */}
       <Sequence from={f(kStart + 30.0)} durationInFrames={f(DROP - kStart - 30.0 - 1.5)}>
-        <AbsoluteFill style={{background: '#000'}} />
-        <Teks text="TOKOH MURID 2026 IALAH..." len={DROP - kStart - 31.5} size={60} />
+        <GbPentas len={DROP - kStart - 31.5} />
       </Sequence>
       {/* E. PENDEDAHAN */}
       <Sequence from={f(DROP)} durationInFrames={f(AKHIR - DROP)}>
         <SceneReveal />
       </Sequence>
+      <FilmLook />
 
       {/* ---------------- muzik ---------------- */}
       <Sequence from={0} durationInFrames={f(PETA + 1)}>

@@ -7,7 +7,7 @@ import '@fontsource/montserrat/500.css';
 import '@fontsource/montserrat/600.css';
 import '@fontsource/montserrat/700.css';
 import '@fontsource/jetbrains-mono/400.css';
-import {ci, easeOut, Gold, GOLD_GRAD, SANS, SERIF, Vignette} from '../components';
+import {ci, easeOut, FilmLook, Gold, GOLD_GRAD, SANS, SERIF, Vignette} from '../components';
 import {BANDAR, City, Globe, lerpRot} from './Globe';
 
 const FPS = 30;
@@ -57,9 +57,11 @@ const VO_LEN: Record<string, number> = {P1: 3.82, P2: 4.0, P3: 3.09, P4: 4.2, P5
 // dialog: [mula, fail, teks]
 const DIALOG: Array<[number, string, string]> = [
   [68.95, 'GB_01', 'Bawa saya ke pangkalan utama.'],
-  [84.75, 'GB_02', 'Adakan mesyuarat segera. Cari Tokoh Murid tahun ini.'],
+  // dipecah dua frasa: diselaraskan dengan gerak mulut GB dalam klip (wajah muncul ~2.3 s, frasa kedua ~4.0 s)
+  [86.35, 'GB_02a', 'Adakan mesyuarat segera.'],
+  [88.05, 'GB_02b', 'Cari Tokoh Murid tahun ini.'],
 ];
-const DIALOG_LEN: Record<string, number> = {GB_01: 3.0, GB_02: 4.86};
+const DIALOG_LEN: Record<string, number> = {GB_01: 3.0, GB_02a: 1.7, GB_02b: 2.76};
 const SUB_ASAL: Array<[number, number, string]> = [[106.47, 108.6, 'Baik, tuan. Saya uruskan.']];
 
 // ------------------------------------------------------------------ komponen kecil
@@ -340,6 +342,7 @@ export const TrailerBahagian1: React.FC = () => {
           <Audio src={staticFile(`${file}.wav`)} volume={v} />
         </Sequence>
       ))}
+      <FilmLook />
     </AbsoluteFill>
   );
 };

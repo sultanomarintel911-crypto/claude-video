@@ -408,3 +408,21 @@ export function cutLayout(cut: {w: number; h: number; face: Rect}, cx: number, t
   const face: Rect = [left + cut.face[0] * w, top + cut.face[1] * height, left + cut.face[2] * w, top + cut.face[3] * height];
   return {left, top, w, h: height, face};
 }
+
+// Rupa filem: butiran (grain) bergerak + vinyet lembut + sedikit halasi pada sorotan.
+// Diletakkan paling atas dalam setiap komposisi supaya seluruh video berasa seperti filem.
+export const FilmLook: React.FC<{grain?: number}> = ({grain = 0.16}) => {
+  const fr = useCurrentFrame();
+  const k = fr % 8;
+  const ox = Math.floor(random('gx' + fr) * 40);
+  const oy = Math.floor(random('gy' + fr) * 40);
+  return (
+    <AbsoluteFill style={{pointerEvents: 'none'}}>
+      <Img
+        src={staticFile(`v8/grain/g${k}.png`)}
+        style={{position: 'absolute', left: -ox, top: -oy, width: 1920 + 80, height: 1080 + 80, opacity: grain, mixBlendMode: 'overlay', imageRendering: 'auto'}}
+      />
+      <AbsoluteFill style={{background: 'radial-gradient(ellipse 75% 70% at center, transparent 55%, rgba(0,0,0,0.38) 100%)'}} />
+    </AbsoluteFill>
+  );
+};
