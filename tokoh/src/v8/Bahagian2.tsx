@@ -49,6 +49,8 @@ const PETA = MORPH + 17.7; // 76.9
 const KLIMAKS = 112.0;
 const DROP = 146.5; // senyap muzik Shore berakhir -> pendedahan
 const AKHIR = 160.0;
+const LS_GAH = 60.05; // saat dalam The Last Strike bila muzik jadi gah
+const LS_PRE = 7.0; // lagu bermula 7 s sebelum pendedahan
 
 // ------------------------------------------------------------------ komponen
 const KadBab: React.FC<{a: string; b: string}> = ({a, b}) => {
@@ -324,12 +326,11 @@ SFX.push([KLIMAKS + 12.5, 'sfx/stinger', 0.4], [KLIMAKS + 18.5, 'sfx/riser', 0.6
 // pendedahan
 SFX.push([DROP - 1.5 - 1.55, 'sfx/sedutan', 0.7]);
 SFX.push(
-  [DROP, 'sfx/impact_besar', 1.0],
-  [DROP, 'sfx/braam', 0.95],
-  [DROP, 'sfx/sub_drop', 0.9],
-  [DROP, 'sfx/taiko', 0.9],
-  [DROP + 0.1, 'sfx/koir', 0.6],
-  [DROP + 0.4, 'sfx/tepukan', 0.75],
+  [DROP, 'sfx/impact_besar', 0.9],
+  [DROP, 'sfx/sub_drop', 0.8],
+  [DROP, 'sfx/braam', 0.6],
+  [DROP, 'sfx/taiko', 0.7],
+  [DROP + 0.4, 'sfx/tepukan', 0.6],
 );
 
 export const TrailerBahagian2: React.FC = () => {
@@ -404,7 +405,11 @@ export const TrailerBahagian2: React.FC = () => {
         <Audio src={staticFile('v8/muzik/midnight_breach.mp3')} trimBefore={f(72)} volume={vol([0, 1, KLIMAKS - PETA - 1.5, KLIMAKS - PETA + 0.5], [0, 0.75, 0.75, 0])} />
       </Sequence>
       <Sequence from={f(KLIMAKS)} durationInFrames={f(AKHIR - KLIMAKS)}>
-        <Audio src={staticFile('v8/muzik/shore_beyond_rain.mp3')} trimBefore={f(95)} volume={vol([0, 1, DROP - KLIMAKS - 1.6, DROP - KLIMAKS - 1.5, DROP - KLIMAKS, DROP - KLIMAKS + 4, DROP - KLIMAKS + 6, AKHIR - KLIMAKS - 2, AKHIR - KLIMAKS], [0.6, 0.8, 0.8, 0, 1.0, 1.0, 0.85, 0.85, 0])} />
+        <Audio src={staticFile('v8/muzik/shore_beyond_rain.mp3')} trimBefore={f(95)} volume={vol([0, 1, DROP - KLIMAKS - 7.6, DROP - KLIMAKS - 6.4], [0.6, 0.8, 0.8, 0])} />
+      </Sequence>
+      {/* The Last Strike: masuk pada 0:53 (binaan perlahan dari 0:54) -> 1:00 bunyi gah tepat pada PENDEDAHAN */}
+      <Sequence from={f(DROP - LS_PRE)} durationInFrames={f(AKHIR - DROP + LS_PRE)}>
+        <Audio src={staticFile('v8/muzik/last_strike.mp3')} trimBefore={f(LS_GAH - LS_PRE)} volume={vol([0, 1.0, LS_PRE + AKHIR - DROP - 2.5, LS_PRE + AKHIR - DROP], [0, 1.0, 1.0, 0])} />
       </Sequence>
       <Sequence from={f(kStart + 1.0)}>
         <Audio src={staticFile('v8/vo/GB_03.wav')} volume={1} />

@@ -45,6 +45,14 @@ MUZIK = {
 }
 for k, src in MUZIK.items():
     ff("-i", f"{B}/muzik/{src}", "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-ar", "48000", "-b:a", "256k", f"{P}/muzik/{k}.mp3")
+# The Last Strike (pendedahan): normalisasi LINEAR 2 laluan supaya binaan senyap -> gah (0:54 -> 1:00) kekal
+import json  # noqa: E402
+_m = subprocess.run(["ffmpeg", "-hide_banner", "-i", f"{B}/muzik/the_last_strike.mp3", "-af", "loudnorm=I=-16:TP=-1.5:LRA=11:print_format=json", "-f", "null", "-"],
+                    capture_output=True, text=True).stderr
+_j = json.loads(_m[_m.rindex("{"):_m.rindex("}") + 1])
+ff("-i", f"{B}/muzik/the_last_strike.mp3", "-af",
+   f"loudnorm=I=-16:TP=-1.5:LRA=11:linear=true:measured_I={_j['input_i']}:measured_TP={_j['input_tp']}:measured_LRA={_j['input_lra']}:measured_thresh={_j['input_thresh']}:offset={_j['target_offset']}",
+   "-ar", "48000", "-b:a", "256k", f"{P}/muzik/last_strike.mp3")
 print("muzik siap")
 
 # ---------------------------------------------------------------- VO prolog: pecah ikut ayat (titik potong = tenaga paling rendah)
