@@ -106,10 +106,10 @@ const HologramMelayu: React.FC = () => {
   const w = x1 - x0;
   const h = y1 - y0;
   // tutup kawasan teks sahaja (bahagian tengah panel)
-  const cx0 = x0 + w * 0.09;
-  const cy0 = y0 + h * 0.2;
-  const cw = w * 0.82;
-  const ch = h * 0.58;
+  const cx0 = x0 + w * 0.07;
+  const cy0 = y0 + h * 0.18;
+  const cw = w * 0.86;
+  const ch = h * 0.62;
   const o = ci(fr, f(3.82), f(4.05));
   return (
     <AbsoluteFill style={{opacity: o}}>
@@ -121,7 +121,7 @@ const HologramMelayu: React.FC = () => {
           width: cw,
           height: ch,
           borderRadius: 10,
-          background: 'rgba(131,180,187,0.97)',
+          background: 'rgb(128,177,184)',
           backgroundImage: 'linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)',
           backgroundSize: '22px 22px',
           boxShadow: '0 0 22px 10px rgba(131,180,187,0.95)',
