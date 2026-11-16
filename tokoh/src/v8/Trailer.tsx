@@ -9,6 +9,7 @@ import '@fontsource/montserrat/700.css';
 import '@fontsource/jetbrains-mono/400.css';
 import {ci, easeOut, FilmLook, Gold, GOLD_GRAD, SANS, SERIF, Vignette} from '../components';
 import {BANDAR, City, Globe, lerpRot} from './Globe';
+import {pulseAt} from './beat';
 
 const FPS = 30;
 const f = (s: number) => Math.round(s * FPS);
@@ -75,9 +76,11 @@ const Sub: React.FC<{text: string; len: number}> = ({text, len}) => {
   );
 };
 
-const Klip: React.FC<{name: string; from: number; len: number; rate?: number; zoom?: number}> = ({name, from, len, rate = 1, zoom = 0.04}) => {
+const Klip: React.FC<{name: string; from: number; len: number; rate?: number; zoom?: number; music?: number; track?: string}> = ({name, from, len, rate = 1, zoom = 0.04, music = -1, track = 'midnight_breach'}) => {
   const fr = useCurrentFrame();
-  const z = 1 + zoom * (fr / f(len));
+  // hentakan zum kecil pada rentak kuat muzik (beat)
+  const bp = music >= 0 ? pulseAt(track, music + fr / FPS, 0.2, 1.0) : 0;
+  const z = 1 + zoom * (fr / f(len)) + 0.022 * bp;
   const fadeIn = ci(fr, 0, 4);
   return (
     <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
@@ -285,7 +288,7 @@ export const TrailerBahagian1: React.FC = () => {
       </Sequence>
       {SHOTS.map(([t, name, from, len], i) => (
         <Sequence key={i} from={f(t)} durationInFrames={f(len)}>
-          <Klip name={`v8/flow/${name}.mp4`} from={from} len={len} />
+          <Klip name={`v8/flow/${name}.mp4`} from={from} len={len} music={t < KOTAK ? t - PANG : -1} />
           {name === 'woman_reading_hologram' ? <HologramMelayu /> : null}
           <Vignette strength={0.45} />
         </Sequence>

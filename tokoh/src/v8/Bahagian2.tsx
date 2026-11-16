@@ -12,6 +12,7 @@ import {ci, easeInOut, easeOut, FilmLook, Gold, GOLD, GOLD_GRAD, SANS, SERIF, Vi
 import {SceneKira, SceneReveal} from '../scenes';
 import {Scramble} from '../scifi';
 import {BANDAR, City, DUNGUN, Globe, lerpRot} from './Globe';
+import {beatIndex, pulseAt, snapBeat, usePulse} from './beat';
 
 const FPS = 30;
 const f = (s: number) => Math.round(s * FPS);
@@ -22,18 +23,16 @@ const RED = '#ff4d5e';
 type Item = {t: number; len: number; kind: 'bab' | 'foto' | 'sulit'; a: string; b?: string};
 const G: Item[] = [];
 let tt = 0;
-const bab = (a: string, b: string) => {
-  G.push({t: tt, len: 2.5, kind: 'bab', a, b});
-  tt += 2.5;
+// setiap potongan jatuh TEPAT pada rentak lagu Princesses Heart (lagu bermula pada 15.3 s dalam fail)
+const PH0 = 15.3;
+const add = (kind: Item['kind'], len: number, a: string, b?: string) => {
+  const end = snapBeat('princesses_heart', tt + len + PH0) - PH0;
+  G.push({t: tt, len: end - tt, kind, a, b});
+  tt = end;
 };
-const foto = (a: string) => {
-  G.push({t: tt, len: 3.6, kind: 'foto', a});
-  tt += 3.6;
-};
-const sulit = (a: string, b: string) => {
-  G.push({t: tt, len: 3.0, kind: 'sulit', a, b});
-  tt += 3.0;
-};
+const bab = (a: string, b: string) => add('bab', 2.5, a, b);
+const foto = (a: string) => add('foto', 3.6, a);
+const sulit = (a: string, b: string) => add('sulit', 3.0, a, b);
 bab('BAB I', 'LANGKAH PERTAMA');
 ['h01', 'h02', 'h03'].forEach(foto);
 bab('BAB II', 'ALAM PERSEKOLAHAN');
@@ -52,12 +51,13 @@ const AKHIR = 160.0;
 const LS_GAH = 60.05; // saat dalam The Last Strike bila muzik jadi gah
 const LS_PRE = 7.0; // lagu bermula 7 s sebelum pendedahan
 const CC_SENYAP = 99.0; // saat The Clockwork Collapse menjadi senyap (sebelum hentakannya pada 104.5)
+const CC0 = CC_SENYAP - (DROP - LS_PRE + 0.2 - KLIMAKS); // masa dalam lagu Clockwork pada KLIMAKS
 
 // ------------------------------------------------------------------ komponen
-const KadBab: React.FC<{a: string; b: string}> = ({a, b}) => {
+const KadBab: React.FC<{a: string; b: string; len: number}> = ({a, b, len}) => {
   const fr = useCurrentFrame();
   const p = ci(fr, 2, 14, 0, 1, easeOut);
-  const out = 1 - ci(fr, f(2.5) - 8, f(2.5));
+  const out = 1 - ci(fr, f(len) - 8, f(len));
   return (
     <AbsoluteFill style={{background: '#050505', justifyContent: 'center', alignItems: 'center', opacity: out}}>
       <div style={{fontFamily: MONO, fontSize: 24, letterSpacing: 14, color: '#bdb6a6', opacity: p}}>{a}</div>
@@ -68,15 +68,17 @@ const KadBab: React.FC<{a: string; b: string}> = ({a, b}) => {
 };
 
 // syot sinematik penuh skrin: paralaks 2.5D (subjek tajam di hadapan, latar kabur bergerak perlahan)
-const Foto: React.FC<{src: string; len: number; i: number}> = ({src, len, i}) => {
+const Foto: React.FC<{src: string; len: number; i: number; music: number}> = ({src, len, i, music}) => {
   const fr = useCurrentFrame();
+  // hentakan zum ikut rentak: subjek 'menolak' ke hadapan pada setiap beat
+  const p = usePulse('princesses_heart', music, 0.28, 0.6);
   const L = f(len);
   const u = fr / L;
   const dir = random('d' + i) > 0.5 ? 1 : -1;
   const inn = ci(fr, 0, 10);
   const out = 1 - ci(fr, L - 8, L);
-  const bgS = 1.06 + 0.03 * u;
-  const fgS = 1.06 + 0.075 * u;
+  const bgS = 1.06 + 0.03 * u + 0.012 * p;
+  const fgS = 1.06 + 0.075 * u + 0.03 * p;
   const bgX = dir * 18 * u;
   const fgX = -dir * 26 * u;
   const base = src.replace('.jpg', '');
@@ -85,16 +87,17 @@ const Foto: React.FC<{src: string; len: number; i: number}> = ({src, len, i}) =>
     <AbsoluteFill style={{background: '#000', opacity: inn * out, overflow: 'hidden'}}>
       <Img src={staticFile(base + '_bg.jpg')} style={{...st, transform: `translateX(${bgX}px) scale(${bgS})`}} />
       <Img src={staticFile(base + '_fg.png')} style={{...st, transform: `translateX(${fgX}px) scale(${fgS})`, filter: `blur(${(1 - ci(fr, 0, 14, 0, 1, easeOut)) * 8}px)`}} />
+      <AbsoluteFill style={{background: '#fff', opacity: 0.06 * p, mixBlendMode: 'soft-light'}} />
       <Vignette strength={0.55} />
     </AbsoluteFill>
   );
 };
 
-const KadSulit: React.FC<{a: string; b: string}> = ({a, b}) => {
+const KadSulit: React.FC<{a: string; b: string; len: number}> = ({a, b, len}) => {
   const fr = useCurrentFrame();
   const p = ci(fr, 0, 8, 0, 1, easeOut);
   const stamp = ci(fr, 26, 34, 0, 1, Easing.out(Easing.back(2)));
-  const out = 1 - ci(fr, f(3) - 6, f(3));
+  const out = 1 - ci(fr, f(len) - 6, f(len));
   return (
     <AbsoluteFill style={{background: 'radial-gradient(ellipse at center, #14161c 0%, #030304 75%)', justifyContent: 'center', alignItems: 'center', opacity: out}}>
       <div style={{position: 'relative', width: 1100, padding: '50px 70px', border: '1.5px solid rgba(255,255,255,0.25)', background: 'rgba(255,255,255,0.03)', opacity: p, transform: `scale(${1.05 - 0.05 * p})`}}>
@@ -226,9 +229,10 @@ const Peta: React.FC = () => {
 };
 
 // gambar K (GB) dengan tolak masuk perlahan
-const KImg: React.FC<{src: string; len: number; z?: [number, number]}> = ({src, len, z = [1.0, 1.08]}) => {
+const KImg: React.FC<{src: string; len: number; z?: [number, number]; music?: number}> = ({src, len, z = [1.0, 1.08], music = -1}) => {
   const fr = useCurrentFrame();
-  const s = interpolate(fr, [0, f(len)], z);
+  const bp = music >= 0 ? pulseAt('clockwork_collapse', music + fr / FPS, 0.2, 0.9) : 0;
+  const s = interpolate(fr, [0, f(len)], z) + 0.025 * bp;
   const inn = ci(fr, 0, 6);
   return (
     <AbsoluteFill style={{background: '#000', opacity: inn, overflow: 'hidden'}}>
@@ -239,20 +243,23 @@ const KImg: React.FC<{src: string; len: number; z?: [number, number]}> = ({src, 
 };
 
 // kelipan kenangan pantas sebelum kiraan detik
-const Kelipan: React.FC<{len: number}> = ({len}) => {
+const Kelipan: React.FC<{len: number; music: number}> = ({len, music}) => {
   const fr = useCurrentFrame();
+  const mt = music + fr / FPS;
   const list = ['h10', 'h05', 'h08', 'h02', 'h12', 'h07', 'h04', 'h09', 'h01', 'h06', 'h03'];
-  const k = Math.floor(fr / 6) % list.length;
-  const flash = fr % 6 < 1 ? 0.5 : 0;
+  // gambar bertukar pada setiap separuh rentak Clockwork Collapse; kilat & hentakan pada rentak penuh
+  const k = beatIndex('clockwork_collapse', mt, true) % list.length;
+  const p = pulseAt('clockwork_collapse', mt, 0.12, 0.5);
   return (
-    <AbsoluteFill style={{background: '#000'}}>
-      <Img src={staticFile(`v8/hidup/${list[k]}.jpg`)} style={{width: 1920, height: 1080, objectFit: 'cover', filter: 'grayscale(0.6) contrast(1.2) brightness(0.8)', transform: `scale(${1.05 + 0.02 * (fr % 6)})`}} />
-      <AbsoluteFill style={{background: '#fff', opacity: flash}} />
+    <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
+      <Img src={staticFile(`v8/hidup/${list[k]}.jpg`)} style={{width: 1920, height: 1080, objectFit: 'cover', filter: `grayscale(0.6) contrast(1.2) brightness(${0.8 + 0.4 * p})`, transform: `scale(${1.04 + 0.08 * p})`}} />
+      <AbsoluteFill style={{background: '#fff', opacity: 0.45 * p * p}} />
       <AbsoluteFill style={{background: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0 2px, transparent 2px 4px)'}} />
       <Vignette strength={0.7} />
     </AbsoluteFill>
   );
 };
+
 
 const GbPentas: React.FC<{len: number}> = ({len}) => {
   const fr = useCurrentFrame();
@@ -346,9 +353,9 @@ export const TrailerBahagian2: React.FC = () => {
       {/* A. perjalanan pembesaran */}
       {G.map((g, i) => (
         <Sequence key={i} from={f(g.t)} durationInFrames={f(g.len)}>
-          {g.kind === 'bab' ? <KadBab a={g.a} b={g.b || ''} /> : null}
-          {g.kind === 'foto' ? <Foto src={`v8/hidup/${g.a}.jpg`} len={g.len} i={i} /> : null}
-          {g.kind === 'sulit' ? <KadSulit a={g.a} b={g.b || ''} /> : null}
+          {g.kind === 'bab' ? <KadBab a={g.a} b={g.b || ''} len={g.len} /> : null}
+          {g.kind === 'foto' ? <Foto src={`v8/hidup/${g.a}.jpg`} len={g.len} i={i} music={g.t + PH0} /> : null}
+          {g.kind === 'sulit' ? <KadSulit a={g.a} b={g.b || ''} len={g.len} /> : null}
         </Sequence>
       ))}
       {/* B. siluet berubah-ubah */}
@@ -365,25 +372,25 @@ export const TrailerBahagian2: React.FC = () => {
       </Sequence>
       {/* D. klimaks */}
       <Sequence from={f(kStart)} durationInFrames={f(5.5)}>
-        <KImg src="v8/img/K1.jpg" len={5.5} z={[1.0, 1.12]} />
+        <KImg src="v8/img/K1.jpg" len={5.5} z={[1.0, 1.12]} music={CC0 + kStart - KLIMAKS} />
       </Sequence>
       <Sequence from={f(kStart + 1.0)} durationInFrames={f(4.2)}>
         <Sub text="Saya dah tahu... siapa dia." len={4.2} />
       </Sequence>
       <Sequence from={f(kStart + 5.5)} durationInFrames={f(3.5)}>
-        <KImg src="v8/img/K2.jpg" len={3.5} z={[1.08, 1.0]} />
+        <KImg src="v8/img/K2.jpg" len={3.5} z={[1.08, 1.0]} music={CC0 + kStart + 5.5 - KLIMAKS} />
       </Sequence>
       <Sequence from={f(kStart + 9.0)} durationInFrames={f(3.5)}>
-        <KImg src="v8/img/K3.jpg" len={3.5} z={[1.0, 1.15]} />
+        <KImg src="v8/img/K3.jpg" len={3.5} z={[1.0, 1.15]} music={CC0 + kStart + 9.0 - KLIMAKS} />
       </Sequence>
       <Sequence from={f(kStart + 12.5)} durationInFrames={f(6.0)}>
         <OffthreadVideo src={staticFile('v8/flow/morph_laju.mp4')} muted />
       </Sequence>
       <Sequence from={f(kStart + 18.5)} durationInFrames={f(5.0)}>
-        <Kelipan len={5.0} />
+        <Kelipan len={5.0} music={CC0 + 18.5} />
       </Sequence>
       <Sequence from={f(kStart + 23.5)} durationInFrames={f(3.5)}>
-        <KImg src="v8/img/K4.jpg" len={3.5} z={[1.0, 1.1]} />
+        <KImg src="v8/img/K4.jpg" len={3.5} z={[1.0, 1.1]} music={CC0 + kStart + 23.5 - KLIMAKS} />
       </Sequence>
       <Sequence from={f(kStart + 27.0)} durationInFrames={f(3.0)}>
         <SceneKira />
@@ -407,7 +414,7 @@ export const TrailerBahagian2: React.FC = () => {
       </Sequence>
       {/* The Clockwork Collapse untuk klimaks: berakhir pada senyapnya sendiri (0:99) tepat bila The Last Strike masuk */}
       <Sequence from={f(KLIMAKS)} durationInFrames={f(DROP - KLIMAKS)}>
-        <Audio src={staticFile('v8/muzik/clockwork_collapse.mp3')} trimBefore={f(CC_SENYAP - (DROP - LS_PRE + 0.2 - KLIMAKS))} volume={vol([0, 1.0, DROP - KLIMAKS - LS_PRE - 0.3, DROP - KLIMAKS - LS_PRE + 0.6], [0, 0.85, 0.85, 0])} />
+        <Audio src={staticFile('v8/muzik/clockwork_collapse.mp3')} trimBefore={f(CC0)} volume={vol([0, 1.0, DROP - KLIMAKS - LS_PRE - 0.3, DROP - KLIMAKS - LS_PRE + 0.6], [0, 0.85, 0.85, 0])} />
       </Sequence>
       {/* The Last Strike: masuk pada 0:53 (binaan perlahan dari 0:54) -> 1:00 bunyi gah tepat pada PENDEDAHAN */}
       <Sequence from={f(DROP - LS_PRE)} durationInFrames={f(AKHIR - DROP + LS_PRE)}>
