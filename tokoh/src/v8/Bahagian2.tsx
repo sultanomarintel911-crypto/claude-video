@@ -10,7 +10,8 @@ import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/700.css';
 import {ci, easeInOut, easeOut, FilmLook, Gold, GOLD, GOLD_GRAD, SANS, SERIF, Vignette} from '../components';
 import {SceneKira, SceneReveal} from '../scenes';
-import {Scramble} from '../scifi';
+import {Brackets, GlitchBands, Scramble} from '../scifi';
+import CALON from './calon.json';
 import {BANDAR, City, DUNGUN, Globe, lerpRot} from './Globe';
 import {beatIndex, pulseAt, snapBeat, usePulse} from './beat';
 
@@ -229,6 +230,65 @@ const Peta: React.FC = () => {
   );
 };
 
+// ------------------------------------------------------------------ imbasan calon (wajah rekaan - BUKAN Thoriq)
+type Box = {x: number; y: number; w: number; h: number};
+const CB = CALON as Box[];
+const NCALON = CB.length;
+// tempoh setiap calon (makin laju), jumlah ~11 s
+const CALON_LEN = Array.from({length: NCALON}, (_, i) => 11 / NCALON * (1.35 - (0.7 * i) / Math.max(1, NCALON - 1)));
+const CALON_T = CALON_LEN.reduce<number[]>((a, l, i) => [...a, i === 0 ? 0 : a[i - 1] + CALON_LEN[i - 1]], []);
+const IMBAS_LEN = CALON_T[NCALON - 1] + CALON_LEN[NCALON - 1];
+
+const KadCalon: React.FC<{k: number; len: number; quick?: boolean}> = ({k, len, quick = false}) => {
+  const fr = useCurrentFrame();
+  const L = f(len);
+  const b = CB[k];
+  const scanEnd = Math.round(L * (quick ? 0.45 : 0.62));
+  const scan = ci(fr, 3, scanEnd);
+  const no = ci(fr, scanEnd, scanEnd + 4, 0, 1, Easing.out(Easing.back(2)));
+  const out = ci(fr, L - 6, L);
+  const pct = Math.round(scan * (18 + random('pc' + k) * 45));
+  const sy = b.y - 30 + (b.h + 60) * scan;
+  const z = 1.0 + 0.06 * (fr / L);
+  return (
+    <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
+      <Img src={staticFile(`v8/calon/c${k + 1}.jpg`)} style={{width: 1920, height: 1080, transform: `scale(${z})`, transformOrigin: `${b.x + b.w / 2}px ${b.y + b.h / 2}px`, filter: `saturate(${1 - 0.6 * no}) brightness(${1 - 0.25 * no})`}} />
+      <AbsoluteFill style={{background: RED, opacity: 0.22 * no, mixBlendMode: 'multiply'}} />
+      <AbsoluteFill style={{background: 'rgba(0,30,40,0.25)', opacity: 1 - no}} />
+      <Brackets rect={[b.x - 30, b.y - 30, b.x + b.w + 30, b.y + b.h + 30]} p={ci(fr, 0, 6)} color={no > 0.5 ? RED : '#7ff3ff'} />
+      {scan < 1 ? <div style={{position: 'absolute', left: b.x - 40, width: b.w + 80, top: sy, height: 3, background: '#9ff8ff', boxShadow: '0 0 18px 6px rgba(120,240,255,0.7)'}} /> : null}
+      <div style={{position: 'absolute', left: 90, top: 80, fontFamily: MONO, color: '#bff6ff', fontSize: 26, letterSpacing: 4, textShadow: '0 0 8px rgba(0,0,0,0.9)'}}>
+        <div>IMBASAN CALON {String(k + 1).padStart(2, '0')} / {String(NCALON).padStart(2, '0')}</div>
+        <div style={{fontSize: 44, fontWeight: 700, marginTop: 10, color: no > 0.5 ? RED : '#fff'}}>PADANAN {pct}%</div>
+      </div>
+      <div style={{position: 'absolute', left: b.x + b.w / 2, top: b.y + b.h + 70, transform: `translateX(-50%) rotate(-8deg) scale(${2.2 - 1.2 * no})`, opacity: no, border: `6px solid ${RED}`, color: RED, fontFamily: MONO, fontWeight: 700, fontSize: 72, letterSpacing: 12, padding: '4px 26px', background: 'rgba(0,0,0,0.35)'}}>BUKAN</div>
+      <GlitchBands intensity={Math.max(ci(fr, L - 8, L), no * (1 - ci(fr, scanEnd + 4, scanEnd + 10)) * 0.6)} seed={'cg' + k} />
+      <AbsoluteFill style={{background: '#000', opacity: out}} />
+      <Vignette strength={0.5} />
+    </AbsoluteFill>
+  );
+};
+
+// klimaks: calon berkelip pantas ikut separuh rentak Clockwork
+const CalonLaju: React.FC<{music: number}> = ({music}) => {
+  const fr = useCurrentFrame();
+  const mt = music + fr / FPS;
+  const k = beatIndex('clockwork_collapse', mt, true) % NCALON;
+  const p = pulseAt('clockwork_collapse', mt, 0.12, 0.5);
+  const b = CB[k];
+  return (
+    <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
+      <Img src={staticFile(`v8/calon/c${k + 1}.jpg`)} style={{width: 1920, height: 1080, transform: `scale(${1.05 + 0.08 * p})`, transformOrigin: `${b.x + b.w / 2}px ${b.y + b.h / 2}px`, filter: 'saturate(0.4) brightness(0.75) contrast(1.2)'}} />
+      <AbsoluteFill style={{background: RED, opacity: 0.25, mixBlendMode: 'multiply'}} />
+      <Brackets rect={[b.x - 30, b.y - 30, b.x + b.w + 30, b.y + b.h + 30]} p={1} color={RED} />
+      <div style={{position: 'absolute', left: b.x + b.w / 2, top: b.y + b.h + 70, transform: 'translateX(-50%) rotate(-8deg)', border: `6px solid ${RED}`, color: RED, fontFamily: MONO, fontWeight: 700, fontSize: 72, letterSpacing: 12, padding: '4px 26px', background: 'rgba(0,0,0,0.35)'}}>BUKAN</div>
+      <AbsoluteFill style={{background: '#fff', opacity: 0.4 * p * p}} />
+      <GlitchBands intensity={0.3 + 0.5 * p} seed={'cl' + k} />
+      <Vignette strength={0.6} />
+    </AbsoluteFill>
+  );
+};
+
 // gambar K (GB) dengan tolak masuk perlahan
 const KImg: React.FC<{src: string; len: number; z?: [number, number]; music?: number}> = ({src, len, z = [1.0, 1.08], music = -1}) => {
   const fr = useCurrentFrame();
@@ -311,7 +371,13 @@ G.forEach((g) => {
     SFX.push([g.t + 0.9, 'sfx/impact_lembut', 0.5]);
   }
 });
-SFX.push([MORPH, 'sfx/dengung', 0.45], [MORPH, 'sfx/sub_drop', 0.5], [MORPH + 11.0, 'sfx/swish_teks', 0.4]);
+SFX.push([MORPH, 'sfx/dengung', 0.45], [MORPH, 'sfx/sub_drop', 0.5], [MORPH + IMBAS_LEN + 0.6, 'sfx/swish_teks', 0.45]);
+CALON_T.forEach((t, k) => {
+  const L = CALON_LEN[k];
+  SFX.push([MORPH + t, 'sfx/hud_boot', 0.35], [MORPH + t + 0.1, 'sfx/imbasan', 0.5], [MORPH + t + 0.2, 'sfx/data', 0.25]);
+  SFX.push([MORPH + t + Math.round(f(L) * 0.62) / FPS, 'sfx/amaran', 0.45], [MORPH + t + Math.round(f(L) * 0.62) / FPS, 'sfx/impact_lembut', 0.5]);
+  SFX.push([MORPH + t + L - 0.25, 'sfx/glitch', 0.4]);
+});
 SFX.push([PETA, 'sfx/hud_boot', 0.6], [PETA + 0.3, 'sfx/data', 0.25]);
 MISI.forEach((m) => {
   SFX.push([PETA + m.t, 'sfx/whoosh_pendek', 0.45], [PETA + m.t + 0.6, 'sfx/imbasan', 0.4]);
@@ -359,11 +425,16 @@ export const TrailerBahagian2: React.FC = () => {
           {g.kind === 'sulit' ? <KadSulit a={g.a} b={g.b || ''} len={g.len} /> : null}
         </Sequence>
       ))}
-      {/* B. siluet berubah-ubah */}
-      <Sequence from={f(MORPH)} durationInFrames={f(PETA - MORPH)}>
-        <OffthreadVideo src={staticFile('v8/flow/morph_lambat.mp4')} muted />
-        <Sequence from={f(10.5)} durationInFrames={f(7.2)}>
-          <Teks text="SIAPAKAH DIA?" len={7.2} size={78} y={-760} />
+      {/* B. imbasan calon (wajah rekaan) -> siluet kabur "SIAPAKAH DIA?" */}
+      {CALON_T.map((t, k) => (
+        <Sequence key={'c' + k} from={f(MORPH + t)} durationInFrames={f(CALON_LEN[k])}>
+          <KadCalon k={k} len={CALON_LEN[k]} />
+        </Sequence>
+      ))}
+      <Sequence from={f(MORPH + IMBAS_LEN)} durationInFrames={f(PETA - MORPH - IMBAS_LEN)}>
+        <OffthreadVideo src={staticFile('v8/flow/morph_lambat.mp4')} muted trimBefore={f(17.7 - (PETA - MORPH - IMBAS_LEN))} />
+        <Sequence from={f(0.6)}>
+          <Teks text="SIAPAKAH DIA?" len={PETA - MORPH - IMBAS_LEN - 0.6} size={78} y={-760} />
         </Sequence>
         <Vignette strength={0.5} />
       </Sequence>
@@ -384,8 +455,11 @@ export const TrailerBahagian2: React.FC = () => {
       <Sequence from={f(kStart + 9.0)} durationInFrames={f(3.5)}>
         <KImg src="v8/img/K3.jpg" len={3.5} z={[1.0, 1.15]} music={CC0 + kStart + 9.0 - KLIMAKS} />
       </Sequence>
-      <Sequence from={f(kStart + 12.5)} durationInFrames={f(6.0)}>
-        <OffthreadVideo src={staticFile('v8/flow/morph_laju.mp4')} muted />
+      <Sequence from={f(kStart + 12.5)} durationInFrames={f(4.6)}>
+        <CalonLaju music={CC0 + 12.5} />
+      </Sequence>
+      <Sequence from={f(kStart + 12.5 + 4.6)} durationInFrames={f(1.4)}>
+        <OffthreadVideo src={staticFile('v8/flow/morph_laju.mp4')} muted trimBefore={f(4.6)} />
       </Sequence>
       <Sequence from={f(kStart + 18.5)} durationInFrames={f(5.0)}>
         <Kelipan len={5.0} music={CC0 + 18.5} />
