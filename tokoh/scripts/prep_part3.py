@@ -53,8 +53,11 @@ ITEMS = {
     "q09": "upd:Squash players on a glass court-9.png",
     "q10": "upd:Trophy exchange on an indoor court-12.png",
     # antarabangsa
-    "i_sg": 64,
+    "i_sg": "upd:Cinematic squash court event-2.png",
+    "i_bhm0": "upd:British Junior Open Squash Lobby-3.png",
     "i_bhm1": "upd:Children with Suitcase at Birmingham Airport-6.png",
+    "i_bhm6": "upd:University of Birmingham Winter Exterior-1.png",
+    "i_bhm7": "upd:Children outside a glass airport terminal-4.png",
     "i_bhm2": "upd:Brick campus lawn under clear skies-1.png",
     "i_bhm3": "upd:Two boys beside a modern garden facade-2.png",
     "i_bhm4": "upd:Two boys beside a squash court-9.png",
@@ -147,5 +150,5 @@ inp = cv2.resize(cv2.inpaint(sm, cv2.resize(hole, (CW // 4, CH // 4), interpolat
 bg = cv2.GaussianBlur(a2 * (1 - hole[..., None]) + inp * hole[..., None], (0, 0), 7)
 Image.fromarray(np.clip(bg, 0, 255).astype(np.uint8)).save(f"{OUT}/lari_bg.jpg", quality=90)
 Image.fromarray(np.dstack([np.clip(a2, 0, 255), m2 * 255]).astype(np.uint8), "RGBA").save(f"{OUT}/lari_fg.png", compress_level=3)
-Image.fromarray(np.clip(bg * (1 - m2[..., None]) + a2 * m2[..., None], 0, 255).astype(np.uint8)).save(f"{OUT}/lari.jpg", quality=92)
+Image.fromarray(np.clip(a2, 0, 255).astype(np.uint8)).save(f"{OUT}/lari.jpg", quality=92)  # rata, tanpa kesan 3D
 print("lari: y0", y0)

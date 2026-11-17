@@ -44,25 +44,26 @@ const SQ_STAMP: Record<number, [string, string]> = {2: ['JOHAN', 'MSSD DUNGUN'],
 // misi antarabangsa (relatif INTL)
 type Misi = {city: number; t: number; len: number; foto: string[]; tajuk: string; sub: string};
 const MISI: Misi[] = [
-  {city: 0, t: 1.5, len: 3.5, foto: ['i_sg'], tajuk: 'SINGAPURA', sub: 'SINGAPORE JUNIOR SQUASH OPEN · 2024'},
-  {city: 1, t: 5.0, len: 7.5, foto: ['i_bhm1', 'i_bhm2', 'i_bhm3', 'i_bhm4', 'i_bhm5'], tajuk: 'BIRMINGHAM', sub: 'UNITED KINGDOM'},
-  {city: 2, t: 12.5, len: 3.0, foto: ['i_ist'], tajuk: 'ISTANBUL', sub: 'TÜRKİYE'},
-  {city: 3, t: 15.5, len: 9.0, foto: ['i_sh1', 'i_sh2', 'i_sh3'], tajuk: 'SHANGHAI', sub: 'CHINA · MISI 2025 & 2026'},
+  {city: 0, t: 1.5, len: 3.5, foto: ['i_sg'], tajuk: 'SINGAPURA', sub: 'ONCOCARE SINGAPORE JUNIOR SQUASH OPEN · DEC 2024'},
+  {city: 1, t: 5.0, len: 10.5, foto: ['i_bhm0', 'i_bhm7', 'i_bhm1', 'i_bhm6', 'i_bhm2', 'i_bhm3', 'i_bhm4', 'i_bhm5'], tajuk: 'BIRMINGHAM', sub: 'BRITISH JUNIOR OPEN SQUASH · JAN 2025'},
+  {city: 2, t: 15.5, len: 3.0, foto: ['i_ist'], tajuk: 'ISTANBUL', sub: 'TÜRKİYE'},
+  {city: 3, t: 18.5, len: 9.0, foto: ['i_sh1', 'i_sh2', 'i_sh3'], tajuk: 'SHANGHAI', sub: 'CHINA · MISI 2025 & 2026'},
 ];
-const RUMUS = INTL + 24.5;
+const RUMUS = INTL + 27.5;
 const KELUARGA = RUMUS + 11.5;
 const FAM = ['f01', 'f02', 'f03', 'f04', 'f05', 'f06', 'f07', 'f08', 'f09'];
 const FAM_LEN = 4.6;
 const PENUTUP = KELUARGA + FAM.length * FAM_LEN;
 const AKHIR = PENUTUP + 15.0;
-// VO keluarga (sari kata; diselaraskan semula bila VO_KELUARGA sampai)
+// VO keluarga (VO_KELUARGA, 37 s) bermula VO_AT saat selepas KELUARGA; masa sari kata dari transkripsi
+const VO_AT = 1.5;
 const VO: Array<[number, number, string]> = [
-  [1.5, 5.0, 'Di sebalik setiap kemenangan... ada doa yang tak pernah putus.'],
-  [7.5, 6.5, 'Ada seorang ibu... yang setia menunggu di tepi gelanggang, di lapangan terbang, dan di setiap perjalanan.'],
-  [15.0, 4.5, 'Ada seorang ayah... yang tak pernah berhenti percaya.'],
-  [21.0, 5.0, 'Ada sahabat... yang ketawa bersama, dan bangkit bersama.'],
-  [28.0, 6.5, 'Thoriq... kejayaan ini bukan milikmu seorang. Ia milik semua yang menyayangimu.'],
-  [36.0, 6.0, 'Terima kasih... kerana membuktikan bahawa mimpi... memang tiada sempadan.'],
+  [0.0, 6.4, 'Di sebalik setiap kemenangan... ada doa yang tak pernah putus.'],
+  [6.84, 8.1, 'Ada seorang ibu... yang setia menunggu di tepi gelanggang, di lapangan terbang, dan di setiap perjalanan.'],
+  [15.42, 3.8, 'Ada seorang ayah... yang tak pernah berhenti percaya.'],
+  [19.5, 4.9, 'Ada sahabat... yang ketawa bersama, dan bangkit bersama.'],
+  [24.78, 5.7, 'Thoriq... kejayaan ini bukan milikmu seorang. Ia milik semua yang menyayangimu.'],
+  [30.68, 5.3, 'Terima kasih... kerana membuktikan bahawa mimpi... memang tiada sempadan.'],
 ];
 
 // ------------------------------------------------------------------ A. ACCESS GRANTED
@@ -232,7 +233,7 @@ const Warp: React.FC = () => {
   );
 };
 
-// ------------------------------------------------------------------ lari berpagar: paralaks 3D gerak perlahan
+// ------------------------------------------------------------------ lari berpagar: gambar rata, zum perlahan
 const Lari: React.FC<{len: number}> = ({len}) => {
   const fr = useCurrentFrame();
   const L = f(len);
@@ -241,8 +242,7 @@ const Lari: React.FC<{len: number}> = ({len}) => {
   const teks = ci(fr, 12, 30, 0, 1, easeOut);
   return (
     <AbsoluteFill style={{background: '#000', overflow: 'hidden', opacity: ci(fr, 0, 4) * (1 - ci(fr, L - 6, L))}}>
-      <Img src={img('lari_bg')} style={{...st, transform: `scale(${1.08 + 0.03 * u}) translateX(${30 * u}px)`}} />
-      <Img src={staticFile('v8/b3/lari_fg.png')} style={{...st, transform: `scale(${1.08 + 0.1 * u}) translateX(${-40 * u}px)`}} />
+      <Img src={img('lari')} style={{...st, transform: `scale(${1.03 + 0.06 * u}) translateX(${20 * (u - 0.5)}px)`}} />
       <AbsoluteFill style={{background: 'linear-gradient(90deg, rgba(0,0,0,0.65) 0%, transparent 45%)'}} />
       <div style={{position: 'absolute', left: 90, top: 330, opacity: teks, transform: `translateX(${-40 * (1 - teks)}px)`}}>
         <div style={{fontFamily: MONO, fontSize: 24, letterSpacing: 10, color: CYAN}}>ATHLETICS</div>
@@ -423,8 +423,8 @@ const Keluarga: React.FC = () => {
       <AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 40%, rgba(255,200,140,0.08), rgba(0,0,0,0.45) 100%)'}} />
       <AbsoluteFill style={{background: 'linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.7) 100%)'}} />
       {VO.map(([t, d, text], i) => {
-        const a = f(t);
-        const b = f(t + d);
+        const a = f(VO_AT + t);
+        const b = f(VO_AT + t + d);
         if (fr < a || fr > b) return null;
         const o = ci(fr, a, a + 12) * (1 - ci(fr, b - 12, b));
         return (
@@ -556,8 +556,11 @@ export const TrailerBahagian3: React.FC = () => {
       <Sequence from={f(INTL - 1.0)} durationInFrames={f(KELUARGA - INTL + 1.0)}>
         <Audio src={staticFile('v8/muzik/clockwork_collapse.mp3')} trimBefore={f(103.5)} volume={vol([0, KELUARGA - INTL - 2.5, KELUARGA - INTL + 0.5], [0.85, 0.85, 0])} />
       </Sequence>
+      <Sequence from={f(KELUARGA + VO_AT)} durationInFrames={f(37.2)}>
+        <Audio src={staticFile('v8/vo/VO_KELUARGA.wav')} volume={1.0} />
+      </Sequence>
       <Sequence from={f(KELUARGA - 0.8)} durationInFrames={f(AKHIR - KELUARGA + 0.8)}>
-        <Audio src={staticFile('v8/muzik/princesses_heart.mp3')} volume={vol([0, 1.5, AKHIR - KELUARGA - 4, AKHIR - KELUARGA + 0.8], [0, 0.75, 0.75, 0])} />
+        <Audio src={staticFile('v8/muzik/princesses_heart.mp3')} volume={vol([0, 1.4, 2.6, VO_AT + 37.0, VO_AT + 39.0, AKHIR - KELUARGA - 4, AKHIR - KELUARGA + 0.8], [0, 0.6, 0.3, 0.3, 0.75, 0.75, 0])} />
       </Sequence>
       {SFX.map(([t, file, v], i) => (
         <Sequence key={'x' + i} from={Math.max(0, f(t))}>

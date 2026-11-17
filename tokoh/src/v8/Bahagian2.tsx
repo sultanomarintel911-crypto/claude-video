@@ -70,10 +70,9 @@ const KadBab: React.FC<{a: string; b: string; len: number}> = ({a, b, len}) => {
   );
 };
 
-// syot sinematik penuh skrin: paralaks 2.5D (subjek tajam di hadapan, latar kabur bergerak perlahan)
+// syot sinematik penuh skrin: gambar rata (tiada kesan 3D), Ken Burns perlahan + hentakan zum ikut rentak
 const Foto: React.FC<{src: string; len: number; i: number; music: number}> = ({src, len, i, music}) => {
   const fr = useCurrentFrame();
-  // hentakan zum ikut rentak: subjek 'menolak' ke hadapan pada setiap beat
   const p = usePulse('last_strike', music, 0.28, 0.6);
   const L = f(len);
   const u = fr / L;
@@ -81,16 +80,11 @@ const Foto: React.FC<{src: string; len: number; i: number; music: number}> = ({s
   const pantas = len < 2;
   const inn = ci(fr, 0, pantas ? 3 : 10);
   const out = 1 - ci(fr, L - (pantas ? 3 : 8), L);
-  const bgS = 1.06 + 0.03 * u + 0.012 * p;
-  const fgS = 1.06 + 0.075 * u + 0.03 * p;
-  const bgX = dir * 18 * u;
-  const fgX = -dir * 26 * u;
-  const base = src.replace('.jpg', '');
+  const sk = 1.03 + 0.05 * u + 0.02 * p;
   const st: React.CSSProperties = {position: 'absolute', width: 1920, height: 1080, left: 0, top: 0};
   return (
     <AbsoluteFill style={{background: '#000', opacity: inn * out, overflow: 'hidden'}}>
-      <Img src={staticFile(base + '_bg.jpg')} style={{...st, transform: `translateX(${bgX}px) scale(${bgS})`}} />
-      <Img src={staticFile(base + '_fg.png')} style={{...st, transform: `translateX(${fgX}px) scale(${fgS})`, filter: `blur(${(1 - ci(fr, 0, pantas ? 6 : 14, 0, 1, easeOut)) * 8}px)`}} />
+      <Img src={staticFile(src)} style={{...st, transform: `translateX(${dir * 14 * (u - 0.5)}px) scale(${sk})`}} />
       <AbsoluteFill style={{background: '#fff', opacity: 0.06 * p, mixBlendMode: 'soft-light'}} />
       <Vignette strength={0.55} />
     </AbsoluteFill>

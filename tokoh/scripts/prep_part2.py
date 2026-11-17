@@ -40,20 +40,20 @@ def load(n):
 # sumber: nombor = bahan/kehidupan (sorted), "upd:..." = bahan/update (HD), lain = bahan/ubah
 HD = (0.5, 0.5, 1.0)
 ITEMS = [
-    # BAB I - bayi (jelas) & tadika (topeng / spek bersilih ganti)
+    # BAB I - bayi & tadika (semua jelas, tanpa topeng)
     ("b01", "upd:baby thori2.2.png", "asli", None, 0, False, HD),
     ("b02", "upd:baby thoriq 2.png", "asli", None, 0, False, HD),
     ("b03", "upd:baby thoriq 1.png", "asli", None, 0, False, HD),
     ("b04", "upd:baby thoriq 3.png", "asli", None, 0, False, HD),
     ("b05", "upd:thoriq belakang baby.png", "asli", None, 0, False, HD),
-    ("b06", "upd:preschool ni.png", "topeng", None, 0, False, HD),
-    ("b07", "upd:Red Firefighter at Preschool-4.png", "spek", None, 0, False, HD),
-    ("b08", "upd:thoriq preschool.png", "topeng", None, 0, False, HD),
-    ("b09", "upd:thoriq tadika 1.png", "spek", None, 0, False, HD),
-    ("b10", "upd:thoriq tadika.png", "topeng", None, 0, False, HD),
-    ("b11", "upd:Removing a stray foot artifact-9.png", "spek", None, 0, False, HD),
-    ("b12", "upd:tadika lagi.png", "topeng", None, 0, False, HD),
-    ("b13", "upd:tadika.png", "spek", None, 0, False, HD),
+    ("b06", "upd:preschool ni.png", "asli", None, 0, False, HD),
+    ("b07", "upd:Red Firefighter at Preschool-4.png", "asli", None, 0, False, HD),
+    ("b08", "upd:thoriq preschool.png", "asli", None, 0, False, HD),
+    ("b09", "upd:thoriq tadika 1.png", "asli", None, 0, False, HD),
+    ("b10", "upd:thoriq tadika.png", "asli", None, 0, False, HD),
+    ("b11", "upd:Removing a stray foot artifact-9.png", "asli", None, 0, False, HD),
+    ("b12", "upd:tadika lagi.png", "asli", None, 0, False, HD),
+    ("b13", "upd:tadika.png", "asli", None, 0, False, HD),
     # BAB II - alam persekolahan
     ("c01", 94, "jelas", None, 0, True, None),
     ("c02", "upd:tahun 2.png", "jelas", None, 0, False, HD),
@@ -279,25 +279,11 @@ for key, n, mode, pt, headf, tag, frm in ITEMS:
     else:
         focus = (0.5, 0.5)
     a = grade(a)
-    # kedalaman medan cetek: latar dikaburkan, subjek tajam (+ lapisan untuk paralaks)
-    pmf = cv2.GaussianBlur(cv2.dilate(pm, np.ones((5, 5), np.uint8)).astype(np.float32), (0, 0), 2.5)
-    hole = cv2.dilate(pm, np.ones((41, 41), np.uint8))
-    small = cv2.resize(a.astype(np.uint8), (W // 4, H // 4), interpolation=cv2.INTER_AREA)
-    inp = cv2.inpaint(small, cv2.resize(hole, (W // 4, H // 4), interpolation=cv2.INTER_NEAREST), 9, cv2.INPAINT_TELEA)
-    inp = cv2.resize(inp, (W, H), interpolation=cv2.INTER_CUBIC).astype(np.float32)
-    bg_src = a * (1 - hole[..., None]) + inp * hole[..., None]
-    bg = cv2.GaussianBlur(bg_src, (0, 0), max(4, W / 260))
-    comp = bg * (1 - pmf[..., None]) + a * pmf[..., None]
+    # tiada kesan 3D / kedalaman palsu: gambar rata, sisi kosong diisi versi kabur gambar sendiri
     fx, fy, z = frm or (focus[0], focus[1], 1.35)
-    # latar lanjutan sisi: latar kabur lebih kuat & malap (ala lensa anamorfik)
-    ext = cv2.GaussianBlur(cover(bg.astype(np.uint8), (fx, fy)).astype(np.float32), (0, 0), 30) * 0.55
-    full = place(comp, (fx, fy), z, ext)
-    bgl = place(bg, (fx, fy), z, ext)
-    rgba = np.dstack([np.clip(a, 0, 255), pmf * 255]).astype(np.float32)
-    fgl = place(rgba, (fx, fy), z, np.zeros((CH, CW, 4), np.float32))
+    ext = cv2.GaussianBlur(cover(a.astype(np.uint8), (fx, fy)).astype(np.float32), (0, 0), 30) * 0.55
+    full = place(a, (fx, fy), z, ext)
     Image.fromarray(np.clip(full, 0, 255).astype(np.uint8)).save(f"{OUT}/{key}.jpg", quality=92)
-    Image.fromarray(np.clip(bgl, 0, 255).astype(np.uint8)).save(f"{OUT}/{key}_bg.jpg", quality=90)
-    Image.fromarray(np.clip(fgl, 0, 255).astype(np.uint8), "RGBA").save(f"{OUT}/{key}_fg.png", compress_level=3)
     print(f"{key} <- {n} {mode} {W}x{H} wajah={len(fl)} fokus=({focus[0]:.2f},{focus[1]:.2f})")
 
 # gambar terawal (hujung kotak kenangan)
