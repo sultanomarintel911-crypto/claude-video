@@ -51,8 +51,8 @@ const CW_PETA = 21.0; // Clockwork untuk peta misi // 76.9
 const KLIMAKS = PETA + 37.7; // peta misi 37.7 s
 const DROP = KLIMAKS + 34.5; // pendedahan (The Last Strike 1:00)
 const AKHIR = DROP + 13.5;
-const LS_GAH = 60.05; // saat dalam The Last Strike bila muzik jadi gah
-const LS_PRE = 7.0; // lagu bermula 7 s sebelum pendedahan
+const SV_GAH = 96.68; // saat dalam Beneath the Sovereign Sky bila muzik meletup selepas senyap (pendedahan)
+const LS_PRE = 7.0; // lagu pendedahan bermula 7 s sebelum DROP
 const CC_SENYAP = 99.0; // saat The Clockwork Collapse menjadi senyap (sebelum hentakannya pada 104.5)
 const CC0 = CC_SENYAP - (DROP - LS_PRE + 0.2 - KLIMAKS); // masa dalam lagu Clockwork pada KLIMAKS
 
@@ -513,7 +513,7 @@ export const TrailerBahagian2: React.FC = () => {
       </Sequence>
       {/* The Last Strike: masuk pada 0:53 (binaan perlahan dari 0:54) -> 1:00 bunyi gah tepat pada PENDEDAHAN */}
       <Sequence from={f(DROP - LS_PRE)} durationInFrames={f(AKHIR - DROP + LS_PRE)}>
-        <Audio src={staticFile('v8/muzik/last_strike.mp3')} trimBefore={f(LS_GAH - LS_PRE)} volume={vol([0, 1.0, LS_PRE + AKHIR - DROP - 2.5, LS_PRE + AKHIR - DROP], [0, 1.0, 1.0, 0])} />
+        <Audio src={staticFile('v8/muzik/sovereign.mp3')} trimBefore={f(SV_GAH - LS_PRE)} volume={vol([0, 1.0, LS_PRE + AKHIR - DROP - 2.5, LS_PRE + AKHIR - DROP], [0, 1.0, 1.0, 0])} />
       </Sequence>
       <Sequence from={f(kStart + 1.0)}>
         <Audio src={staticFile('v8/vo/GB_03.wav')} volume={1} />

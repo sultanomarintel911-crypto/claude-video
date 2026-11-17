@@ -61,6 +61,8 @@ def norm_linear(src, dst):
 
 norm_linear(f"{B}/muzik/the_last_strike.mp3", f"{P}/muzik/last_strike.mp3")
 norm_linear(f"{B}/muzik/the_clockwork_collapse.mp3", f"{P}/muzik/clockwork_collapse.mp3")
+norm_linear(f"{B}/muzik/beneath_the_sovereign_sky.mp3", f"{P}/muzik/sovereign.mp3")
+norm_linear(f"{B}/muzik/top_of_the_morning.mp3", f"{P}/muzik/morning.mp3")
 print("muzik siap")
 
 # ---------------------------------------------------------------- VO prolog: pecah ikut ayat (titik potong = tenaga paling rendah)

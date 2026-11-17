@@ -23,8 +23,8 @@ const GREEN = '#3dff9a';
 const img = (k: string) => staticFile(`v8/b3/${k}.jpg`);
 
 // ------------------------------------------------------------------ garis masa (saat)
-const LS0 = 73.55; // The Last Strike bersambung dari hujung Bahagian 2
-const snapLS = (t: number) => snapBeat('last_strike', t + LS0) - LS0;
+const LS0 = 96.68 + 13.5; // Beneath the Sovereign Sky bersambung dari hujung Bahagian 2 (DROP + 13.5)
+const snapLS = (t: number) => snapBeat('sovereign', t + LS0) - LS0;
 const AKSES = 0;
 const SEKOLAH = 5.0;
 const PANEL = ['s01', 's02', 's03', 's04', 's05', 's06', 's07'];
@@ -37,7 +37,7 @@ const WARP_TAG = ['SUKAN TAHUNAN', 'PODIUM', 'PINGAT · SEKOLAH', 'PINGAT · DAE
 const WARP_T = WARP.map((_, i) => snapLS(SUKAN + i * 0.93));
 const LARI = snapLS(SUKAN + WARP.length * 0.93);
 const SKUASY = snapLS(LARI + 5.0);
-const INTL = 119.5 - LS0; // The Last Strike reda (~1:59.5) -> hentakan Clockwork
+const INTL = 45.95; // -> hentakan Clockwork (misi antarabangsa)
 const SQ = ['q01', 'q02', 'q03', 'q04', 'q05', 'q06', 'q07', 'q08', 'q10'];
 const SQ_T = SQ.map((_, i) => SKUASY + ((INTL - SKUASY) * i) / SQ.length);
 const SQ_STAMP: Record<number, [string, string]> = {2: ['JOHAN', 'MSSD DUNGUN'], 5: ['JOHAN', 'MSST TERENGGANU'], 8: ['MSSM 2026', 'PERINGKAT KEBANGSAAN']};
@@ -208,7 +208,7 @@ const Warp: React.FC = () => {
   const lf = fr - f(WARP_T[i] - SUKAN);
   const hit = 1 - ci(lf, 0, 8);
   const z = 1.0 + 0.22 * hit * hit + 0.03 * (lf / 28);
-  const p = pulseAt('last_strike', t + LS0, 0.2, 0.8);
+  const p = pulseAt('sovereign', t + LS0, 0.2, 0.8);
   return (
     <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
       <Img src={img(WARP[i])} style={{position: 'absolute', width: 1920, height: 1080, transform: `scale(${z + 0.02 * p})`, filter: `blur(${hit * 5}px) brightness(${1 + 0.3 * hit})`}} />
@@ -265,7 +265,7 @@ const Skuasy: React.FC = () => {
   let i = 0;
   while (i < SQ.length - 1 && t >= SQ_T[i + 1]) i++;
   const lf = fr - f(SQ_T[i] - SKUASY);
-  const p = pulseAt('last_strike', t + LS0, 0.2, 0.7);
+  const p = pulseAt('sovereign', t + LS0, 0.2, 0.7);
   const stamp = SQ_STAMP[i];
   const sp = ci(lf, 3, 9, 0, 1, Easing.out(Easing.back(2.2)));
   return (
@@ -555,7 +555,7 @@ export const TrailerBahagian3: React.FC = () => {
 
       {/* ---------------- muzik ---------------- */}
       <Sequence from={0} durationInFrames={f(INTL + 0.6)}>
-        <Audio src={staticFile('v8/muzik/last_strike.mp3')} trimBefore={f(LS0)} volume={vol([0, INTL - 0.6, INTL + 0.4], [1.0, 1.0, 0])} />
+        <Audio src={staticFile('v8/muzik/sovereign.mp3')} trimBefore={f(LS0)} volume={vol([0, INTL - 0.6, INTL + 0.4], [1.0, 1.0, 0])} />
       </Sequence>
       <Sequence from={f(INTL - 1.0)} durationInFrames={f(KELUARGA - INTL + 1.0)}>
         <Audio src={staticFile('v8/muzik/clockwork_collapse.mp3')} trimBefore={f(103.5)} volume={vol([0, KELUARGA - INTL - 2.5, KELUARGA - INTL + 0.5], [0.85, 0.85, 0])} />
@@ -564,7 +564,7 @@ export const TrailerBahagian3: React.FC = () => {
         <Audio src={staticFile('v8/vo/VO_KELUARGA.wav')} volume={1.0} />
       </Sequence>
       <Sequence from={f(KELUARGA - 0.8)} durationInFrames={f(AKHIR - KELUARGA + 0.8)}>
-        <Audio src={staticFile('v8/muzik/princesses_heart.mp3')} volume={vol([0, 1.4, 2.6, VO_AT + 37.0, VO_AT + 39.0, AKHIR - KELUARGA - 4, AKHIR - KELUARGA + 0.8], [0, 0.6, 0.3, 0.3, 0.75, 0.75, 0])} />
+        <Audio src={staticFile('v8/muzik/morning.mp3')} trimBefore={f(0.4)} volume={vol([0, 1.2, 2.4, VO_AT + 36.0, VO_AT + 37.5, AKHIR - KELUARGA - 4, AKHIR - KELUARGA + 0.8], [0, 0.5, 0.22, 0.22, 0.7, 0.7, 0])} />
       </Sequence>
       {SFX.map(([t, file, v], i) => (
         <Sequence key={'x' + i} from={Math.max(0, f(t))}>
