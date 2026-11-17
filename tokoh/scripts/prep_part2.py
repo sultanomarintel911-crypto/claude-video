@@ -23,6 +23,8 @@ FS = sorted(glob.glob(f"{SRC}/*.jpg"))
 
 
 def load(n):
+    if isinstance(n, str):  # gambar yang telah disunting (bahan/ubah)
+        return ImageOps.exif_transpose(Image.open(os.path.join(SRC, "..", "ubah", n))).convert("RGB")
     return ImageOps.exif_transpose(Image.open(FS[n - 1])).convert("RGB")
 
 
@@ -31,11 +33,11 @@ def load(n):
 #   jelas : wajah semua orang dikaburkan (wajah sahaja - badan, pingat & sijil kekal jelas)
 #   kabur : seperti 'jelas' + kepala Thoriq dikaburkan lebih kuat (topeng orang)
 # bingkai: (fokus x, fokus y, zum) - zum 1 = tinggi penuh gambar kelihatan (sisi dilanjutkan dengan latar kabur)
-FRAME = {7: (0.45, 0.6, 1.3), 8: (0.5, 0.62, 1.25), 9: (0.5, 0.55, 1.45), 10: (0.58, 0.58, 1.2), 5: (0.45, 0.45, 1.15), 12: (0.5, 0.5, 1.25), 3: (0.55, 0.45, 1.5)}
+FRAME = {3: (0.5, 0.5, 1.0), 7: (0.45, 0.6, 1.3), 8: (0.5, 0.62, 1.25), 9: (0.5, 0.55, 1.45), 10: (0.58, 0.58, 1.2), 5: (0.45, 0.45, 1.15), 12: (0.5, 0.5, 1.25)}
 ITEMS = [
     (103, "asli", None, 0, False),
     (95, "asli", None, 0, False),
-    (100, "jelas", None, 0, False),
+    ("kuda_perisai.webp", "sedia", None, 0, False),  # #100 disunting: topeng rantai pahlawan menutup wajah
     (94, "jelas", None, 0, True),
     (90, "jelas", None, 0, True),
     (88, "jelas", None, 0, True),
@@ -50,6 +52,7 @@ ITEMS = [
 from rembg import new_session, remove  # noqa: E402
 
 sess = new_session("u2net_human_seg")
+sess_am = new_session("u2net")
 YUNET = os.path.join(HERE, "model", "yunet.onnx")
 CW, CH = 1920, 1080  # bingkai sinematik 16:9
 
@@ -156,7 +159,9 @@ def place(arr, focus, z, ext=None):
     sc = max(CH / H * z, min(CW / W, CH / H) if ext is None else 0)
     if W * sc >= CW and H * sc >= CH or ext is None:
         sc = max(sc, CW / W, CH / H)
-    nw, nh = int(round(W * sc)), int(round(H * sc))
+    nw, nh = int(np.ceil(W * sc - 1e-6)), int(np.ceil(H * sc - 1e-6))
+    if abs(nw - CW) <= 2:
+        nw = CW
     r = cv2.resize(arr, (nw, nh), interpolation=cv2.INTER_CUBIC if sc > 1 else cv2.INTER_AREA)
     x0 = int(np.clip(focus[0] * nw - CW / 2, min(0, nw - CW), max(0, nw - CW))) if nw > CW else -(CW - nw) // 2
     y0 = int(np.clip(focus[1] * nh - CH / 2, 0, nh - CH))
@@ -208,9 +213,12 @@ for i, (n, mode, pt, headf, tag) in enumerate(ITEMS):
     im.thumbnail((2400, 2400), Image.LANCZOS)
     a = np.asarray(im).astype(np.float32)
     H, W = a.shape[:2]
-    pm = (np.asarray(remove(im, session=sess, only_mask=True, post_process_mask=True)) > 128).astype(np.uint8)
+    # subjek: orang (atau orang + kuda untuk gambar suntingan, model am u2net)
+    pm = (np.asarray(remove(im, session=sess_am if mode == "sedia" else sess, only_mask=True, post_process_mask=True)) > 128).astype(np.uint8)
     fl = []
-    if mode == "asli":  # gambar kecil: topeng mata adiwira
+    if mode == "sedia":  # wajah sudah ditutup dalam suntingan
+        pass
+    elif mode == "asli":  # gambar kecil: topeng mata adiwira
         a, nm = topeng_adiwira(a)
         print(f"   topeng adiwira x{nm}")
     else:
@@ -261,7 +269,7 @@ for i, (n, mode, pt, headf, tag) in enumerate(ITEMS):
     Image.fromarray(np.clip(full, 0, 255).astype(np.uint8)).save(f"{OUT}/h{i + 1:02d}.jpg", quality=92)
     Image.fromarray(np.clip(bgl, 0, 255).astype(np.uint8)).save(f"{OUT}/h{i + 1:02d}_bg.jpg", quality=90)
     Image.fromarray(np.clip(fgl, 0, 255).astype(np.uint8), "RGBA").save(f"{OUT}/h{i + 1:02d}_fg.png", compress_level=3)
-    print(f"h{i + 1:02d} <- #{n:03d} {mode} {W}x{H} wajah={len(fl)} fokus=({focus[0]:.2f},{focus[1]:.2f})")
+    print(f"h{i + 1:02d} <- {n} {mode} {W}x{H} wajah={len(fl)} fokus=({focus[0]:.2f},{focus[1]:.2f})")
 
 # gambar terawal (hujung kotak kenangan)
 load(101).save(os.path.join(IMG, "awal.jpg"), quality=92)  # gambar kecil: tidak dikaburkan
