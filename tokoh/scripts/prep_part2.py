@@ -92,6 +92,53 @@ def blur_faces(a, tag):
     return blur_region(a, m), fl
 
 
+def topeng_adiwira(a):
+    """Topeng mata adiwira (hitam berkilat, lubang mata kecil) pada setiap wajah - gaya, bukan tapisan."""
+    H, W = a.shape[:2]
+    det = cv2.FaceDetectorYN.create(YUNET, "", (W, H), 0.5, 0.3, 5000)
+    _, fs = det.detect(a.astype(np.uint8)[:, :, ::-1].copy())
+    if fs is None:
+        return a, 0
+    S = 4  # lukis 4x untuk tepi licin
+    out = a.copy()
+    for f_ in fs:
+        rx, ry, lx, ly = f_[4:8]  # mata kanan (imej kiri), mata kiri
+        mx, my = (rx + lx) / 2, (ry + ly) / 2
+        d = float(np.hypot(lx - rx, ly - ry))
+        ang = float(np.degrees(np.arctan2(ly - ry, lx - rx)))
+        # kanvas tempatan (unit d), pusat di tengah mata
+        cw, ch = int(3.2 * d * S), int(1.8 * d * S)
+        m = np.zeros((ch, cw), np.uint8)
+        hole = np.zeros((ch, cw), np.uint8)
+        u = d * S
+        cx, cy = cw // 2, ch // 2
+        P = lambda x, y: (int(cx + x * u), int(cy + y * u))  # noqa: E731
+        for sgn in (-1, 1):
+            cv2.ellipse(m, P(sgn * 0.52, 0.0), (int(0.6 * u), int(0.38 * u)), 0, 0, 360, 255, -1)
+            tip = np.array([P(sgn * 0.75, -0.32), P(sgn * 1.32, -0.5), P(sgn * 1.06, 0.04), P(sgn * 0.8, 0.24)], np.int32)
+            cv2.fillPoly(m, [tip], 255)
+            cv2.ellipse(hole, P(sgn * 0.5, 0.01), (int(0.2 * u), int(0.11 * u)), sgn * 8, 0, 360, 255, -1)
+        cv2.rectangle(m, P(-0.22, -0.2), P(0.22, 0.1), 255, -1)
+        cv2.ellipse(m, P(0, 0.16), (int(0.13 * u), int(0.1 * u)), 0, 180, 360, 0, -1)  # lengkung hidung
+        m = cv2.subtract(m, hole)
+        m = cv2.GaussianBlur(m, (0, 0), S * 0.7)
+        # putar & letak
+        M = cv2.getRotationMatrix2D((cx, cy), -ang, 1.0 / S)
+        M[0, 2] += mx - cx
+        M[1, 2] += my - cy
+        al = cv2.warpAffine(m, M, (W, H)).astype(np.float32) / 255
+        # bayang lembut di bawah topeng
+        sh = cv2.GaussianBlur(cv2.warpAffine(m, M, (W, H)).astype(np.float32) / 255, (0, 0), d * 0.06)
+        sh = np.roll(sh, int(d * 0.05), axis=0)
+        out = out * (1 - 0.45 * sh[..., None])
+        # warna: hitam kebiruan berkilat (kilauan di bahagian atas)
+        yy = np.arange(H, dtype=np.float32)[:, None]
+        g = np.clip(1 - (yy - (my - 0.3 * d)) / (0.6 * d), 0, 1)
+        col = np.dstack([10 + 70 * g ** 2, 10 + 72 * g ** 2, 14 + 80 * g ** 2])
+        out = out * (1 - al[..., None]) + col * al[..., None]
+    return out, len(fs)
+
+
 def grade(a):
     """Gred filem neutral: lengkung-S lembut, hitam diangkat sedikit, ketepuan dikurang sedikit."""
     x = a / 255.0
@@ -163,7 +210,10 @@ for i, (n, mode, pt, headf, tag) in enumerate(ITEMS):
     H, W = a.shape[:2]
     pm = (np.asarray(remove(im, session=sess, only_mask=True, post_process_mask=True)) > 128).astype(np.uint8)
     fl = []
-    if mode != "asli":
+    if mode == "asli":  # gambar kecil: topeng mata adiwira
+        a, nm = topeng_adiwira(a)
+        print(f"   topeng adiwira x{nm}")
+    else:
         a, fl = blur_faces(a, tag)
         # lapisan keselamatan: kepala orang yang wajahnya tidak dikesan
         nlab, lab, stats, _ = cv2.connectedComponentsWithStats(pm, 8)

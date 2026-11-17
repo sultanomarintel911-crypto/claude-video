@@ -7,7 +7,7 @@ import '@fontsource/montserrat/500.css';
 import '@fontsource/montserrat/600.css';
 import '@fontsource/montserrat/700.css';
 import '@fontsource/jetbrains-mono/400.css';
-import {ci, easeOut, FilmLook, Gold, GOLD_GRAD, SANS, SERIF, Vignette} from '../components';
+import {ci, easeOut, FilmLook, Gold, Gold3D, GOLD_GRAD, SANS, SERIF, Vignette} from '../components';
 import {BANDAR, City, Globe, lerpRot} from './Globe';
 import {pulseAt} from './beat';
 
@@ -163,6 +163,7 @@ const Prolog: React.FC = () => {
   const dim = ci(fr, f(37.2), f(38.6));
   const words: Array<[string, number]> = [['MIMPI', 38.78], ['TIADA', 39.44], ['SEMPADAN', 40.28]];
   const empat = ci(fr, f(29.6), f(29.9)) * (1 - ci(fr, f(32.0), f(32.6)));
+  const zk = ci(fr, f(29.0), f(29.9), 0, 1, easeOut) * (1 - ci(fr, f(32.2), f(33.4), 0, 1, easeOut));
   return (
     <AbsoluteFill style={{background: '#000'}}>
       <Sequence from={0} durationInFrames={f(11.4)}>
@@ -179,16 +180,14 @@ const Prolog: React.FC = () => {
       <AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.55))', opacity: fr < f(22.4) ? 1 : 0}} />
       {fr >= f(22.4) ? (
         <AbsoluteFill style={{opacity: globeIn * globeOut}}>
-          <Globe cx={960} cy={560} r={430} rot={rot} cities={cities} dungunAt={f(25.8)} opacity={1 - dim * 0.65} />
+          {/* zum keluar semasa "4 NEGARA": glob mengecil ke atas, teks 3D di bawah (tidak menutup label bandar) */}
+          <Globe cx={960} cy={interpolate(zk, [0, 1], [560, 360])} r={interpolate(zk, [0, 1], [430, 255])} rot={rot} cities={cities} dungunAt={f(25.8)} opacity={1 - dim * 0.65} />
         </AbsoluteFill>
       ) : null}
       {/* "4 NEGARA" */}
       {empat > 0 ? (
-        <AbsoluteFill style={{justifyContent: 'center', alignItems: 'flex-end', paddingRight: 150, opacity: empat}}>
-          <div style={{textAlign: 'right'}}>
-            <Gold size={180}>4</Gold>
-            <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 30, letterSpacing: 12, color: '#fff'}}>NEGARA</div>
-          </div>
+        <AbsoluteFill style={{justifyContent: 'flex-start', alignItems: 'center', paddingTop: 690, opacity: 1 - ci(fr, f(32.0), f(32.6))}}>
+          <Gold3D text="4 NEGARA" size={150} p={ci(fr, f(29.45), f(30.25))} shine={ci(fr, f(30.3), f(31.3))} yaw={interpolate(fr, [f(29.6), f(32.6)], [-6, 6])} />
         </AbsoluteFill>
       ) : null}
       {/* MIMPI TIADA SEMPADAN */}

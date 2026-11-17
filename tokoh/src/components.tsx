@@ -426,3 +426,49 @@ export const FilmLook: React.FC<{grain?: number}> = ({grain = 0.16}) => {
     </AbsoluteFill>
   );
 };
+
+// ------------------------------------------------------------ teks emas 3D (tebal, perspektif, terbang masuk)
+// p: 0..1 kemasukan (terbang dari hadapan kamera), shine: sapuan kilauan, yaw: putaran perlahan (darjah)
+export const Gold3D: React.FC<{text: string; size: number; p: number; shine?: number; yaw?: number; depth?: number; spacing?: number}> = ({
+  text,
+  size,
+  p,
+  shine = -1,
+  yaw = 0,
+  depth = 16,
+  spacing = 6,
+}) => {
+  const e = Easing.out(Easing.cubic)(Math.min(1, Math.max(0, p)));
+  const layers = Array.from({length: depth}, (_, i) => depth - i);
+  const base: React.CSSProperties = {position: 'absolute', left: 0, top: 0, fontFamily: SERIF, fontWeight: 900, fontSize: size, letterSpacing: spacing, lineHeight: 1.04, whiteSpace: 'pre'};
+  return (
+    <div style={{perspective: 1400, opacity: Math.min(1, e * 1.6)}}>
+      <div
+        style={{
+          position: 'relative',
+          transformStyle: 'preserve-3d',
+          transform: `translateZ(${(1 - e) * 900}px) rotateX(${14 + (1 - e) * 25}deg) rotateY(${yaw + (1 - e) * -30}deg)`,
+        }}
+      >
+        {/* bayang jatuh */}
+        <div style={{...base, position: 'absolute', color: 'rgba(0,0,0,0.55)', transform: `translateZ(${-depth * 2.6}px) translateY(${size * 0.1}px)`, filter: 'blur(10px)'}}>{text}</div>
+        {/* ketebalan (ekstrusi) */}
+        {layers.map((i) => {
+          const k = i / depth;
+          const c = Math.round(70 + 60 * (1 - k));
+          return (
+            <div key={i} style={{...base, color: `rgb(${c + 60},${Math.round(c * 0.72 + 20)},${Math.round(c * 0.2)})`, transform: `translateZ(${-i * 2.2}px)`}}>
+              {text}
+            </div>
+          );
+        })}
+        {/* muka hadapan */}
+        <div style={{position: 'relative'}}>
+          <Gold size={size} spacing={spacing} shine={shine}>
+            {text}
+          </Gold>
+        </div>
+      </div>
+    </div>
+  );
+};

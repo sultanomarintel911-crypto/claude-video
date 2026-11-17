@@ -8,7 +8,7 @@ import '@fontsource/montserrat/600.css';
 import '@fontsource/montserrat/700.css';
 import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/700.css';
-import {ci, easeInOut, easeOut, FilmLook, Gold, GOLD, GOLD_GRAD, SANS, SERIF, Vignette} from '../components';
+import {ci, easeInOut, easeOut, FilmLook, Gold, Gold3D, GOLD, GOLD_GRAD, SANS, SERIF, Vignette} from '../components';
 import {SceneKira, SceneReveal} from '../scenes';
 import {Brackets, GlitchBands, Scramble} from '../scifi';
 import CALON from './calon.json';
@@ -43,7 +43,7 @@ bab('BAB III', 'MULA DIKENALI');
 ['h07', 'h08', 'h09'].forEach(foto);
 sulit('JOHAN ███', 'PERINGKAT NEGERI');
 bab('BAB IV', '█████████');
-['h10', 'h12'].forEach(foto); // h11 (lari berpagar) dipindah ke montaj selepas pendedahan, penuh skrin
+['h10'].forEach(foto); // h11 (lari berpagar) -> montaj selepas pendedahan; h12 (baju Melayu bawa nasi) -> kenangan keluarga
 const MORPH = tt; // 59.2
 const PETA = MORPH + 17.7;
 const CW_PETA = 21.0; // Clockwork untuk peta misi // 76.9
@@ -204,11 +204,13 @@ const Peta: React.FC = () => {
   const rot = lerpRot(fr, keys, rots);
   const cities: City[] = MISI.map((m) => ({...m.city, at: f(m.t + 0.6)}));
   const inn = ci(fr, 0, 12);
-  const akhir = ci(fr, f(31.2), f(32.2), 0, 1, easeOut);
+  const akhir = ci(fr, f(30.6), f(31.8), 0, 1, easeOut);
+  const teks = ci(fr, f(31.2), f(32.1));
   const r = interpolate(fr, [0, f(2.5), f(31), len], [380, 470, 470, 400], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   return (
     <AbsoluteFill style={{background: 'radial-gradient(ellipse at 40% 50%, #121a28 0%, #020305 75%)', opacity: inn}}>
-      <Globe cx={720} cy={560} r={r} rot={rot} cities={cities} arcLen={22} dungunAt={f(1.2)} />
+      {/* zum keluar pada akhir: glob kecil di tengah atas, teks 3D di bawah */}
+      <Globe cx={interpolate(akhir, [0, 1], [720, 960])} cy={interpolate(akhir, [0, 1], [560, 350])} r={interpolate(akhir, [0, 1], [r, 245])} rot={rot} cities={cities} arcLen={22} dungunAt={f(1.2)} />
       <div style={{position: 'absolute', left: 90, top: 70, fontFamily: MONO, fontSize: 24, letterSpacing: 8, color: '#d9d2c2'}}>
         FAIL MISI · <span style={{color: GOLD}}>LUAR NEGARA</span>
       </div>
@@ -217,12 +219,10 @@ const Peta: React.FC = () => {
           <KadMisi m={m} i={i} />
         </Sequence>
       ))}
-      {akhir > 0 ? (
-        <AbsoluteFill style={{justifyContent: 'center', alignItems: 'flex-end', paddingRight: 140, opacity: akhir}}>
-          <div style={{textAlign: 'right'}}>
-            <Gold size={170}>4 NEGARA</Gold>
-            <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, letterSpacing: 14, color: '#fff', marginTop: 10}}>1 MURID</div>
-          </div>
+      {teks > 0 ? (
+        <AbsoluteFill style={{justifyContent: 'flex-start', alignItems: 'center', paddingTop: 660}}>
+          <Gold3D text="4 NEGARA" size={150} p={teks} shine={ci(fr, f(32.2), f(33.4))} yaw={interpolate(fr, [f(31.2), len], [-6, 5])} />
+          <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, letterSpacing: 14, color: '#fff', marginTop: 34, opacity: ci(fr, f(32.3), f(32.9)), textShadow: '0 4px 16px rgba(0,0,0,0.9)'}}>1 MURID</div>
         </AbsoluteFill>
       ) : null}
       <Vignette strength={0.6} />
@@ -241,29 +241,47 @@ const CALON_LEN = Array.from({length: NCALON}, (_, i) => 12.5 / NCALON * (1.35 -
 const CALON_T = CALON_LEN.reduce<number[]>((a, l, i) => [...a, i === 0 ? 0 : a[i - 1] + CALON_LEN[i - 1]], []);
 const IMBAS_LEN = CALON_T[NCALON - 1] + CALON_LEN[NCALON - 1];
 
-const KadCalon: React.FC<{k: number; len: number; quick?: boolean}> = ({k, len, quick = false}) => {
+// kamera: zum z berpusat pada wajah, wajah digerakkan ke tengah skrin sebanyak e (0..1)
+const kam = (b: Box, z: number, e: number) => {
+  const ox = b.x + b.w / 2;
+  const oy = b.y + b.h / 2;
+  const tx = (960 - ox) * e;
+  const ty = (480 - oy) * e;
+  const map = (x: number, y: number): [number, number] => [ox + tx + (x - ox) * z, oy + ty + (y - oy) * z];
+  const [x0, y0] = map(b.x, b.y);
+  const [x1, y1] = map(b.x + b.w, b.y + b.h);
+  return {style: {transform: `translate(${tx}px, ${ty}px) scale(${z})`, transformOrigin: `${ox}px ${oy}px`} as React.CSSProperties, rect: [x0, y0, x1, y1] as [number, number, number, number]};
+};
+
+const KadCalon: React.FC<{k: number; len: number}> = ({k, len}) => {
   const fr = useCurrentFrame();
   const L = f(len);
   const b = CB[k];
-  const scanEnd = Math.round(L * (quick ? 0.45 : 0.62));
+  const scanEnd = Math.round(L * 0.62);
   const scan = ci(fr, 3, scanEnd);
   const no = ci(fr, scanEnd, scanEnd + 4, 0, 1, Easing.out(Easing.back(2)));
   const out = ci(fr, L - 6, L);
   const pct = Math.round(scan * (18 + random('pc' + k) * 45));
-  const sy = b.y - 30 + (b.h + 60) * scan;
-  const z = 1.0 + 0.06 * (fr / L);
+  // bidikan sederhana -> tolak masuk ke wajah; calon lewat bermula lebih dekat
+  const z0 = 1.0 + 0.85 * (k / Math.max(1, NCALON - 1));
+  const e = Easing.inOut(Easing.cubic)(ci(fr, 0, scanEnd + 2));
+  const z = z0 + (2.05 - z0) * e + 0.03 * (fr / L);
+  const c = kam(b, z, Math.min(1, 0.35 + e));
+  const [rx0, ry0, rx1, ry1] = c.rect;
+  const pad = 26;
+  const sy = ry0 - pad + (ry1 - ry0 + 2 * pad) * scan;
   return (
     <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
-      <Img src={staticFile(`v8/calon/c${URUT[k]}.jpg`)} style={{width: 1920, height: 1080, transform: `scale(${z})`, transformOrigin: `${b.x + b.w / 2}px ${b.y + b.h / 2}px`, filter: `saturate(${1 - 0.6 * no}) brightness(${1 - 0.25 * no})`}} />
+      <Img src={staticFile(`v8/calon/c${URUT[k]}.jpg`)} style={{width: 1920, height: 1080, ...c.style, filter: `saturate(${1 - 0.6 * no}) brightness(${1 - 0.25 * no})`}} />
       <AbsoluteFill style={{background: RED, opacity: 0.22 * no, mixBlendMode: 'multiply'}} />
       <AbsoluteFill style={{background: 'rgba(0,30,40,0.25)', opacity: 1 - no}} />
-      <Brackets rect={[b.x - 30, b.y - 30, b.x + b.w + 30, b.y + b.h + 30]} p={ci(fr, 0, 6)} color={no > 0.5 ? RED : '#7ff3ff'} />
-      {scan < 1 ? <div style={{position: 'absolute', left: b.x - 40, width: b.w + 80, top: sy, height: 3, background: '#9ff8ff', boxShadow: '0 0 18px 6px rgba(120,240,255,0.7)'}} /> : null}
+      <Brackets rect={[rx0 - pad, ry0 - pad, rx1 + pad, ry1 + pad]} p={ci(fr, 0, 6)} color={no > 0.5 ? RED : '#7ff3ff'} />
+      {scan < 1 ? <div style={{position: 'absolute', left: rx0 - 40, width: rx1 - rx0 + 80, top: sy, height: 3, background: '#9ff8ff', boxShadow: '0 0 18px 6px rgba(120,240,255,0.7)'}} /> : null}
       <div style={{position: 'absolute', left: 90, top: 80, fontFamily: MONO, color: '#bff6ff', fontSize: 26, letterSpacing: 4, textShadow: '0 0 8px rgba(0,0,0,0.9)'}}>
         <div>IMBASAN CALON {String(k + 1).padStart(2, '0')} / {String(NCALON).padStart(2, '0')}</div>
         <div style={{fontSize: 44, fontWeight: 700, marginTop: 10, color: no > 0.5 ? RED : '#fff'}}>PADANAN {pct}%</div>
       </div>
-      <div style={{position: 'absolute', left: b.x + b.w / 2, top: b.y + b.h + 70, transform: `translateX(-50%) rotate(-8deg) scale(${2.2 - 1.2 * no})`, opacity: no, border: `6px solid ${RED}`, color: RED, fontFamily: MONO, fontWeight: 700, fontSize: 72, letterSpacing: 12, padding: '4px 26px', background: 'rgba(0,0,0,0.35)'}}>BUKAN</div>
+      <div style={{position: 'absolute', left: (rx0 + rx1) / 2, top: Math.min(ry1 + 60, 900), transform: `translateX(-50%) rotate(-8deg) scale(${2.2 - 1.2 * no})`, opacity: no, border: `6px solid ${RED}`, color: RED, fontFamily: MONO, fontWeight: 700, fontSize: 72, letterSpacing: 12, padding: '4px 26px', background: 'rgba(0,0,0,0.35)'}}>BUKAN</div>
       <GlitchBands intensity={Math.max(ci(fr, L - 8, L), no * (1 - ci(fr, scanEnd + 4, scanEnd + 10)) * 0.6)} seed={'cg' + k} />
       <AbsoluteFill style={{background: '#000', opacity: out}} />
       <Vignette strength={0.5} />
@@ -278,12 +296,14 @@ const CalonLaju: React.FC<{music: number}> = ({music}) => {
   const k = beatIndex('clockwork_collapse', mt, true) % NCALON;
   const p = pulseAt('clockwork_collapse', mt, 0.12, 0.5);
   const b = CB[k];
+  const c = kam(b, 1.9 + 0.12 * p, 1);
+  const [rx0, ry0, rx1, ry1] = c.rect;
   return (
     <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
-      <Img src={staticFile(`v8/calon/c${URUT[k]}.jpg`)} style={{width: 1920, height: 1080, transform: `scale(${1.05 + 0.08 * p})`, transformOrigin: `${b.x + b.w / 2}px ${b.y + b.h / 2}px`, filter: 'saturate(0.4) brightness(0.75) contrast(1.2)'}} />
+      <Img src={staticFile(`v8/calon/c${URUT[k]}.jpg`)} style={{width: 1920, height: 1080, ...c.style, filter: 'saturate(0.4) brightness(0.75) contrast(1.2)'}} />
       <AbsoluteFill style={{background: RED, opacity: 0.25, mixBlendMode: 'multiply'}} />
-      <Brackets rect={[b.x - 30, b.y - 30, b.x + b.w + 30, b.y + b.h + 30]} p={1} color={RED} />
-      <div style={{position: 'absolute', left: b.x + b.w / 2, top: b.y + b.h + 70, transform: 'translateX(-50%) rotate(-8deg)', border: `6px solid ${RED}`, color: RED, fontFamily: MONO, fontWeight: 700, fontSize: 72, letterSpacing: 12, padding: '4px 26px', background: 'rgba(0,0,0,0.35)'}}>BUKAN</div>
+      <Brackets rect={[rx0 - 26, ry0 - 26, rx1 + 26, ry1 + 26]} p={1} color={RED} />
+      <div style={{position: 'absolute', left: (rx0 + rx1) / 2, top: Math.min(ry1 + 60, 900), transform: 'translateX(-50%) rotate(-8deg)', border: `6px solid ${RED}`, color: RED, fontFamily: MONO, fontWeight: 700, fontSize: 72, letterSpacing: 12, padding: '4px 26px', background: 'rgba(0,0,0,0.35)'}}>BUKAN</div>
       <AbsoluteFill style={{background: '#fff', opacity: 0.4 * p * p}} />
       <GlitchBands intensity={0.3 + 0.5 * p} seed={'cl' + k} />
       <Vignette strength={0.6} />
@@ -309,7 +329,7 @@ const KImg: React.FC<{src: string; len: number; z?: [number, number]; music?: nu
 const Kelipan: React.FC<{len: number; music: number}> = ({len, music}) => {
   const fr = useCurrentFrame();
   const mt = music + fr / FPS;
-  const list = ['h10', 'h05', 'h08', 'h02', 'h12', 'h07', 'h04', 'h09', 'h01', 'h06', 'h03'];
+  const list = ['h10', 'h05', 'h08', 'h02', 'h07', 'h04', 'h09', 'h01', 'h06', 'h03'];
   // gambar bertukar pada setiap separuh rentak Clockwork Collapse; kilat & hentakan pada rentak penuh
   const k = beatIndex('clockwork_collapse', mt, true) % list.length;
   const p = pulseAt('clockwork_collapse', mt, 0.12, 0.5);
