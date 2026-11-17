@@ -24,8 +24,8 @@ const RED = '#ff4d5e';
 type Item = {t: number; len: number; kind: 'bab' | 'foto' | 'sulit'; a: string; b?: string};
 const G: Item[] = [];
 let tt = 0;
-// setiap potongan jatuh TEPAT pada rentak lagu The Last Strike (bermula pada 1:52 dalam fail - sambungan terus dari hujung Bahagian 1)
-const PH0 = 112.0;
+// setiap potongan jatuh TEPAT pada rentak lagu The Last Strike (sambungan terus dari hujung Bahagian 1; dipilih supaya bab terakhir berakhir sebelum outro lagu ~2:48)
+const PH0 = 104.6;
 const add = (kind: Item['kind'], len: number, a: string, b?: string) => {
   const end = snapBeat('last_strike', tt + len + PH0) - PH0;
   G.push({t: tt, len: end - tt, kind, a, b});
@@ -35,21 +35,22 @@ const bab = (a: string, b: string) => add('bab', 2.5, a, b);
 const foto = (a: string) => add('foto', 3.6, a);
 const sulit = (a: string, b: string) => add('sulit', 3.0, a, b);
 bab('BAB I', 'LANGKAH PERTAMA');
-['h01', 'h02', 'h03'].forEach(foto);
+// bayi & tadika: tukar pantas ikut rentak (album diselak)
+['b01', 'b02', 'b03', 'b04', 'b05', 'b06', 'b07', 'b08', 'b09', 'b10', 'b11', 'b12', 'b13'].forEach((k) => add('foto', 1.5, k));
 bab('BAB II', 'ALAM PERSEKOLAHAN');
-['h04', 'h05', 'h06'].forEach(foto);
+['c01', 'c02', 'c03', 'c04', 'c05', 'c06'].forEach((k) => add('foto', 2.6, k));
 sulit('PENYERTAAN 2026', '18 ████████████');
 bab('BAB III', 'MULA DIKENALI');
-['h07', 'h08', 'h09'].forEach(foto);
+['d01', 'd02', 'd03'].forEach((k) => add('foto', 3.0, k));
 sulit('JOHAN ███', 'PERINGKAT NEGERI');
 bab('BAB IV', '█████████');
-['h10'].forEach(foto); // h11 (lari berpagar) -> montaj selepas pendedahan; h12 (baju Melayu bawa nasi) -> kenangan keluarga
-const MORPH = tt; // 59.2
+['e01'].forEach(foto); // lari berpagar -> montaj selepas pendedahan; baju Melayu bawa nasi -> kenangan keluarga
+const MORPH = tt; // ~63.5
 const PETA = MORPH + 17.7;
 const CW_PETA = 21.0; // Clockwork untuk peta misi // 76.9
-const KLIMAKS = 112.0;
-const DROP = 146.5; // senyap muzik Shore berakhir -> pendedahan
-const AKHIR = 160.0;
+const KLIMAKS = PETA + 37.7; // peta misi 37.7 s
+const DROP = KLIMAKS + 34.5; // pendedahan (The Last Strike 1:00)
+const AKHIR = DROP + 13.5;
 const LS_GAH = 60.05; // saat dalam The Last Strike bila muzik jadi gah
 const LS_PRE = 7.0; // lagu bermula 7 s sebelum pendedahan
 const CC_SENYAP = 99.0; // saat The Clockwork Collapse menjadi senyap (sebelum hentakannya pada 104.5)
@@ -77,8 +78,9 @@ const Foto: React.FC<{src: string; len: number; i: number; music: number}> = ({s
   const L = f(len);
   const u = fr / L;
   const dir = random('d' + i) > 0.5 ? 1 : -1;
-  const inn = ci(fr, 0, 10);
-  const out = 1 - ci(fr, L - 8, L);
+  const pantas = len < 2;
+  const inn = ci(fr, 0, pantas ? 3 : 10);
+  const out = 1 - ci(fr, L - (pantas ? 3 : 8), L);
   const bgS = 1.06 + 0.03 * u + 0.012 * p;
   const fgS = 1.06 + 0.075 * u + 0.03 * p;
   const bgX = dir * 18 * u;
@@ -88,7 +90,7 @@ const Foto: React.FC<{src: string; len: number; i: number; music: number}> = ({s
   return (
     <AbsoluteFill style={{background: '#000', opacity: inn * out, overflow: 'hidden'}}>
       <Img src={staticFile(base + '_bg.jpg')} style={{...st, transform: `translateX(${bgX}px) scale(${bgS})`}} />
-      <Img src={staticFile(base + '_fg.png')} style={{...st, transform: `translateX(${fgX}px) scale(${fgS})`, filter: `blur(${(1 - ci(fr, 0, 14, 0, 1, easeOut)) * 8}px)`}} />
+      <Img src={staticFile(base + '_fg.png')} style={{...st, transform: `translateX(${fgX}px) scale(${fgS})`, filter: `blur(${(1 - ci(fr, 0, pantas ? 6 : 14, 0, 1, easeOut)) * 8}px)`}} />
       <AbsoluteFill style={{background: '#fff', opacity: 0.06 * p, mixBlendMode: 'soft-light'}} />
       <Vignette strength={0.55} />
     </AbsoluteFill>
@@ -329,7 +331,7 @@ const KImg: React.FC<{src: string; len: number; z?: [number, number]; music?: nu
 const Kelipan: React.FC<{len: number; music: number}> = ({len, music}) => {
   const fr = useCurrentFrame();
   const mt = music + fr / FPS;
-  const list = ['h10', 'h05', 'h08', 'h02', 'h07', 'h04', 'h09', 'h01', 'h06', 'h03'];
+  const list = ['e01', 'c03', 'd02', 'b07', 'd01', 'c01', 'd03', 'b04', 'c04', 'b09', 'c05', 'b02', 'c06', 'b12'];
   // gambar bertukar pada setiap separuh rentak Clockwork Collapse; kilat & hentakan pada rentak penuh
   const k = beatIndex('clockwork_collapse', mt, true) % list.length;
   const p = pulseAt('clockwork_collapse', mt, 0.12, 0.5);

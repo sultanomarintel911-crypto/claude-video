@@ -23,30 +23,50 @@ FS = sorted(glob.glob(f"{SRC}/*.jpg"))
 
 
 def load(n):
+    if isinstance(n, str) and n.startswith("upd:"):  # gambar HD dikemas kini (bahan/update)
+        return ImageOps.exif_transpose(Image.open(os.path.join(SRC, "..", "update", n[4:]))).convert("RGB")
     if isinstance(n, str):  # gambar yang telah disunting (bahan/ubah)
         return ImageOps.exif_transpose(Image.open(os.path.join(SRC, "..", "ubah", n))).convert("RGB")
     return ImageOps.exif_transpose(Image.open(FS[n - 1])).convert("RGB")
 
 
-# (nombor gambar, rawatan, titik Thoriq (x,y dinormal), pecahan kepala daripada tinggi badan, kabur tanda nama?)
-#   asli  : tiada kabur (gambar kecil)
-#   jelas : wajah semua orang dikaburkan (wajah sahaja - badan, pingat & sijil kekal jelas)
-#   kabur : seperti 'jelas' + kepala Thoriq dikaburkan lebih kuat (topeng orang)
-# bingkai: (fokus x, fokus y, zum) - zum 1 = tinggi penuh gambar kelihatan (sisi dilanjutkan dengan latar kabur)
-FRAME = {3: (0.5, 0.5, 1.0), 7: (0.45, 0.6, 1.3), 8: (0.5, 0.62, 1.25), 9: (0.5, 0.55, 1.45), 10: (0.58, 0.58, 1.2), 5: (0.45, 0.45, 1.15), 12: (0.5, 0.5, 1.25)}
+# (kunci output, sumber, rawatan, titik Thoriq, pecahan kepala, kabur tanda nama?, bingkai (fx, fy, zum) atau None)
+#   asli   : tiada kabur (gambar bayi)
+#   topeng : topeng mata adiwira (tadika / prasekolah)
+#   spek   : cermin mata hitam (tadika / prasekolah)
+#   sedia  : wajah sudah ditutup dalam suntingan
+#   jelas  : wajah semua orang dikaburkan (badan, pingat & sijil kekal jelas)
+#   kabur  : seperti 'jelas' + kepala Thoriq dikaburkan lebih kuat
+# sumber: nombor = bahan/kehidupan (sorted), "upd:..." = bahan/update (HD), lain = bahan/ubah
+HD = (0.5, 0.5, 1.0)
 ITEMS = [
-    (103, "asli", None, 0, False),
-    (95, "asli", None, 0, False),
-    ("kuda_perisai.webp", "sedia", None, 0, False),  # #100 disunting: topeng rantai pahlawan menutup wajah
-    (94, "jelas", None, 0, True),
-    (90, "jelas", None, 0, True),
-    (88, "jelas", None, 0, True),
-    (85, "kabur", (0.62, 0.45), 0.36, True),
-    (87, "kabur", (0.5, 0.45), 0.34, False),
-    (91, "kabur", (0.55, 0.6), 0.16, False),
-    (80, "kabur", (0.45, 0.32), 0.16, False),
-    (1, "jelas", None, 0, False),
-    (73, "kabur", (0.5, 0.5), 0.15, False),
+    # BAB I - bayi (jelas) & tadika (topeng / spek bersilih ganti)
+    ("b01", "upd:baby thori2.2.png", "asli", None, 0, False, HD),
+    ("b02", "upd:baby thoriq 2.png", "asli", None, 0, False, HD),
+    ("b03", "upd:baby thoriq 1.png", "asli", None, 0, False, HD),
+    ("b04", "upd:baby thoriq 3.png", "asli", None, 0, False, HD),
+    ("b05", "upd:thoriq belakang baby.png", "asli", None, 0, False, HD),
+    ("b06", "upd:preschool ni.png", "topeng", None, 0, False, HD),
+    ("b07", "upd:Red Firefighter at Preschool-4.png", "spek", None, 0, False, HD),
+    ("b08", "upd:thoriq preschool.png", "topeng", None, 0, False, HD),
+    ("b09", "upd:thoriq tadika 1.png", "spek", None, 0, False, HD),
+    ("b10", "upd:thoriq tadika.png", "topeng", None, 0, False, HD),
+    ("b11", "upd:Removing a stray foot artifact-9.png", "spek", None, 0, False, HD),
+    ("b12", "upd:tadika lagi.png", "topeng", None, 0, False, HD),
+    ("b13", "upd:tadika.png", "spek", None, 0, False, HD),
+    # BAB II - alam persekolahan
+    ("c01", 94, "jelas", None, 0, True, None),
+    ("c02", "upd:tahun 2.png", "jelas", None, 0, False, HD),
+    ("c03", "upd:Timber hall with balloons and banner-11.png", "jelas", None, 0, True, HD),
+    ("c04", "upd:Childrens blossom stage presentation-13.png", "jelas", None, 0, True, HD),
+    ("c05", "kuda_perisai.webp", "sedia", None, 0, False, HD),
+    ("c06", "upd:waktu kecil.png", "jelas", None, 0, False, HD),
+    # BAB III - mula dikenali
+    ("d01", "upd:Teal classroom desks in cinematic light-6.png", "jelas", None, 0, True, HD),
+    ("d02", "upd:Medaled boy in a quiet car-10.png", "jelas", None, 0, False, HD),
+    ("d03", "upd:Young medalist at sports day-18.png", "jelas", None, 0, False, HD),
+    # BAB IV
+    ("e01", 80, "kabur", (0.45, 0.32), 0.16, False, (0.58, 0.58, 1.2)),
 ]
 
 from rembg import new_session, remove  # noqa: E402
@@ -95,8 +115,8 @@ def blur_faces(a, tag):
     return blur_region(a, m), fl
 
 
-def topeng_adiwira(a):
-    """Topeng mata adiwira (hitam berkilat, lubang mata kecil) pada setiap wajah - gaya, bukan tapisan."""
+def topeng_adiwira(a, gaya="topeng"):
+    """Topeng mata adiwira (hitam berkilat, lubang mata kecil) atau cermin mata hitam (gaya spek) pada setiap wajah."""
     H, W = a.shape[:2]
     det = cv2.FaceDetectorYN.create(YUNET, "", (W, H), 0.5, 0.3, 5000)
     _, fs = det.detect(a.astype(np.uint8)[:, :, ::-1].copy())
@@ -116,13 +136,20 @@ def topeng_adiwira(a):
         u = d * S
         cx, cy = cw // 2, ch // 2
         P = lambda x, y: (int(cx + x * u), int(cy + y * u))  # noqa: E731
-        for sgn in (-1, 1):
-            cv2.ellipse(m, P(sgn * 0.52, 0.0), (int(0.6 * u), int(0.38 * u)), 0, 0, 360, 255, -1)
-            tip = np.array([P(sgn * 0.75, -0.32), P(sgn * 1.32, -0.5), P(sgn * 1.06, 0.04), P(sgn * 0.8, 0.24)], np.int32)
-            cv2.fillPoly(m, [tip], 255)
-            cv2.ellipse(hole, P(sgn * 0.5, 0.01), (int(0.2 * u), int(0.11 * u)), sgn * 8, 0, 360, 255, -1)
-        cv2.rectangle(m, P(-0.22, -0.2), P(0.22, 0.1), 255, -1)
-        cv2.ellipse(m, P(0, 0.16), (int(0.13 * u), int(0.1 * u)), 0, 180, 360, 0, -1)  # lengkung hidung
+        if gaya == "spek":  # cermin mata hitam: dua kanta + jambatan + kaki
+            for sgn in (-1, 1):
+                cv2.ellipse(m, P(sgn * 0.52, 0.04), (int(0.36 * u), int(0.25 * u)), 0, 0, 360, 255, -1)
+                cv2.rectangle(m, P(sgn * 0.52 - 0.36, -0.2), P(sgn * 0.52 + 0.36, 0.02), 255, -1)
+                cv2.line(m, P(sgn * 0.86, -0.12), P(sgn * 1.3, -0.08), 255, max(2, int(0.06 * u)))
+            cv2.line(m, P(-0.18, -0.08), P(0.18, -0.08), 255, max(2, int(0.07 * u)))
+        else:
+            for sgn in (-1, 1):
+                cv2.ellipse(m, P(sgn * 0.52, 0.0), (int(0.6 * u), int(0.38 * u)), 0, 0, 360, 255, -1)
+                tip = np.array([P(sgn * 0.75, -0.32), P(sgn * 1.32, -0.5), P(sgn * 1.06, 0.04), P(sgn * 0.8, 0.24)], np.int32)
+                cv2.fillPoly(m, [tip], 255)
+                cv2.ellipse(hole, P(sgn * 0.5, 0.01), (int(0.2 * u), int(0.11 * u)), sgn * 8, 0, 360, 255, -1)
+            cv2.rectangle(m, P(-0.22, -0.2), P(0.22, 0.1), 255, -1)
+            cv2.ellipse(m, P(0, 0.16), (int(0.13 * u), int(0.1 * u)), 0, 180, 360, 0, -1)  # lengkung hidung
         m = cv2.subtract(m, hole)
         m = cv2.GaussianBlur(m, (0, 0), S * 0.7)
         # putar & letak
@@ -208,7 +235,7 @@ def person_mask(im, pt):
     return (lab == k).astype(np.uint8)
 
 
-for i, (n, mode, pt, headf, tag) in enumerate(ITEMS):
+for key, n, mode, pt, headf, tag, frm in ITEMS:
     im = load(n)
     im.thumbnail((2400, 2400), Image.LANCZOS)
     a = np.asarray(im).astype(np.float32)
@@ -218,9 +245,11 @@ for i, (n, mode, pt, headf, tag) in enumerate(ITEMS):
     fl = []
     if mode == "sedia":  # wajah sudah ditutup dalam suntingan
         pass
-    elif mode == "asli":  # gambar kecil: topeng mata adiwira
-        a, nm = topeng_adiwira(a)
-        print(f"   topeng adiwira x{nm}")
+    elif mode == "asli":  # bayi: jelas
+        pass
+    elif mode in ("topeng", "spek"):  # tadika: topeng adiwira / cermin mata hitam
+        a, nm = topeng_adiwira(a, mode)
+        print(f"   {mode} x{nm}")
     else:
         a, fl = blur_faces(a, tag)
         # lapisan keselamatan: kepala orang yang wajahnya tidak dikesan
@@ -259,17 +288,17 @@ for i, (n, mode, pt, headf, tag) in enumerate(ITEMS):
     bg_src = a * (1 - hole[..., None]) + inp * hole[..., None]
     bg = cv2.GaussianBlur(bg_src, (0, 0), max(4, W / 260))
     comp = bg * (1 - pmf[..., None]) + a * pmf[..., None]
-    fx, fy, z = FRAME.get(i + 1, (focus[0], focus[1], 1.35))
+    fx, fy, z = frm or (focus[0], focus[1], 1.35)
     # latar lanjutan sisi: latar kabur lebih kuat & malap (ala lensa anamorfik)
     ext = cv2.GaussianBlur(cover(bg.astype(np.uint8), (fx, fy)).astype(np.float32), (0, 0), 30) * 0.55
     full = place(comp, (fx, fy), z, ext)
     bgl = place(bg, (fx, fy), z, ext)
     rgba = np.dstack([np.clip(a, 0, 255), pmf * 255]).astype(np.float32)
     fgl = place(rgba, (fx, fy), z, np.zeros((CH, CW, 4), np.float32))
-    Image.fromarray(np.clip(full, 0, 255).astype(np.uint8)).save(f"{OUT}/h{i + 1:02d}.jpg", quality=92)
-    Image.fromarray(np.clip(bgl, 0, 255).astype(np.uint8)).save(f"{OUT}/h{i + 1:02d}_bg.jpg", quality=90)
-    Image.fromarray(np.clip(fgl, 0, 255).astype(np.uint8), "RGBA").save(f"{OUT}/h{i + 1:02d}_fg.png", compress_level=3)
-    print(f"h{i + 1:02d} <- {n} {mode} {W}x{H} wajah={len(fl)} fokus=({focus[0]:.2f},{focus[1]:.2f})")
+    Image.fromarray(np.clip(full, 0, 255).astype(np.uint8)).save(f"{OUT}/{key}.jpg", quality=92)
+    Image.fromarray(np.clip(bgl, 0, 255).astype(np.uint8)).save(f"{OUT}/{key}_bg.jpg", quality=90)
+    Image.fromarray(np.clip(fgl, 0, 255).astype(np.uint8), "RGBA").save(f"{OUT}/{key}_fg.png", compress_level=3)
+    print(f"{key} <- {n} {mode} {W}x{H} wajah={len(fl)} fokus=({focus[0]:.2f},{focus[1]:.2f})")
 
 # gambar terawal (hujung kotak kenangan)
 load(101).save(os.path.join(IMG, "awal.jpg"), quality=92)  # gambar kecil: tidak dikaburkan

@@ -47,7 +47,7 @@ const AKHIR = 164.0;
 const CW1_END = 105.0; // Clockwork 0:00-1:00 (komposisi 45-105)
 const MESY = 108.94; // mesyuarat VR bermula
 const CW_HIT = 104.5; // hentakan besar Clockwork
-const LS_KOTAK = 96.7; // The Last Strike untuk kotak kenangan (berakhir ~1:52, Bahagian 2 menyambung dari situ)
+const LS_KOTAK = 89.3; // The Last Strike untuk kotak kenangan (berakhir ~1:44.6, Bahagian 2 menyambung dari situ)
 // masa dalam lagu Clockwork pada masa komposisi t (-1 jika tiada)
 const cwAt = (t: number) => (t < CW1_END ? t - PANG : t >= MESY && t < KOTAK ? t - MESY + CW_HIT : -1);
 
