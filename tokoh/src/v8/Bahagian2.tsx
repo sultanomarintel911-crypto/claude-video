@@ -232,10 +232,12 @@ const Peta: React.FC = () => {
 
 // ------------------------------------------------------------------ imbasan calon (wajah rekaan - BUKAN Thoriq)
 type Box = {x: number; y: number; w: number; h: number};
-const CB = CALON as Box[];
+// susunan paparan: lelaki & perempuan bersilih ganti (nombor fail CALON_0n)
+const URUT = [3, 1, 5, 6, 8, 2, 9, 4, 7].filter((n) => n <= (CALON as Box[]).length);
+const CB = URUT.map((n) => (CALON as Box[])[n - 1]);
 const NCALON = CB.length;
-// tempoh setiap calon (makin laju), jumlah ~11 s
-const CALON_LEN = Array.from({length: NCALON}, (_, i) => 11 / NCALON * (1.35 - (0.7 * i) / Math.max(1, NCALON - 1)));
+// tempoh setiap calon (makin laju), jumlah ~12.5 s
+const CALON_LEN = Array.from({length: NCALON}, (_, i) => 12.5 / NCALON * (1.35 - (0.7 * i) / Math.max(1, NCALON - 1)));
 const CALON_T = CALON_LEN.reduce<number[]>((a, l, i) => [...a, i === 0 ? 0 : a[i - 1] + CALON_LEN[i - 1]], []);
 const IMBAS_LEN = CALON_T[NCALON - 1] + CALON_LEN[NCALON - 1];
 
@@ -252,7 +254,7 @@ const KadCalon: React.FC<{k: number; len: number; quick?: boolean}> = ({k, len, 
   const z = 1.0 + 0.06 * (fr / L);
   return (
     <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
-      <Img src={staticFile(`v8/calon/c${k + 1}.jpg`)} style={{width: 1920, height: 1080, transform: `scale(${z})`, transformOrigin: `${b.x + b.w / 2}px ${b.y + b.h / 2}px`, filter: `saturate(${1 - 0.6 * no}) brightness(${1 - 0.25 * no})`}} />
+      <Img src={staticFile(`v8/calon/c${URUT[k]}.jpg`)} style={{width: 1920, height: 1080, transform: `scale(${z})`, transformOrigin: `${b.x + b.w / 2}px ${b.y + b.h / 2}px`, filter: `saturate(${1 - 0.6 * no}) brightness(${1 - 0.25 * no})`}} />
       <AbsoluteFill style={{background: RED, opacity: 0.22 * no, mixBlendMode: 'multiply'}} />
       <AbsoluteFill style={{background: 'rgba(0,30,40,0.25)', opacity: 1 - no}} />
       <Brackets rect={[b.x - 30, b.y - 30, b.x + b.w + 30, b.y + b.h + 30]} p={ci(fr, 0, 6)} color={no > 0.5 ? RED : '#7ff3ff'} />
@@ -278,7 +280,7 @@ const CalonLaju: React.FC<{music: number}> = ({music}) => {
   const b = CB[k];
   return (
     <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
-      <Img src={staticFile(`v8/calon/c${k + 1}.jpg`)} style={{width: 1920, height: 1080, transform: `scale(${1.05 + 0.08 * p})`, transformOrigin: `${b.x + b.w / 2}px ${b.y + b.h / 2}px`, filter: 'saturate(0.4) brightness(0.75) contrast(1.2)'}} />
+      <Img src={staticFile(`v8/calon/c${URUT[k]}.jpg`)} style={{width: 1920, height: 1080, transform: `scale(${1.05 + 0.08 * p})`, transformOrigin: `${b.x + b.w / 2}px ${b.y + b.h / 2}px`, filter: 'saturate(0.4) brightness(0.75) contrast(1.2)'}} />
       <AbsoluteFill style={{background: RED, opacity: 0.25, mixBlendMode: 'multiply'}} />
       <Brackets rect={[b.x - 30, b.y - 30, b.x + b.w + 30, b.y + b.h + 30]} p={1} color={RED} />
       <div style={{position: 'absolute', left: b.x + b.w / 2, top: b.y + b.h + 70, transform: 'translateX(-50%) rotate(-8deg)', border: `6px solid ${RED}`, color: RED, fontFamily: MONO, fontWeight: 700, fontSize: 72, letterSpacing: 12, padding: '4px 26px', background: 'rgba(0,0,0,0.35)'}}>BUKAN</div>
