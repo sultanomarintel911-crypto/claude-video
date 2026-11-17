@@ -67,15 +67,16 @@ ITEMS = {
     "i_sh2": 38,
     "i_sh3": "upd:Family group in airport terminal-7.png",
     # keluarga & kawan-kawan
-    "f01": "upd:Seven people beside an open hatchback-7.png",
-    "f02": "upd:Sports hall, stairway, and spectators-14.png",
-    "f03": "upd:Smiling boys with a Malaysian flag.png",
-    "f04": "upd:Turquoise shoulder and woven sampin-22.png",
-    "f05": "upd:Boys with a gift by the porch-13.png",
-    "f06": "upd:Seamless hall extension with cake table-2.png",
-    "f07": "upd:Childrens blossom stage presentation-13.png",
-    "f08": "upd:School facade beneath blue sky-3.png",
-    "f09": "upd:tadika.png",
+    "f01": "upd:Seamless hall extension with cake table-2.png",   # doa
+    "f02": "upd:Seven people beside an open hatchback-7.png",     # ibu (selfie)
+    "f03": "upd:Family group in airport terminal-7.png",          # ibu - lapangan terbang
+    "f04": "upd:Brick campus lawn under clear skies-1.png",       # ayah (Birmingham)
+    "f05": "upd:Smiling boys with a Malaysian flag.png",          # sahabat
+    "f06": "upd:Turquoise shoulder and woven sampin-22.png",      # sahabat
+    "f07": "upd:Childrens blossom stage presentation-13.png",     # milik semua
+    "f08": "upd:Sports hall, stairway, and spectators-14.png",    # milik semua
+    "f09": "upd:Children on a snowy court-4.png",                 # mimpi tiada sempadan
+    "f10": "upd:School facade beneath blue sky-3.png",            # penutup
 }
 
 

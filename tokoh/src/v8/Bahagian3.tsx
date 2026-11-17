@@ -45,15 +45,19 @@ const SQ_STAMP: Record<number, [string, string]> = {2: ['JOHAN', 'MSSD DUNGUN'],
 type Misi = {city: number; t: number; len: number; foto: string[]; tajuk: string; sub: string};
 const MISI: Misi[] = [
   {city: 0, t: 1.5, len: 3.5, foto: ['i_sg'], tajuk: 'SINGAPURA', sub: 'ONCOCARE SINGAPORE JUNIOR SQUASH OPEN · DEC 2024'},
-  {city: 1, t: 5.0, len: 10.5, foto: ['i_bhm0', 'i_bhm7', 'i_bhm1', 'i_bhm6', 'i_bhm2', 'i_bhm3', 'i_bhm4', 'i_bhm5'], tajuk: 'BIRMINGHAM', sub: 'BRITISH JUNIOR OPEN SQUASH · JAN 2025'},
+  {city: 1, t: 5.0, len: 10.5, foto: ['i_bhm0', 'i_bhm7', 'i_bhm1', 'i_bhm6', 'i_bhm3', 'i_bhm4'], tajuk: 'BIRMINGHAM', sub: 'BRITISH JUNIOR OPEN SQUASH · JAN 2025'},
   {city: 2, t: 15.5, len: 3.0, foto: ['i_ist'], tajuk: 'ISTANBUL', sub: 'TÜRKİYE'},
-  {city: 3, t: 18.5, len: 9.0, foto: ['i_sh1', 'i_sh2', 'i_sh3'], tajuk: 'SHANGHAI', sub: 'CHINA · MISI 2025 & 2026'},
+  {city: 3, t: 18.5, len: 9.0, foto: ['i_sh1', 'i_sh2'], tajuk: 'SHANGHAI', sub: 'CHINA · MISI 2025 & 2026'},
 ];
 const RUMUS = INTL + 27.5;
 const KELUARGA = RUMUS + 11.5;
-const FAM = ['f01', 'f02', 'f03', 'f04', 'f05', 'f06', 'f07', 'f08', 'f09'];
-const FAM_LEN = 4.6;
-const PENUTUP = KELUARGA + FAM.length * FAM_LEN;
+// gambar keluarga ikut baris VO (masa mula relatif KELUARGA): doa, ibu, ayah, sahabat, milik semua, mimpi
+const FAM: Array<[string, number]> = [
+  ['f01', 0], ['f02', 8.0], ['f03', 12.4], ['f04', 16.6], ['f05', 20.8], ['f06', 23.5],
+  ['f07', 26.1], ['f08', 29.0], ['f09', 32.0], ['f10', 37.0],
+];
+const FAM_END = 41.4;
+const PENUTUP = KELUARGA + FAM_END;
 const AKHIR = PENUTUP + 15.0;
 // VO keluarga (VO_KELUARGA, 37 s) bermula VO_AT saat selepas KELUARGA; masa sari kata dari transkripsi
 const VO_AT = 1.5;
@@ -403,11 +407,11 @@ const Rumusan: React.FC<{len: number}> = ({len}) => {
 // ------------------------------------------------------------------ I. keluarga & kawan-kawan
 const Keluarga: React.FC = () => {
   const fr = useCurrentFrame();
-  const L = f(FAM_LEN);
   return (
     <AbsoluteFill style={{background: '#000'}}>
-      {FAM.map((k, i) => {
-        const s = i * L;
+      {FAM.map(([k, t0], i) => {
+        const s = f(t0);
+        const L = f((i + 1 < FAM.length ? FAM[i + 1][1] : FAM_END) - t0);
         if (fr < s - 30 || fr > s + L + 30) return null;
         const o = ci(fr, s - 15, s + 15) * (1 - ci(fr, s + L - 15, s + L + 15));
         const u = (fr - s + 15) / (L + 30);
