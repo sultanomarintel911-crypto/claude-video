@@ -164,7 +164,7 @@ const KadMisi: React.FC<{m: Misi; i: number}> = ({m, i}) => {
   const kilat = Math.exp(-Math.max(0, fr - f(CAP)) / 3) * (fr >= f(CAP) - 1 ? 1 : 0);
   return (
     <div style={{position: 'absolute', right: 90, top: 170, width: 620, opacity: p * out, transform: `translateX(${60 * (1 - p)}px)`}}>
-      <div style={{background: 'rgba(8,10,14,0.85)', border: '1px solid rgba(255,255,255,0.22)', padding: 26, backdropFilter: 'blur(6px)'}}>
+      <div style={{background: 'linear-gradient(180deg, rgba(10,32,58,0.82), rgba(4,14,28,0.88))', border: '1.5px solid rgba(127,200,255,0.55)', boxShadow: '0 0 40px rgba(60,150,255,0.25), inset 0 0 30px rgba(60,150,255,0.12)', padding: 26, backdropFilter: 'blur(6px)'}}>
         <div style={{display: 'flex', justifyContent: 'space-between', fontFamily: MONO, fontSize: 20, color: '#9aa3b2', letterSpacing: 4}}>
           <span>FAIL MISI #0{i + 1}</span>
           <span style={{color: RED}}>● SULIT</span>
@@ -223,7 +223,8 @@ const Peta: React.FC = () => {
   const teks = ci(fr, f(AKHIR_T + 1.1), f(AKHIR_T + 1.8));
   const r = interpolate(fr, [0, f(1.2), f(AKHIR_T), len], [380, 470, 470, 400], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   return (
-    <AbsoluteFill style={{background: 'radial-gradient(ellipse at 40% 50%, #121a28 0%, #020305 75%)', opacity: inn}}>
+    <AbsoluteFill style={{background: 'radial-gradient(ellipse at 38% 50%, #0e3157 0%, #061a33 38%, #020814 78%)', opacity: inn}}>
+      <Bintang fr={fr} />
       {/* zum keluar pada akhir: glob kecil di tengah atas, teks 3D di bawah */}
       <Globe cx={interpolate(akhir, [0, 1], [720, 960])} cy={interpolate(akhir, [0, 1], [560, 350])} r={interpolate(akhir, [0, 1], [r, 245])} rot={rot} cities={cities} arcLen={22} dungunAt={f(1.2)} />
       <div style={{position: 'absolute', left: 90, top: 70, fontFamily: MONO, fontSize: 24, letterSpacing: 8, color: '#d9d2c2'}}>
@@ -245,6 +246,19 @@ const Peta: React.FC = () => {
     </AbsoluteFill>
   );
 };
+
+// latar angkasa: bintang berkelip + debu cahaya
+const Bintang: React.FC<{fr: number}> = ({fr}) => (
+  <svg width={1920} height={1080} style={{position: 'absolute'}}>
+    {Array.from({length: 160}, (_, k) => {
+      const x = random('bx' + k) * 1920;
+      const y = random('by' + k) * 1080;
+      const rr = 0.6 + random('br' + k) * 1.6;
+      const tw = 0.35 + 0.65 * Math.abs(Math.sin(fr / (12 + random('bt' + k) * 30) + k));
+      return <circle key={k} cx={x - fr * 0.15 * rr} cy={y} r={rr} fill="#cfe6ff" opacity={tw * (0.25 + 0.6 * random('bo' + k))} />;
+    })}
+  </svg>
+);
 
 // HUD sci-fi peta: cincin imbasan berputar, aliran data, pautan satelit, garis masa 4 misi
 const PetaHUD: React.FC<{fr: number; hilang: number}> = ({fr, hilang}) => {
