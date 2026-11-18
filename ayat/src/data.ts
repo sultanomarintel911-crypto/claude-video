@@ -11,10 +11,11 @@ export const OUTRO = 4.2;
 
 export type Word = {ar: string; start: number; end: number};
 export const WORDS: Word[] = ayat.words.map((w) => ({ar: w.ar, start: w.start / 1000, end: w.end / 1000}));
-export const AUDIO_END = 29.07;
+export const AUDIO_END = ayat.duration;
+export const AUDIO_FILE = ayat.audioFile;
 export const DURATION = Math.ceil((INTRO + AUDIO_END + OUTRO) * FPS);
 
-export const RUJUKAN = 'Surah Al-Ahzab · 33:59';
+export const RUJUKAN = ayat.rujukan;
 
 /**
  * Kumpulan frasa. `from`/`to` = nombor perkataan (1-based, inklusif).

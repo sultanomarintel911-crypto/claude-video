@@ -6,7 +6,7 @@ import '@fontsource/montserrat/700.css';
 import '@fontsource/cormorant-garamond/500-italic.css';
 import '@fontsource/nunito/600.css';
 import '@fontsource/nunito/800.css';
-import {AUDIO_END, C, FPS, GROUPS, H, INTRO, RUJUKAN, W, WORDS, groupEnd, groupStart} from './data';
+import {AUDIO_END, AUDIO_FILE, C, FPS, GROUPS, H, INTRO, RUJUKAN, W, WORDS, groupEnd, groupStart} from './data';
 
 // ---------- pembantu ----------
 const ease = Easing.bezier(0.33, 0, 0.2, 1);
@@ -435,7 +435,7 @@ export const Video: React.FC = () => {
 				{RUJUKAN}
 			</div>
 			<Sequence from={Math.round(INTRO * FPS)}>
-				<Audio src={staticFile('033059.mp3')} />
+				<Audio src={staticFile(AUDIO_FILE)} />
 			</Sequence>
 		</AbsoluteFill>
 	);
