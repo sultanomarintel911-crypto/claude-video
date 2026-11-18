@@ -58,3 +58,11 @@ export const usePulse = (track: string, musicAt0: number, decay = 0.22, accent =
   const fr = useCurrentFrame();
   return pulseAt(track, musicAt0 + fr / FPS, decay, accent);
 };
+
+/** masa rentak ke-n selepas rentak terdekat dengan mt (untuk potongan gambar tepat pada rentak) */
+export const beatAfter = (track: string, mt: number, n: number) => {
+  const tr = B[track];
+  const i0 = Math.max(0, lastIdx(tr, mt + 0.15));
+  const i = Math.min(tr.t.length - 1, i0 + n);
+  return i0 + n > tr.t.length - 1 ? mt + n * (60 / tr.tempo) : tr.t[i];
+};

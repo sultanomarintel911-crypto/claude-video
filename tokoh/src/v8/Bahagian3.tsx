@@ -13,7 +13,7 @@ import {ci, easeOut, Embers, FilmLook, Gold, Gold3D, GOLD, GOLD_GRAD, Rays, SANS
 import {CUT_GRAD} from '../data';
 import {Brackets, GlitchBands, HexGrid, ProgressBar, Scanlines, Scramble, TypedLine} from '../scifi';
 import {BANDAR, City, DUNGUN, Globe, lerpRot} from './Globe';
-import {pulseAt, snapBeat} from './beat';
+import {beatAfter, pulseAt, snapBeat} from './beat';
 
 const FPS = 30;
 const f = (s: number) => Math.round(s * FPS);
@@ -26,7 +26,23 @@ const img = (k: string) => staticFile(`v8/b3/${k}.jpg`);
 const LS0 = 96.68 + 13.5; // Beneath the Sovereign Sky bersambung dari hujung Bahagian 2 (DROP + 13.5)
 const snapLS = (t: number) => snapBeat('sovereign', t + LS0) - LS0;
 const AKSES = 0;
-const SEKOLAH = 5.0;
+// REDACTION REMOVED: gambar yang dikaburkan sebelum pendedahan dibuka semula, setiap satu masuk tepat pada rentak
+const BUKA = 5.0;
+const BUKA_FOTO: Array<[string, string, number]> = [
+  ['c01', 'BAB II · ALAM PERSEKOLAHAN', 4], ['c02', 'BAB II · ALAM PERSEKOLAHAN', 3], ['c03', 'BAB II · ALAM PERSEKOLAHAN', 2],
+  ['c04', 'BAB II · ALAM PERSEKOLAHAN', 2], ['c06', 'BAB II · ALAM PERSEKOLAHAN', 2], ['d01', 'BAB III · MULA DIKENALI', 2],
+  ['d02', 'BAB III · MULA DIKENALI', 2], ['d03', 'BAB III · MULA DIKENALI', 2], ['e01', 'BAB IV · HARI ANUGERAH', 6],
+];
+const BUKA_T: number[] = [];
+{
+  let t = beatAfter('sovereign', BUKA + LS0, 3) - LS0; // 3 rentak: tajuk REDACTION REMOVED
+  for (const [, , n] of BUKA_FOTO) {
+    BUKA_T.push(t);
+    t = beatAfter('sovereign', t + LS0, n) - LS0;
+  }
+  BUKA_T.push(t);
+}
+const SEKOLAH = BUKA_T[BUKA_T.length - 1];
 const PANEL = ['s01', 's02', 's03', 's04', 's05', 's06', 's07'];
 const PANEL_TAG = ['SUBJECT IDENTIFIED', 'PENOLONG KETUA MURID', 'PENGERUSI · TV PSS', 'KETUA RUMAH TEMENGGUNG', 'AJK TUNAS KADET REMAJA', 'NILAM · 4 BINTANG', 'KEPIMPINAN · KERJASAMA'];
 const PANEL_T = PANEL.map((_, i) => snapLS(SEKOLAH + i * 2.0));
@@ -37,7 +53,7 @@ const WARP_TAG = ['SUKAN TAHUNAN', 'PODIUM', 'PINGAT · SEKOLAH', 'PINGAT · DAE
 const WARP_T = WARP.map((_, i) => snapLS(SUKAN + i * 0.93));
 const LARI = snapLS(SUKAN + WARP.length * 0.93);
 const SKUASY = snapLS(LARI + 5.0);
-const INTL = 45.95; // -> hentakan Clockwork (misi antarabangsa)
+const INTL = 45.95 + (SEKOLAH - 5.0); // -> hentakan Clockwork (misi antarabangsa)
 const SQ = ['q01', 'q02', 'q03', 'q04', 'q05', 'q06', 'q07', 'q08', 'q10'];
 const SQ_T = SQ.map((_, i) => SKUASY + ((INTL - SKUASY) * i) / SQ.length);
 const SQ_STAMP: Record<number, [string, string]> = {2: ['JOHAN', 'MSSD DUNGUN'], 5: ['JOHAN', 'MSST TERENGGANU'], 8: ['MSSM 2026', 'PERINGKAT KEBANGSAAN']};
@@ -69,6 +85,53 @@ const VO: Array<[number, number, string]> = [
   [24.78, 5.7, 'Thoriq... kejayaan ini bukan milikmu seorang. Ia milik semua yang menyayangimu.'],
   [30.68, 5.3, 'Terima kasih... kerana membuktikan bahawa mimpi... memang tiada sempadan.'],
 ];
+
+// ------------------------------------------------------------------ A2. REDACTION REMOVED (kabur -> jelas, ikut rentak)
+const Nyahkabur: React.FC = () => {
+  const fr = useCurrentFrame();
+  const t = BUKA + fr / FPS;
+  const i = BUKA_T.findIndex((x, j) => t >= x && t < BUKA_T[j + 1]);
+  const p = pulseAt('sovereign', t + LS0, 0.18, 0.6);
+  if (i < 0) {
+    // tajuk
+    const a = ci(fr, 0, 8, 0, 1, easeOut);
+    return (
+      <AbsoluteFill style={{background: 'radial-gradient(ellipse at center, #071216 0%, #010203 75%)', justifyContent: 'center', alignItems: 'center'}}>
+        <HexGrid opacity={0.1} />
+        <div style={{fontFamily: MONO, fontSize: 26, letterSpacing: 10, color: CYAN, opacity: a}}>DECLASSIFYING ARCHIVE</div>
+        <div style={{fontFamily: MONO, fontWeight: 700, fontSize: 84, letterSpacing: 8, color: '#fff', marginTop: 18, opacity: a, transform: `scale(${1.08 - 0.08 * a + 0.03 * p})`}}>
+          <Scramble text="REDACTION REMOVED" reveal={ci(fr, 2, 18)} />
+        </div>
+        <div style={{width: 700 * a, height: 2, background: GREEN, marginTop: 22, boxShadow: `0 0 18px ${GREEN}`}} />
+        <Scanlines opacity={0.12} />
+      </AbsoluteFill>
+    );
+  }
+  const [k, tag] = BUKA_FOTO[i];
+  const lf = fr - f(BUKA_T[i] - BUKA);
+  const L = f(BUKA_T[i + 1] - BUKA_T[i]);
+  const sapu = Math.min(10, Math.max(5, Math.round(L * 0.45))); // imbasan buka kabur
+  const x = ci(lf, 1, sapu, 0, 1, easeOut);
+  const tumbuk = 0.06 * Math.exp(-lf / 4);
+  const sk = 1.03 + 0.04 * (lf / L) + 0.02 * p + tumbuk;
+  const st: React.CSSProperties = {position: 'absolute', width: 1920, height: 1080, left: 0, top: 0, transform: `scale(${sk})`};
+  const cop = ci(lf, sapu, sapu + 5, 0, 1, Easing.out(Easing.back(2)));
+  return (
+    <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
+      <Img src={staticFile(`v8/hidup/${k}.jpg`)} style={{...st, filter: 'saturate(0.6) brightness(0.8)'}} />
+      <Img src={staticFile(`v8/hidup/u_${k}.jpg`)} style={{...st, clipPath: `inset(0 ${(1 - x) * 100}% 0 0)`}} />
+      {x > 0 && x < 1 ? <div style={{position: 'absolute', left: x * 1920 - 3, top: 0, width: 6, height: 1080, background: CYAN, boxShadow: `0 0 30px 8px ${CYAN}`}} /> : null}
+      <AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 18%, transparent 78%, rgba(0,0,0,0.6) 100%)'}} />
+      <div style={{position: 'absolute', left: 70, top: 50, fontFamily: MONO, fontWeight: 700, fontSize: 30, letterSpacing: 6, color: CYAN, background: 'rgba(0,0,0,0.55)', padding: '6px 14px', textShadow: '0 0 10px rgba(127,243,255,0.6)'}}>
+        ARCHIVE {String(i + 1).padStart(2, '0')}/{String(BUKA_FOTO.length).padStart(2, '0')} · {tag}
+      </div>
+      <div style={{position: 'absolute', right: 70, bottom: 60, fontFamily: MONO, fontWeight: 700, fontSize: 34, letterSpacing: 6, color: GREEN, border: `2px solid ${GREEN}`, padding: '8px 18px', opacity: cop, transform: `scale(${1.4 - 0.4 * cop}) rotate(-4deg)`, textShadow: `0 0 12px ${GREEN}`}}>
+        UNREDACTED ✓
+      </div>
+      <Vignette strength={0.45} />
+    </AbsoluteFill>
+  );
+};
 
 // ------------------------------------------------------------------ A. ACCESS GRANTED
 const Akses: React.FC = () => {
@@ -495,6 +558,7 @@ const SFX: Sfx[] = [
   [AKSES + 3.35, 'sfx/glitch', 0.4],
 ];
 for (let k = 0; k < 18; k++) SFX.push([AKSES + 0.1 + k * 0.12, 'sfx/taip', 0.25]);
+BUKA_T.slice(0, -1).forEach((t) => SFX.push([t, 'sfx/imbasan', 0.4], [t + 0.35, 'sfx/bip', 0.35]));
 PANEL_T.forEach((t) => SFX.push([t - 0.6, 'sfx/whoosh_pendek', 0.4], [t, 'sfx/blip', 0.3]));
 SFX.push([DULU + 1.0, 'sfx/imbasan', 0.4], [DULU + 2.2, 'sfx/swish_teks', 0.35]);
 WARP_T.forEach((t, i) => SFX.push([t, i === 0 ? 'sfx/warp' : 'sfx/whoosh_pendek', i === 0 ? 0.6 : 0.35]));
@@ -520,8 +584,11 @@ export const TrailerBahagian3: React.FC = () => {
   const vol = (pts: number[], vals: number[]) => (fr: number) => interpolate(fr, pts.map(f), vals, {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   return (
     <AbsoluteFill style={{background: '#000'}}>
-      <Sequence from={f(AKSES)} durationInFrames={f(SEKOLAH - AKSES)}>
+      <Sequence from={f(AKSES)} durationInFrames={f(BUKA - AKSES)}>
         <Akses />
+      </Sequence>
+      <Sequence from={f(BUKA)} durationInFrames={f(SEKOLAH - BUKA)}>
+        <Nyahkabur />
       </Sequence>
       <Sequence from={f(SEKOLAH)} durationInFrames={f(DULU - SEKOLAH)}>
         <HoloSekolah />

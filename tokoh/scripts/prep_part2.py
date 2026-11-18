@@ -68,6 +68,10 @@ ITEMS = [
     # BAB IV
     ("e01", 80, "kabur", (0.45, 0.32), 0.16, False, (0.58, 0.58, 1.2)),
 ]
+# versi tanpa kabur (u_*) untuk babak 'REDACTION REMOVED' selepas pendedahan: bingkai sama, semua wajah jelas
+ITEMS += [("u_" + k, n, "asli", pt, hf, tg, fr) for k, n, mode, pt, hf, tg, fr in ITEMS if mode in ("jelas", "kabur")]
+if os.environ.get("HANYA"):
+    ITEMS = [it for it in ITEMS if it[0].startswith(os.environ["HANYA"])]
 
 from rembg import new_session, remove  # noqa: E402
 

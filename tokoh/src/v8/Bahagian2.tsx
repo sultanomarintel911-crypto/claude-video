@@ -13,7 +13,7 @@ import {SceneKira, SceneReveal} from '../scenes';
 import {Brackets, GlitchBands, Scramble} from '../scifi';
 import CALON from './calon.json';
 import {BANDAR, City, DUNGUN, Globe, lerpRot} from './Globe';
-import {beatIndex, pulseAt, snapBeat, usePulse} from './beat';
+import {beatAfter, beatIndex, pulseAt, usePulse} from './beat';
 
 const FPS = 30;
 const f = (s: number) => Math.round(s * FPS);
@@ -24,27 +24,27 @@ const RED = '#ff4d5e';
 type Item = {t: number; len: number; kind: 'bab' | 'foto' | 'sulit'; a: string; b?: string};
 const G: Item[] = [];
 let tt = 0;
-// setiap potongan jatuh TEPAT pada rentak lagu The Last Strike (sambungan terus dari hujung Bahagian 1; dipilih supaya bab terakhir berakhir sebelum outro lagu ~2:48)
+// setiap gambar dikira dalam RENTAK lagu The Last Strike (~0.46 s/rentak): dum - tukar, dup - tukar.
+// Dalam setiap bab tukaran makin laju (4 -> 2 -> 1 rentak), kemudian ditahan sekejap sebelum bab seterusnya.
 const PH0 = 104.6;
-const add = (kind: Item['kind'], len: number, a: string, b?: string) => {
-  const end = snapBeat('last_strike', tt + len + PH0) - PH0;
+const T0 = 104.87 - PH0; // rentak kuat pertama
+const add = (kind: Item['kind'], beats: number, a: string, b?: string) => {
+  const end = beatAfter('last_strike', tt + PH0, beats) - PH0;
   G.push({t: tt, len: end - tt, kind, a, b});
   tt = end;
 };
-const bab = (a: string, b: string) => add('bab', 2.5, a, b);
-const foto = (a: string) => add('foto', 3.6, a);
-const sulit = (a: string, b: string) => add('sulit', 3.0, a, b);
-bab('BAB I', 'LANGKAH PERTAMA');
-// bayi & tadika: tukar pantas ikut rentak (album diselak)
-['b01', 'b02', 'b03', 'b04', 'b05', 'b06', 'b07', 'b08', 'b09', 'b10', 'b11', 'b12', 'b13'].forEach((k) => add('foto', 1.5, k));
-bab('BAB II', 'ALAM PERSEKOLAHAN');
-['c01', 'c02', 'c03', 'c04', 'c05', 'c06'].forEach((k) => add('foto', 2.6, k));
-sulit('PENYERTAAN 2026', '18 ████████████');
-bab('BAB III', 'MULA DIKENALI');
-['d01', 'd02', 'd03'].forEach((k) => add('foto', 3.0, k));
-sulit('JOHAN ███', 'PERINGKAT NEGERI');
-bab('BAB IV', '█████████');
-['e01'].forEach(foto); // lari berpagar -> montaj selepas pendedahan; baju Melayu bawa nasi -> kenangan keluarga
+const siri = (keys: string[], rentak: number[]) => keys.forEach((k, i) => add('foto', rentak[Math.min(i, rentak.length - 1)], k));
+tt = T0;
+add('bab', 4, 'BAB I', 'LANGKAH PERTAMA');
+siri(['b01', 'b02', 'b03', 'b04', 'b05', 'b06', 'b07', 'b08', 'b09', 'b10', 'b11', 'b12', 'b13'], [4, 4, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 4]);
+add('bab', 4, 'BAB II', 'ALAM PERSEKOLAHAN');
+siri(['c01', 'c02', 'c03', 'c04', 'c05', 'c06'], [4, 2, 2, 1, 1, 4]);
+add('sulit', 6, 'PENYERTAAN 2026', '18 ████████████');
+add('bab', 4, 'BAB III', 'MULA DIKENALI');
+siri(['d01', 'd02', 'd03'], [4, 2, 4]);
+add('sulit', 6, 'JOHAN ███', 'PERINGKAT NEGERI');
+add('bab', 4, 'BAB IV', '█████████');
+add('foto', 8, 'e01'); // lari berpagar -> montaj selepas pendedahan
 const MORPH = tt; // ~63.5
 const PETA = MORPH + 17.7;
 const CW_PETA = 21.0; // Clockwork untuk peta misi // 76.9
@@ -77,10 +77,11 @@ const Foto: React.FC<{src: string; len: number; i: number; music: number}> = ({s
   const L = f(len);
   const u = fr / L;
   const dir = random('d' + i) > 0.5 ? 1 : -1;
-  const pantas = len < 2;
-  const inn = ci(fr, 0, pantas ? 3 : 10);
-  const out = 1 - ci(fr, L - (pantas ? 3 : 8), L);
-  const sk = 1.03 + 0.05 * u + 0.02 * p;
+  const pantas = len < 1.2; // potongan keras tepat pada rentak
+  const inn = pantas ? 1 : ci(fr, 0, 6);
+  const out = pantas ? 1 : 1 - ci(fr, L - 4, L);
+  const tumbuk = 0.06 * Math.exp(-fr / 4); // hentakan zum setiap kali gambar masuk pada rentak
+  const sk = 1.03 + 0.05 * u + 0.02 * p + tumbuk;
   const st: React.CSSProperties = {position: 'absolute', width: 1920, height: 1080, left: 0, top: 0};
   return (
     <AbsoluteFill style={{background: '#000', opacity: inn * out, overflow: 'hidden'}}>
