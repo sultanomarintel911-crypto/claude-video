@@ -36,16 +36,22 @@ export const groupStart = (g: Group) => WORDS[g.from - 1].start;
 export const groupEnd = (i: number) => (i + 1 < GROUPS.length ? groupStart(GROUPS[i + 1]) : AUDIO_END + 0.6);
 
 export const C = {
-	skyTop: '#060d1f',
-	skyMid: '#0d2238',
-	skyLow: '#163a4c',
-	hillFar: '#0f2b3a',
-	hillNear: '#0a1e2a',
-	gold: '#f0c878',
-	goldDeep: '#d9a441',
-	cream: '#efe4cf',
-	creamLight: '#f8f0e0',
-	jilbab: '#d8c3a0',
-	text: '#f4ecdc',
-	dim: 'rgba(244,236,220,0.55)',
+	// Tema "Subuh": ungu tua → merah jambu → peach di ufuk.
+	skyTop: '#1d0f2e',
+	skyMid: '#6a2d5c',
+	skyLow: '#e3866f',
+	horizon: '#f8c38c',
+	sun: '#ffe2b0',
+	hillFar: '#a2506d',
+	hillMid: '#5e2a4d',
+	hillNear: '#2a1327',
+	gold: '#ffb48c', // warna sorotan (koral-peach)
+	goldDeep: '#ec7a62',
+	cream: '#3a1a35', // jubah (siluet)
+	creamLight: '#f6dcc6', // wajah / cahaya lembut
+	jilbab: '#5c2a4e',
+	rim: '#ffc9a0',
+	text: '#fbeee4',
+	dim: 'rgba(251,238,228,0.55)',
+	bottom: '#170a19',
 };

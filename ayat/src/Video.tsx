@@ -4,6 +4,8 @@ import '@fontsource/amiri-quran';
 import '@fontsource/montserrat/500.css';
 import '@fontsource/montserrat/700.css';
 import '@fontsource/cormorant-garamond/500-italic.css';
+import '@fontsource/nunito/600.css';
+import '@fontsource/nunito/800.css';
 import {AUDIO_END, C, FPS, GROUPS, H, INTRO, RUJUKAN, W, WORDS, groupEnd, groupStart} from './data';
 
 // ---------- pembantu ----------
@@ -37,36 +39,43 @@ const S = {
 };
 
 // ---------- langit ----------
-const STARS = (() => {
+const SPARKS = (() => {
 	const r = rng(59);
-	return Array.from({length: 90}, () => ({
-		x: r() * W,
-		y: 90 + Math.pow(r(), 1.3) * 1000,
-		s: 1 + r() * 2.6,
-		ph: r() * Math.PI * 2,
-		sp: 0.6 + r() * 1.6,
-		gold: r() < 0.28,
-	}));
+	return Array.from({length: 34}, () => ({x: r() * W, y: 60 + Math.pow(r(), 1.6) * 560, s: 1 + r() * 2.2, ph: r() * 6.28, sp: 0.6 + r() * 1.6}));
 })();
+const CLOUDS = [
+	{y: 430, w: 420, x0: 120, sp: 9},
+	{y: 560, w: 300, x0: 760, sp: -7},
+	{y: 700, w: 520, x0: 520, sp: 6},
+	{y: 820, w: 260, x0: 60, sp: -10},
+	{y: 930, w: 380, x0: 880, sp: 8},
+];
 
 const Sky: React.FC<{t: number; a: number}> = ({t, a}) => {
-	const rahmat = ramp(a, S.rahmat, S.rahmat + 1.2) * (1 - ramp(a, AUDIO_END + 1.5, AUDIO_END + 3));
+	const rahmat = ramp(a, S.rahmat, S.rahmat + 1.6) * (1 - ramp(a, AUDIO_END + 1.5, AUDIO_END + 3));
+	const sunY = GROUND - 120 - rahmat * 90;
 	return (
 		<>
 			<defs>
 				<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
 					<stop offset="0" stopColor={C.skyTop} />
-					<stop offset="0.45" stopColor={C.skyMid} />
-					<stop offset="0.66" stopColor={C.skyLow} />
+					<stop offset="0.3" stopColor={C.skyMid} />
+					<stop offset="0.5" stopColor={C.skyLow} />
+					<stop offset="0.6" stopColor={C.horizon} />
 					<stop offset="1" stopColor={C.hillNear} />
 				</linearGradient>
 				<radialGradient id="glow">
 					<stop offset="0" stopColor={C.gold} stopOpacity="0.9" />
 					<stop offset="1" stopColor={C.gold} stopOpacity="0" />
 				</radialGradient>
+				<radialGradient id="sunGlow">
+					<stop offset="0" stopColor={C.sun} stopOpacity="0.95" />
+					<stop offset="0.35" stopColor={C.horizon} stopOpacity="0.55" />
+					<stop offset="1" stopColor={C.horizon} stopOpacity="0" />
+				</radialGradient>
 				<radialGradient id="soft">
-					<stop offset="0" stopColor={C.creamLight} stopOpacity="0.55" />
-					<stop offset="1" stopColor={C.creamLight} stopOpacity="0" />
+					<stop offset="0" stopColor="#fff4e8" stopOpacity="0.7" />
+					<stop offset="1" stopColor="#fff4e8" stopOpacity="0" />
 				</radialGradient>
 				<filter id="blur8">
 					<feGaussianBlur stdDeviation="8" />
@@ -74,29 +83,43 @@ const Sky: React.FC<{t: number; a: number}> = ({t, a}) => {
 				<filter id="blur3">
 					<feGaussianBlur stdDeviation="3" />
 				</filter>
-				<mask id="moonMask">
-					<rect width={W} height={H} fill="white" />
-					<circle cx={884} cy={232} r={50} fill="black" />
-				</mask>
+				<filter id="blur14">
+					<feGaussianBlur stdDeviation="14" />
+				</filter>
 			</defs>
 			<rect width={W} height={H} fill="url(#sky)" />
-			{STARS.map((s, i) => {
-				const tw = 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph));
-				const o = Math.min(1, tw * (0.75 + rahmat * 0.5));
-				return s.gold ? (
-					<g key={i} opacity={o}>
-						<circle cx={s.x} cy={s.y} r={s.s * 4.5} fill="url(#glow)" opacity={0.5} />
-						<circle cx={s.x} cy={s.y} r={s.s * 1.1} fill={C.gold} />
+			{SPARKS.map((s, i) => {
+				const tw = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * s.sp + s.ph));
+				return <circle key={i} cx={s.x} cy={s.y} r={s.s * 0.7} fill="#fff4ea" opacity={tw * 0.7} />;
+			})}
+			{/* matahari terbit di ufuk */}
+			<circle cx={540} cy={sunY} r={520 + rahmat * 80} fill="url(#sunGlow)" opacity={0.75 + rahmat * 0.25} />
+			{rahmat > 0 &&
+				Array.from({length: 14}, (_, i) => {
+					const ang = (i / 14) * Math.PI * 2 + t * 0.08;
+					return (
+						<path
+							key={i}
+							d={`M 540 ${sunY} L ${540 + Math.cos(ang - 0.06) * 1400} ${sunY + Math.sin(ang - 0.06) * 1400} L ${540 + Math.cos(ang + 0.06) * 1400} ${sunY + Math.sin(ang + 0.06) * 1400} Z`}
+							fill="#fff0dc"
+							opacity={0.09 * rahmat}
+						/>
+					);
+				})}
+			<circle cx={540} cy={sunY} r={150} fill={C.sun} />
+			{/* awan */}
+			{CLOUDS.map((c, i) => {
+				const x = ((c.x0 + t * c.sp) % (W + c.w * 2) + W + c.w * 2) % (W + c.w * 2) - c.w;
+				return (
+					<g key={i} opacity={0.5} filter="url(#blur3)">
+						<rect x={x - c.w / 2} y={c.y} width={c.w} height={30} rx={15} fill="#f7b49a" />
+						<rect x={x - c.w / 4} y={c.y - 16} width={c.w * 0.45} height={30} rx={15} fill="#f7b49a" />
 					</g>
-				) : (
-					<circle key={i} cx={s.x} cy={s.y} r={s.s * 0.6} fill={C.creamLight} opacity={o * 0.7} />
 				);
 			})}
-			{/* bulan sabit */}
-			<circle cx={860} cy={250} r={150 + rahmat * 60} fill="url(#glow)" opacity={0.18 + rahmat * 0.25} />
-			<circle cx={860} cy={250} r={56} fill={C.creamLight} mask="url(#moonMask)" />
-			{/* bukit */}
-			<path d={`M0 ${GROUND - 70} C 220 ${GROUND - 140}, 470 ${GROUND - 60}, 700 ${GROUND - 110} S 980 ${GROUND - 120}, 1080 ${GROUND - 80} L1080 ${H} L0 ${H}Z`} fill={C.hillFar} />
+			{/* bukit berlapis */}
+			<path d={`M0 ${GROUND - 120} C 200 ${GROUND - 190}, 420 ${GROUND - 120}, 620 ${GROUND - 160} S 940 ${GROUND - 200}, 1080 ${GROUND - 140} L1080 ${H} L0 ${H}Z`} fill={C.hillFar} />
+			<path d={`M0 ${GROUND - 60} C 220 ${GROUND - 120}, 470 ${GROUND - 50}, 700 ${GROUND - 95} S 980 ${GROUND - 110}, 1080 ${GROUND - 70} L1080 ${H} L0 ${H}Z`} fill={C.hillMid} />
 			<path d={`M0 ${GROUND + 10} C 300 ${GROUND - 30}, 720 ${GROUND + 6}, 1080 ${GROUND - 18} L1080 ${H} L0 ${H}Z`} fill={C.hillNear} />
 		</>
 	);
@@ -111,10 +134,10 @@ const Woman: React.FC<{x: number; s: number; drape: number; op?: number; t: numb
 	return (
 		<g transform={`translate(${x} ${GROUND}) scale(${s})`} opacity={op}>
 			<ellipse cx={0} cy={2} rx={95} ry={10} fill="#000" opacity={0.25} />
-			<path d="M -44 -250 C -58 -150 -76 -60 -86 0 L 86 0 C 76 -60 58 -150 44 -250 Z" fill={C.cream} />
+			<path d="M -44 -250 C -58 -150 -76 -60 -86 0 L 86 0 C 76 -60 58 -150 44 -250 Z" fill={C.cream} stroke={C.rim} strokeWidth={2.5} strokeOpacity={0.55} />
 			<ellipse cx={-26} cy={-2} rx={16} ry={6} fill={C.jilbab} />
 			<ellipse cx={26} cy={-2} rx={16} ry={6} fill={C.jilbab} />
-			<path d={drapePath} fill={C.jilbab} />
+			<path d={drapePath} fill={C.jilbab} stroke={C.rim} strokeWidth={3} strokeOpacity={0.7} />
 			{shimmer > 0 && (
 				<path
 					d={`M ${wR} ${hem} Q ${wob} ${hem + 24} ${-wR} ${hem}`}
@@ -170,7 +193,8 @@ const Stage: React.FC<{t: number; a: number}> = ({t, a}) => {
 	const ringT = a - WORDS[14].start;
 
 	// E: dilindungi
-	const dome = ramp(a, S.dilindungi, S.dilindungi + 1) * (1 - ramp(a, S.rahmat + 0.4, S.rahmat + 1.2));
+	const dome = ramp(a, S.dilindungi, S.dilindungi + 1);
+	const domeOut = ramp(a, S.rahmat - 0.3, S.rahmat + 0.5);
 	const hitT = WORDS[16].start + 1.25;
 	const zIn = ramp(a, S.dilindungi + 0.3, hitT);
 	const zOut = ramp(a, hitT, hitT + 1);
@@ -241,7 +265,7 @@ const Stage: React.FC<{t: number; a: number}> = ({t, a}) => {
 							const xHead = start + (reach - start) * zIn - side * zOut * 160;
 							const y0 = GROUND - 380 + j * 120;
 							const pts = Array.from({length: 7}, (_, k) => `${xHead + side * k * 34},${y0 + (k % 2 ? -22 : 22)}`).join(' ');
-							return <polyline key={`${side}${j}`} points={pts} stroke="#6b6f8e" strokeWidth={7} fill="none" strokeLinejoin="round" strokeLinecap="round" />;
+							return <polyline key={`${side}${j}`} points={pts} stroke={C.hillNear} strokeWidth={7} fill="none" strokeLinejoin="round" strokeLinecap="round" />;
 						}),
 					)}
 				</g>
@@ -266,7 +290,7 @@ const Stage: React.FC<{t: number; a: number}> = ({t, a}) => {
 				})}
 
 			{/* E: kubah perlindungan */}
-			{dome > 0 && (
+			{dome > 0 && domeOut < 1 && (
 				<g>
 					<path
 						d={`M ${540 - 270} ${GROUND} A 270 470 0 0 1 ${540 + 270} ${GROUND}`}
@@ -277,7 +301,7 @@ const Stage: React.FC<{t: number; a: number}> = ({t, a}) => {
 						pathLength={1}
 						strokeDasharray="1 1"
 						strokeDashoffset={1 - dome}
-						opacity={0.85}
+						opacity={0.85 * (1 - domeOut)}
 					/>
 				</g>
 			)}
@@ -354,11 +378,11 @@ const Texts: React.FC<{a: number}> = ({a}) => (
 							);
 						})}
 					</div>
-					<div style={{fontFamily: 'Montserrat', fontWeight: 500, fontSize: 44, lineHeight: 1.45, color: C.text, marginTop: 6, padding: '0 20px'}}>
+					<div style={{fontFamily: 'Nunito', fontWeight: 600, fontSize: 44, lineHeight: 1.45, color: C.text, marginTop: 6, padding: '0 20px'}}>
 						{tr.map((w, i) => {
 							const k = Math.max(0, Math.min(1, prog - i));
 							return (
-								<span key={i} style={{opacity: k, display: 'inline-block', transform: `translateY(${(1 - k) * 12}px)`, color: w.gold ? C.gold : C.text, fontWeight: w.gold ? 700 : 500, marginRight: 11}}>
+								<span key={i} style={{opacity: k, display: 'inline-block', transform: `translateY(${(1 - k) * 12}px)`, color: w.gold ? C.gold : C.text, fontWeight: w.gold ? 800 : 600, marginRight: 11}}>
 									{w.w}
 								</span>
 							);
@@ -389,16 +413,16 @@ export const Video: React.FC = () => {
 	const titleOp = Math.max(1 - ramp(a, -0.5, 0.2), ramp(a, AUDIO_END + 1, AUDIO_END + 2));
 	const refOp = ramp(a, -0.3, 0.4) * (1 - ramp(a, AUDIO_END + 0.6, AUDIO_END + 1.2));
 	return (
-		<AbsoluteFill style={{backgroundColor: C.skyTop}}>
+		<AbsoluteFill style={{backgroundColor: C.bottom}}>
 			<svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{position: 'absolute'}}>
 				<Sky t={t} a={a} />
 				<Stage t={t} a={a} />
 				<rect x={0} y={GROUND + 20} width={W} height={H - GROUND} fill="url(#fadeDown)" />
 				<defs>
 					<linearGradient id="fadeDown" x1="0" y1="0" x2="0" y2="1">
-						<stop offset="0" stopColor="#050c16" stopOpacity="0" />
-						<stop offset="0.4" stopColor="#050c16" stopOpacity="0.55" />
-						<stop offset="1" stopColor="#050c16" stopOpacity="0.85" />
+						<stop offset="0" stopColor={C.bottom} stopOpacity="0" />
+						<stop offset="0.4" stopColor={C.bottom} stopOpacity="0.55" />
+						<stop offset="1" stopColor={C.bottom} stopOpacity="0.85" />
 					</linearGradient>
 				</defs>
 			</svg>
