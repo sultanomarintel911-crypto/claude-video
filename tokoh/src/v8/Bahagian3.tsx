@@ -50,14 +50,22 @@ const BUKA_T: number[] = [];
 }
 const SEKOLAH = BUKA_T[BUKA_T.length - 1];
 const PANEL = ['s01', 's02', 's03', 's04', 's05', 's06', 's07'];
-const PANEL_TAG = ['SUBJECT IDENTIFIED', 'PENOLONG KETUA MURID', 'PENGERUSI · TV PSS', 'KETUA RUMAH TEMENGGUNG', 'AJK TUNAS KADET REMAJA', 'NILAM · 4 BINTANG', 'KEPIMPINAN · KERJASAMA'];
 const ikutRentak = (t0: number, rentak: number[]) => {
   const out = [t0];
   for (const n of rentak) out.push(beatAfter('sovereign', out[out.length - 1] + LS0, n) - LS0);
   return out;
 };
-const PANEL_T = ikutRentak(SEKOLAH, PANEL.map(() => 4));
-const DULU = PANEL_T.pop() as number;
+const PANEL_T = ikutRentak(SEKOLAH, PANEL.map(() => 3));
+const JAWATAN_T0 = PANEL_T.pop() as number;
+// semua jawatan disandang dikumpul dalam satu senarai (gaya sama dengan senarai penyertaan)
+const JAWATAN: Array<[string, string, string]> = [
+  ['LEMBAGA PENGAWAS', 'PENOLONG KETUA MURID', 'SK SULTAN OMAR · 2026'],
+  ['KELAB & PERSATUAN', 'PENGERUSI', 'TV PSS'],
+  ['RUMAH SUKAN', 'KETUA RUMAH', 'TEMENGGUNG'],
+  ['BADAN BERUNIFORM', 'AHLI JAWATANKUASA', 'TUNAS KADET REMAJA SEKOLAH'],
+];
+const JAWATAN_B = ikutRentak(JAWATAN_T0, [1, 1, 1, 1, 3]); // tajuk, 4 kad tepat pada rentak, tahan 3 rentak
+const DULU = JAWATAN_B[JAWATAN_B.length - 1];
 const SUKAN = snapLS(DULU + 5.0);
 const WARP = ['k01', 'k02', 'k03', 'k04', 'k05', 'k06', 'k07', 'k08', 'k09'];
 const WARP_TAG = ['SUKAN TAHUNAN', 'PODIUM', 'PINGAT · SEKOLAH', 'PINGAT · DAERAH', 'MERENTAS DESA', 'PINGAT', 'BOLA BALING · KETIGA ZON SURA', 'BOLA BALING · KETIGA MSSD DUNGUN', 'BERKUDA'];
@@ -208,7 +216,7 @@ const HoloSekolah: React.FC = () => {
         <AbsoluteFill style={{transformStyle: 'preserve-3d'}}>
           {PANEL.map((k, i) => {
             const s = f(PANEL_T[i]) - t0;
-            const e = (i < PANEL.length - 1 ? f(PANEL_T[i + 1]) : f(DULU)) - t0;
+            const e = (i < PANEL.length - 1 ? f(PANEL_T[i + 1]) : f(JAWATAN_T0)) - t0;
             if (fr < s - 24 || fr > e + 14) return null;
             const inn = Easing.out(Easing.cubic)(ci(fr, s - 24, s));
             const lew = Easing.in(Easing.cubic)(ci(fr, e - 2, e + 14));
@@ -216,7 +224,6 @@ const HoloSekolah: React.FC = () => {
             const z = -2600 * (1 - inn) + 900 * lew;
             const x = side * 520 * (1 - inn) - side * 60 * ci(fr, s, e);
             const ry = side * -28 * (1 - inn) + side * 4 * ci(fr, s, e);
-            const tag = ci(fr, s + 4, s + 18);
             return (
               <div
                 key={k}
@@ -235,9 +242,6 @@ const HoloSekolah: React.FC = () => {
                 <div style={{position: 'absolute', left: 0, top: -44, fontFamily: MONO, fontSize: 22, letterSpacing: 6, color: CYAN}}>
                   ◆ RECORD {String(i + 1).padStart(2, '0')} / {String(PANEL.length).padStart(2, '0')}
                 </div>
-                <div style={{position: 'absolute', left: 0, bottom: -86, opacity: tag, fontFamily: SANS, fontWeight: 700, fontSize: 46, letterSpacing: 6, color: GOLD, textShadow: '0 4px 18px rgba(0,0,0,0.9)'}}>
-                  <Scramble text={PANEL_TAG[i]} reveal={tag} seed={'pt' + i} />
-                </div>
               </div>
             );
           })}
@@ -245,6 +249,58 @@ const HoloSekolah: React.FC = () => {
       </AbsoluteFill>
       <Scanlines opacity={0.18} />
       <Vignette strength={0.55} />
+    </AbsoluteFill>
+  );
+};
+
+
+// ------------------------------------------------------------------ B2. senarai jawatan disandang
+const Jawatan: React.FC<{len: number}> = ({len}) => {
+  const fr = useCurrentFrame();
+  const L = f(len);
+  const t0 = JAWATAN_T0;
+  const b = JAWATAN_B.map((t) => f(t - t0));
+  const n = Math.round(JAWATAN.length * Easing.out(Easing.cubic)(ci(fr, 4, 22)));
+  const p = pulseAt('sovereign', t0 + fr / FPS + LS0, 0.2, 0.7);
+  const imbas = (fr % 70) / 70;
+  const sah = ci(fr, b[4] + 4, b[4] + 12, 0, 1, Easing.out(Easing.back(2)));
+  return (
+    <AbsoluteFill style={{background: 'radial-gradient(ellipse at center, #0d1418 0%, #010203 75%)', opacity: ci(fr, 0, 6) * (1 - ci(fr, L - 8, L)), overflow: 'hidden'}}>
+      <HexGrid opacity={0.1 + 0.06 * p} />
+      <div style={{position: 'absolute', left: 0, right: 0, top: 70, textAlign: 'center', transform: `scale(${1 + 0.03 * p})`}}>
+        <div style={{fontFamily: MONO, fontSize: 26, letterSpacing: 10, color: CYAN}}>
+          <Scramble text="LEADERSHIP DOSSIER · 2026" reveal={ci(fr, 0, 14)} seed="jw" />
+        </div>
+        <Gold size={170} spacing={4}>{String(n).padStart(2, '0')}</Gold>
+        <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 44, letterSpacing: 16, color: '#fff'}}>JAWATAN DISANDANG</div>
+      </div>
+      <div style={{position: 'absolute', left: 200, right: 200, top: 420, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 34}}>
+        {JAWATAN.map(([kat, jaw, unit], i) => {
+          const s = b[i];
+          const q = ci(fr, s, s + 8, 0, 1, easeOut);
+          const tumbuk = fr >= s ? 0.1 * Math.exp(-(fr - s) / 4) : 0;
+          const kilat = fr >= s ? 0.5 * Math.exp(-(fr - s) / 3) : 0;
+          return (
+            <div key={jaw + unit} style={{position: 'relative', opacity: q, transform: `perspective(900px) rotateX(${(1 - q) * 70}deg) translateY(${(1 - q) * 60}px) scale(${1 + tumbuk})`, border: `1.5px solid ${CYAN}`, background: `rgba(127,243,255,${0.06 + kilat * 0.3})`, padding: '30px 34px', boxShadow: `0 0 ${24 + 40 * kilat}px rgba(127,243,255,${0.15 + kilat})`, overflow: 'hidden'}}>
+              <div style={{fontFamily: MONO, fontSize: 18, letterSpacing: 4, color: CYAN}}>ROLE · {String(i + 1).padStart(2, '0')} · {kat}</div>
+              <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, color: GOLD, marginTop: 10, lineHeight: 1.15, textShadow: '0 2px 12px rgba(0,0,0,0.8)'}}>
+                <Scramble text={jaw} reveal={ci(fr, s, s + 10)} seed={'jw' + i} />
+              </div>
+              <div style={{fontFamily: SANS, fontWeight: 500, fontSize: 26, letterSpacing: 3, color: '#fff', marginTop: 6}}>{unit}</div>
+              <div style={{position: 'absolute', left: 0, right: 0, top: `${imbas * 100}%`, height: 2, background: `linear-gradient(90deg, transparent, ${CYAN}, transparent)`, opacity: 0.35}} />
+            </div>
+          );
+        })}
+      </div>
+      {sah > 0 ? (
+        <AbsoluteFill style={{justifyContent: 'flex-end', alignItems: 'center', paddingBottom: 55}}>
+          <div style={{transform: `rotate(-6deg) scale(${2.2 - 1.2 * sah})`, opacity: sah, border: `6px solid ${GREEN}`, padding: '14px 46px', background: 'rgba(0,15,8,0.85)', fontFamily: MONO, fontWeight: 700, fontSize: 64, letterSpacing: 10, color: GREEN, textShadow: `0 0 20px ${GREEN}`}}>
+            LEADER · VERIFIED
+          </div>
+        </AbsoluteFill>
+      ) : null}
+      <Scanlines opacity={0.15} />
+      <Vignette strength={0.5} />
     </AbsoluteFill>
   );
 };
@@ -584,6 +640,9 @@ const SFX: Sfx[] = [
 for (let k = 0; k < 18; k++) SFX.push([AKSES + 0.1 + k * 0.12, 'sfx/taip', 0.25]);
 BUKA_T.slice(0, -1).forEach((t) => SFX.push([t, 'sfx/imbasan', 0.4], [t + 0.35, 'sfx/bip', 0.35]));
 PANEL_T.forEach((t) => SFX.push([t - 0.6, 'sfx/whoosh_pendek', 0.4], [t, 'sfx/blip', 0.3]));
+SFX.push([JAWATAN_T0, 'sfx/hud_boot', 0.45]);
+JAWATAN_B.slice(1, 5).forEach((t) => SFX.push([t, 'sfx/impact_lembut', 0.5], [t, 'sfx/bip', 0.35]));
+SFX.push([JAWATAN_B[4] + 0.15, 'sfx/impact_besar', 0.5]);
 SFX.push([DULU + 1.0, 'sfx/imbasan', 0.4], [DULU + 2.2, 'sfx/swish_teks', 0.35]);
 WARP_T.forEach((t, i) => SFX.push([t, i === 0 ? 'sfx/warp' : 'sfx/whoosh_pendek', i === 0 ? 0.6 : 0.35]));
 SFX.push([LARI, 'sfx/impact_lembut', 0.6], [LARI + 0.1, 'sfx/whoosh_panjang', 0.4]);
@@ -616,6 +675,9 @@ export const TrailerBahagian3: React.FC = () => {
       </Sequence>
       <Sequence from={f(SEKOLAH)} durationInFrames={f(DULU - SEKOLAH)}>
         <HoloSekolah />
+      </Sequence>
+      <Sequence from={f(JAWATAN_T0)} durationInFrames={f(DULU - JAWATAN_T0)}>
+        <Jawatan len={DULU - JAWATAN_T0} />
       </Sequence>
       <Sequence from={f(DULU)} durationInFrames={f(SUKAN - DULU)}>
         <DuluKini len={SUKAN - DULU} />
