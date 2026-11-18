@@ -70,6 +70,8 @@ ITEMS = [
 ]
 # versi tanpa kabur (u_*) untuk babak 'REDACTION REMOVED' selepas pendedahan: bingkai sama, semua wajah jelas
 ITEMS += [("u_" + k, n, "asli", pt, hf, tg, fr) for k, n, mode, pt, hf, tg, fr in ITEMS if mode in ("jelas", "kabur")]
+# Hari Anugerah (potret) untuk REDACTION REMOVED: penuh tinggi supaya wajah tidak terpotong
+ITEMS.append(("u2_e01", 80, "asli", None, 0, False, (0.5, 0.5, 1.0)))
 if os.environ.get("HANYA"):
     ITEMS = [it for it in ITEMS if it[0].startswith(os.environ["HANYA"])]
 

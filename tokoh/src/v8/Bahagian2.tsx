@@ -48,7 +48,8 @@ add('foto', 8, 'e01'); // lari berpagar -> montaj selepas pendedahan
 const MORPH = tt; // ~63.5
 const PETA = MORPH + 17.7;
 const CW_PETA = 21.0; // Clockwork untuk peta misi // 76.9
-const KLIMAKS = PETA + 37.7; // peta misi 37.7 s
+const PETA_LEN = 21.5; // peta misi (dipendekkan; cop MISI SELESAI jatuh pada hentakan kuat Clockwork)
+const KLIMAKS = PETA + PETA_LEN;
 const DROP = KLIMAKS + 34.5; // pendedahan (The Last Strike 1:00)
 const AKHIR = DROP + 13.5;
 const SV_GAH = 96.68; // saat dalam Beneath the Sovereign Sky bila muzik meletup selepas senyap (pendedahan)
@@ -142,20 +143,25 @@ const KadSulit: React.FC<{a: string; b: string; len: number}> = ({a, b, len}) =>
 // peta misi: setiap bandar mendapat fail misi
 type Misi = {city: Omit<City, 'at'>; t: number; foto?: string; negara: string};
 const MISI: Misi[] = [
-  {city: BANDAR[0], t: 3.0, negara: 'SINGAPURA'},
-  {city: BANDAR[1], t: 10.0, foto: 'v8/img/misi_birmingham.jpg', negara: 'UNITED KINGDOM'},
-  {city: BANDAR[2], t: 17.0, foto: 'v8/img/misi_istanbul.jpg', negara: 'TÜRKİYE'},
-  {city: BANDAR[3], t: 24.0, negara: 'CHINA'},
+  {city: BANDAR[0], t: 1.42, negara: 'SINGAPURA'},
+  {city: BANDAR[1], t: 5.79, foto: 'v8/img/misi_birmingham.jpg', negara: 'UNITED KINGDOM'},
+  {city: BANDAR[2], t: 10.14, foto: 'v8/img/misi_istanbul.jpg', negara: 'TÜRKİYE'},
+  {city: BANDAR[3], t: 14.51, negara: 'CHINA'},
 ];
+const CAP = 2.2; // cop MISI SELESAI (s selepas kad muncul) -> rentak kuat Clockwork 24.62 / 28.99 / 33.34 / 37.71
+const KAD_LEN = 4.3;
+const AKHIR_T = 18.0; // zum keluar -> 4 NEGARA
 const fmt = (v: number, pos: string, neg: string) => `${Math.abs(v).toFixed(4)}° ${v >= 0 ? pos : neg}`;
 
 const KadMisi: React.FC<{m: Misi; i: number}> = ({m, i}) => {
   const fr = useCurrentFrame();
-  const p = ci(fr, 6, 16, 0, 1, easeOut);
+  const p = ci(fr, 0, 8, 0, 1, easeOut);
   const coord = `${fmt(m.city.lat, 'U', 'S')}  ${fmt(m.city.lon, 'T', 'B')}`;
-  const nCh = Math.floor(coord.length * ci(fr, 10, 34));
-  const stamp = ci(fr, 92, 100, 0, 1, Easing.out(Easing.back(2)));
-  const out = 1 - ci(fr, f(7) - 8, f(7));
+  const nCh = Math.floor(coord.length * ci(fr, 6, 22));
+  const stamp = ci(fr, f(CAP) - 3, f(CAP) + 3, 0, 1, Easing.out(Easing.back(2)));
+  const kl = Math.min(KAD_LEN, AKHIR_T - 0.4 - m.t);
+  const out = 1 - ci(fr, f(kl) - 6, f(kl));
+  const kilat = Math.exp(-Math.max(0, fr - f(CAP)) / 3) * (fr >= f(CAP) - 1 ? 1 : 0);
   return (
     <div style={{position: 'absolute', right: 90, top: 170, width: 620, opacity: p * out, transform: `translateX(${60 * (1 - p)}px)`}}>
       <div style={{background: 'rgba(8,10,14,0.85)', border: '1px solid rgba(255,255,255,0.22)', padding: 26, backdropFilter: 'blur(6px)'}}>
@@ -168,7 +174,7 @@ const KadMisi: React.FC<{m: Misi; i: number}> = ({m, i}) => {
         <div style={{fontFamily: MONO, fontSize: 22, color: GOLD, marginTop: 10, height: 30}}>{coord.slice(0, nCh)}</div>
         <div style={{position: 'relative', marginTop: 16, height: 300, overflow: 'hidden', background: '#11141a', border: '1px solid rgba(255,255,255,0.15)'}}>
           {m.foto ? (
-            <Img src={staticFile(m.foto)} style={{width: '100%', height: '100%', objectFit: 'cover', filter: `blur(${(1 - ci(fr, 30, 60)) * 14}px) saturate(0.85)`}} />
+            <Img src={staticFile(m.foto)} style={{width: '100%', height: '100%', objectFit: 'cover', filter: `blur(${(1 - ci(fr, 12, 34)) * 14}px) saturate(0.85)`}} />
           ) : (
             <AbsoluteFill style={{justifyContent: 'center', alignItems: 'center', background: 'repeating-linear-gradient(45deg, #15181f 0 14px, #1b1f28 14px 28px)'}}>
               <div style={{fontFamily: MONO, fontWeight: 700, fontSize: 30, color: '#9aa3b2', letterSpacing: 6}}>FOTO DISULITKAN</div>
@@ -176,7 +182,7 @@ const KadMisi: React.FC<{m: Misi; i: number}> = ({m, i}) => {
           )}
         </div>
         <div style={{fontFamily: MONO, fontSize: 24, color: '#fff', marginTop: 16, letterSpacing: 3}}>
-          MISI: <Scramble text="████████████" reveal={0} seed={'m' + i} />
+          STATUS: <span style={{color: stamp > 0.5 ? '#3ddc84' : GOLD}}>{stamp > 0.5 ? 'SELESAI ✓' : 'DALAM OPERASI…'}</span>
         </div>
       </div>
       <div
@@ -198,6 +204,8 @@ const KadMisi: React.FC<{m: Misi; i: number}> = ({m, i}) => {
       >
         MISI SELESAI
       </div>
+      <div style={{position: 'absolute', inset: 0, background: '#3ddc84', opacity: 0.25 * kilat, mixBlendMode: 'screen'}} />
+      <GlitchBands intensity={kilat * 0.8} seed={'k' + i} />
     </div>
   );
 };
@@ -206,14 +214,14 @@ const Peta: React.FC = () => {
   const fr = useCurrentFrame();
   const len = f(KLIMAKS - PETA);
   // pusing ke setiap bandar
-  const keys = [0, f(2.5), ...MISI.flatMap((m) => [f(m.t), f(m.t + 5)]), f(31.5), len];
+  const keys = [0, f(1.2), ...MISI.flatMap((m) => [f(m.t), f(m.t + 2.5)]), f(AKHIR_T), len];
   const rots: Array<[number, number]> = [[80, 10], [DUNGUN.lon, DUNGUN.lat], ...MISI.flatMap((m) => [[m.city.lon * 0.55 + DUNGUN.lon * 0.45, m.city.lat * 0.55 + 5], [m.city.lon * 0.55 + DUNGUN.lon * 0.45, m.city.lat * 0.55 + 5]] as Array<[number, number]>), [62, 28], [62, 28]];
   const rot = lerpRot(fr, keys, rots);
   const cities: City[] = MISI.map((m) => ({...m.city, at: f(m.t + 0.6)}));
   const inn = ci(fr, 0, 12);
-  const akhir = ci(fr, f(30.6), f(31.8), 0, 1, easeOut);
-  const teks = ci(fr, f(31.2), f(32.1));
-  const r = interpolate(fr, [0, f(2.5), f(31), len], [380, 470, 470, 400], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const akhir = ci(fr, f(AKHIR_T - 0.6), f(AKHIR_T + 0.6), 0, 1, easeOut);
+  const teks = ci(fr, f(AKHIR_T + 1.1), f(AKHIR_T + 1.8));
+  const r = interpolate(fr, [0, f(1.2), f(AKHIR_T), len], [380, 470, 470, 400], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   return (
     <AbsoluteFill style={{background: 'radial-gradient(ellipse at 40% 50%, #121a28 0%, #020305 75%)', opacity: inn}}>
       {/* zum keluar pada akhir: glob kecil di tengah atas, teks 3D di bawah */}
@@ -221,18 +229,74 @@ const Peta: React.FC = () => {
       <div style={{position: 'absolute', left: 90, top: 70, fontFamily: MONO, fontSize: 24, letterSpacing: 8, color: '#d9d2c2'}}>
         FAIL MISI · <span style={{color: GOLD}}>LUAR NEGARA</span>
       </div>
+      <PetaHUD fr={fr} hilang={akhir} />
       {MISI.map((m, i) => (
-        <Sequence key={i} from={f(m.t)} durationInFrames={f(7)}>
+        <Sequence key={i} from={f(m.t)} durationInFrames={f(Math.min(KAD_LEN, AKHIR_T - 0.4 - m.t))}>
           <KadMisi m={m} i={i} />
         </Sequence>
       ))}
       {teks > 0 ? (
         <AbsoluteFill style={{justifyContent: 'flex-start', alignItems: 'center', paddingTop: 660}}>
-          <Gold3D text="4 NEGARA" size={150} p={teks} shine={ci(fr, f(32.2), f(33.4))} yaw={interpolate(fr, [f(31.2), len], [-6, 5])} />
-          <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, letterSpacing: 14, color: '#fff', marginTop: 34, opacity: ci(fr, f(32.3), f(32.9)), textShadow: '0 4px 16px rgba(0,0,0,0.9)'}}>1 MURID</div>
+          <Gold3D text="4 NEGARA" size={150} p={teks} shine={ci(fr, f(AKHIR_T + 2.0), f(AKHIR_T + 3.0))} yaw={interpolate(fr, [f(AKHIR_T + 1.1), len], [-6, 5])} />
+          <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, letterSpacing: 14, color: '#fff', marginTop: 34, opacity: ci(fr, f(AKHIR_T + 2.0), f(AKHIR_T + 2.5)), textShadow: '0 4px 16px rgba(0,0,0,0.9)'}}>1 MURID</div>
         </AbsoluteFill>
       ) : null}
       <Vignette strength={0.6} />
+    </AbsoluteFill>
+  );
+};
+
+// HUD sci-fi peta: cincin imbasan berputar, aliran data, pautan satelit, garis masa 4 misi
+const PetaHUD: React.FC<{fr: number; hilang: number}> = ({fr, hilang}) => {
+  const o = ci(fr, 4, 16) * (1 - hilang);
+  if (o <= 0) return null;
+  const selesai = MISI.filter((m) => fr >= f(m.t + CAP)).length;
+  const p = pulseAt('clockwork_collapse', CW_PETA + fr / FPS, 0.15, 0.8);
+  const baris = Array.from({length: 18}, (_, k) => {
+    const n = Math.floor(fr / 2) + k;
+    return `${(random('h' + n) * 0xffffff | 0).toString(16).toUpperCase().padStart(6, '0')} ${(random('g' + n) * 999).toFixed(0).padStart(3, '0')}.${(random('j' + n) * 99).toFixed(0).padStart(2, '0')}`;
+  });
+  return (
+    <AbsoluteFill style={{opacity: o, pointerEvents: 'none'}}>
+      {/* cincin imbasan mengelilingi glob */}
+      <svg width={1920} height={1080} style={{position: 'absolute'}}>
+        <g transform={`translate(720 560) rotate(${fr * 1.2})`}>
+          <circle r={520} fill="none" stroke="rgba(127,243,255,0.35)" strokeWidth={2} strokeDasharray="4 14" />
+        </g>
+        <g transform={`translate(720 560) rotate(${-fr * 0.7})`}>
+          <circle r={548} fill="none" stroke="rgba(244,200,92,0.3)" strokeWidth={1.5} strokeDasharray="60 30 6 30" />
+        </g>
+        <g transform={`translate(720 560) rotate(${fr * 3})`}>
+          <path d="M 0 0 L 520 -40 A 520 520 0 0 1 520 40 Z" fill="rgba(127,243,255,0.07)" />
+        </g>
+        <circle cx={720} cy={560} r={490 + 18 * p} fill="none" stroke={`rgba(127,243,255,${0.12 + 0.35 * p})`} strokeWidth={2} />
+      </svg>
+      {/* aliran data kiri */}
+      <div style={{position: 'absolute', left: 90, top: 150, fontFamily: MONO, fontSize: 15, lineHeight: 1.55, color: 'rgba(127,243,255,0.55)', letterSpacing: 2}}>
+        {baris.map((b, k) => (
+          <div key={k} style={{opacity: 0.35 + 0.65 * (k / baris.length)}}>{b}</div>
+        ))}
+      </div>
+      {/* pautan satelit */}
+      <div style={{position: 'absolute', left: 90, bottom: 150, fontFamily: MONO, fontSize: 20, letterSpacing: 5, color: '#9aa3b2'}}>
+        <span style={{color: Math.floor(fr / 10) % 2 ? '#ff4d5e' : '#5a1d22'}}>●</span> SATELLITE LINK · LIVE
+      </div>
+      {/* garis masa misi */}
+      <div style={{position: 'absolute', left: 90, bottom: 80, display: 'flex', alignItems: 'center', gap: 0}}>
+        {MISI.map((m, k) => {
+          const ok = k < selesai;
+          const aktif = fr >= f(m.t) && !ok;
+          return (
+            <React.Fragment key={k}>
+              <div style={{fontFamily: MONO, fontSize: 18, letterSpacing: 3, padding: '6px 12px', border: `1.5px solid ${ok ? '#3ddc84' : aktif ? GOLD : 'rgba(255,255,255,0.25)'}`, color: ok ? '#3ddc84' : aktif ? GOLD : 'rgba(255,255,255,0.45)', background: ok ? 'rgba(61,220,132,0.12)' : 'transparent'}}>
+                {ok ? '✓ ' : ''}{m.city.name}
+              </div>
+              {k < MISI.length - 1 ? <div style={{width: 40, height: 2, background: k < selesai - 1 ? '#3ddc84' : 'rgba(255,255,255,0.2)'}} /> : null}
+            </React.Fragment>
+          );
+        })}
+        <div style={{fontFamily: MONO, fontSize: 18, letterSpacing: 4, color: GOLD, marginLeft: 24}}>{selesai}/{MISI.length} MISI</div>
+      </div>
     </AbsoluteFill>
   );
 };
@@ -412,9 +476,9 @@ SFX.push([PETA, 'sfx/hud_boot', 0.6], [PETA + 0.3, 'sfx/data', 0.25]);
 MISI.forEach((m) => {
   SFX.push([PETA + m.t, 'sfx/whoosh_pendek', 0.45], [PETA + m.t + 0.6, 'sfx/imbasan', 0.4]);
   for (let k = 0; k < 8; k++) SFX.push([PETA + m.t + 0.35 + k * 0.1, 'sfx/taip', 0.35]);
-  SFX.push([PETA + m.t + 3.07, 'sfx/impact_lembut', 0.55]);
+  SFX.push([PETA + m.t + CAP, 'sfx/impact_lembut', 0.6], [PETA + m.t + CAP, 'sfx/glitch', 0.3]);
 });
-SFX.push([PETA + 31.2, 'sfx/braam', 0.6]);
+SFX.push([PETA + AKHIR_T + 1.0, 'sfx/braam', 0.6]);
 // klimaks
 SFX.push([KLIMAKS, 'sfx/braam', 0.6], [KLIMAKS, 'sfx/impact_lembut', 0.6]);
 SFX.push([KLIMAKS + 12.5, 'sfx/stinger', 0.4], [KLIMAKS + 18.5, 'sfx/riser', 0.6]);

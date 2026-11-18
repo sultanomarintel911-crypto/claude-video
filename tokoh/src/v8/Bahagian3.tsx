@@ -38,7 +38,7 @@ const BUKA_FOTO: Array<[string, string, number]> = [
   ['e01', 'BAB IV · HARI ANUGERAH', 6],
 ];
 // gambar jelas (asal) bagi setiap fail sulit
-const JELAS = (k: string) => (k.startsWith('b') || k === 'c05' ? `v8/hidup/${k}.jpg` : `v8/hidup/u_${k}.jpg`);
+const JELAS = (k: string) => (k === 'e01' ? 'v8/hidup/u2_e01.jpg' : k.startsWith('b') || k === 'c05' ? `v8/hidup/${k}.jpg` : `v8/hidup/u_${k}.jpg`);
 const BUKA_T: number[] = [];
 {
   let t = beatAfter('sovereign', BUKA + LS0, 3) - LS0; // 3 rentak: tajuk REDACTION REMOVED
