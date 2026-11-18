@@ -291,8 +291,11 @@ for key, n, mode, pt, headf, tag, frm in ITEMS:
     print(f"{key} <- {n} {mode} {W}x{H} wajah={len(fl)} fokus=({focus[0]:.2f},{focus[1]:.2f})")
 
 # gambar terawal (hujung kotak kenangan)
-load(101).save(os.path.join(IMG, "awal.jpg"), quality=92)  # gambar kecil: tidak dikaburkan
-print("awal.jpg asli")
+# bayi neutral (b01) dipotong 3:4 - tiada petunjuk jantina sebelum pendedahan
+_b = Image.open(f"{OUT}/b01.jpg")
+_x = max(0, min(_b.width - 810, int(0.49 * _b.width) - 405))
+_b.crop((_x, 0, _x + 810, 1080)).resize((960, 1280), Image.LANCZOS).save(os.path.join(IMG, "awal.jpg"), quality=92)
+print("awal.jpg <- b01")
 
 # fail misi: papan tanda sahaja (tiada orang, tiada skuasy)
 for n, name, box in ((57, "istanbul", (0.12, 0.0, 0.98, 0.42)), (60, "birmingham", (0.0, 0.0, 1.0, 0.44))):

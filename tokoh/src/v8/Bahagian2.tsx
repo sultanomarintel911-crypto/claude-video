@@ -71,7 +71,9 @@ const KadBab: React.FC<{a: string; b: string; len: number}> = ({a, b, len}) => {
 };
 
 // syot sinematik penuh skrin: gambar rata (tiada kesan 3D), Ken Burns perlahan + hentakan zum ikut rentak
-const Foto: React.FC<{src: string; len: number; i: number; music: number}> = ({src, len, i, music}) => {
+// gambar yang menunjukkan jantina/identiti -> versi CLASSIFIED (bar hitam / zum bukti), dibuka selepas pendedahan
+export const SULIT = new Set(['b03', 'b06', 'b07', 'b08', 'b09', 'b10', 'b11', 'b12', 'b13', 'c01', 'c02', 'c03', 'c04', 'c05', 'c06', 'd01', 'd02', 'd03', 'e01']);
+const Foto: React.FC<{src: string; bar?: string; len: number; i: number; music: number}> = ({src, bar, len, i, music}) => {
   const fr = useCurrentFrame();
   const p = usePulse('last_strike', music, 0.28, 0.6);
   const L = f(len);
@@ -86,6 +88,13 @@ const Foto: React.FC<{src: string; len: number; i: number; music: number}> = ({s
   return (
     <AbsoluteFill style={{background: '#000', opacity: inn * out, overflow: 'hidden'}}>
       <Img src={staticFile(src)} style={{...st, transform: `translateX(${dir * 14 * (u - 0.5)}px) scale(${sk})`}} />
+      {bar ? (
+        // bar CLASSIFIED sentiasa ada sejak bingkai pertama (tiada kebocoran), cuma dihentak dari besar ke saiz asal
+        <>
+          <Img src={staticFile(bar)} style={{...st, transform: `translateX(${dir * 14 * (u - 0.5)}px) scale(${sk})`}} />
+          <Img src={staticFile(bar)} style={{...st, opacity: 0.6 * (1 - ci(fr, 0, 6)), transform: `translateX(${dir * 14 * (u - 0.5)}px) scale(${sk * (1 + 0.2 * (1 - ci(fr, 0, 6, 0, 1, easeOut)))})`}} />
+        </>
+      ) : null}
       <AbsoluteFill style={{background: '#fff', opacity: 0.06 * p, mixBlendMode: 'soft-light'}} />
       <AbsoluteFill style={{background: '#fff', opacity: 0.35 * Math.exp(-fr / 2.5)}} />
       <Vignette strength={0.55} />
@@ -333,7 +342,8 @@ const Kelipan: React.FC<{len: number; music: number}> = ({len, music}) => {
   const p = pulseAt('clockwork_collapse', mt, 0.12, 0.5);
   return (
     <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
-      <Img src={staticFile(`v8/hidup/${list[k]}.jpg`)} style={{width: 1920, height: 1080, objectFit: 'cover', filter: `grayscale(0.6) contrast(1.2) brightness(${0.8 + 0.4 * p})`, transform: `scale(${1.04 + 0.08 * p})`}} />
+      <Img src={staticFile(SULIT.has(list[k]) ? `v8/hidup/r_${list[k]}.jpg` : `v8/hidup/${list[k]}.jpg`)} style={{position: 'absolute', width: 1920, height: 1080, objectFit: 'cover', filter: `grayscale(0.6) contrast(1.2) brightness(${0.8 + 0.4 * p})`, transform: `scale(${1.04 + 0.08 * p})`}} />
+      {SULIT.has(list[k]) ? <Img src={staticFile(`v8/hidup/r_${list[k]}_bar.png`)} style={{position: 'absolute', width: 1920, height: 1080, transform: `scale(${1.04 + 0.08 * p})`}} /> : null}
       <AbsoluteFill style={{background: '#fff', opacity: 0.45 * p * p}} />
       <AbsoluteFill style={{background: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0 2px, transparent 2px 4px)'}} />
       <Vignette strength={0.7} />
@@ -441,7 +451,7 @@ export const TrailerBahagian2: React.FC = () => {
       {G.map((g, i) => (
         <Sequence key={i} from={f(g.t)} durationInFrames={f(g.len)}>
           {g.kind === 'bab' ? <KadBab a={g.a} b={g.b || ''} len={g.len} /> : null}
-          {g.kind === 'foto' ? <Foto src={`v8/hidup/${g.a}.jpg`} len={g.len} i={i} music={g.t + PH0} /> : null}
+          {g.kind === 'foto' ? <Foto src={SULIT.has(g.a) ? `v8/hidup/r_${g.a}.jpg` : `v8/hidup/${g.a}.jpg`} bar={SULIT.has(g.a) ? `v8/hidup/r_${g.a}_bar.png` : undefined} len={g.len} i={i} music={g.t + PH0} /> : null}
           {g.kind === 'sulit' ? <KadSulit a={g.a} b={g.b || ''} len={g.len} /> : null}
         </Sequence>
       ))}

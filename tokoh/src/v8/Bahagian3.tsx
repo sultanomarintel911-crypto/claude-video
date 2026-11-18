@@ -29,10 +29,16 @@ const AKSES = 0;
 // REDACTION REMOVED: gambar yang dikaburkan sebelum pendedahan dibuka semula, setiap satu masuk tepat pada rentak
 const BUKA = 5.0;
 const BUKA_FOTO: Array<[string, string, number]> = [
-  ['c01', 'BAB II · ALAM PERSEKOLAHAN', 4], ['c02', 'BAB II · ALAM PERSEKOLAHAN', 3], ['c03', 'BAB II · ALAM PERSEKOLAHAN', 2],
-  ['c04', 'BAB II · ALAM PERSEKOLAHAN', 2], ['c06', 'BAB II · ALAM PERSEKOLAHAN', 2], ['d01', 'BAB III · MULA DIKENALI', 2],
-  ['d02', 'BAB III · MULA DIKENALI', 2], ['d03', 'BAB III · MULA DIKENALI', 2], ['e01', 'BAB IV · HARI ANUGERAH', 6],
+  ['b03', 'BAB I · LANGKAH PERTAMA', 3], ['b06', 'BAB I · LANGKAH PERTAMA', 2], ['b07', 'BAB I · LANGKAH PERTAMA', 1],
+  ['b08', 'BAB I · LANGKAH PERTAMA', 1], ['b09', 'BAB I · LANGKAH PERTAMA', 1], ['b10', 'BAB I · LANGKAH PERTAMA', 1],
+  ['b11', 'BAB I · LANGKAH PERTAMA', 1], ['b12', 'BAB I · LANGKAH PERTAMA', 1], ['b13', 'BAB I · LANGKAH PERTAMA', 2],
+  ['c01', 'BAB II · ALAM PERSEKOLAHAN', 2], ['c02', 'BAB II · ALAM PERSEKOLAHAN', 2], ['c03', 'BAB II · ALAM PERSEKOLAHAN', 2],
+  ['c04', 'BAB II · ALAM PERSEKOLAHAN', 2], ['c05', 'BAB II · ALAM PERSEKOLAHAN', 2], ['c06', 'BAB II · ALAM PERSEKOLAHAN', 2],
+  ['d01', 'BAB III · MULA DIKENALI', 2], ['d02', 'BAB III · MULA DIKENALI', 2], ['d03', 'BAB III · MULA DIKENALI', 2],
+  ['e01', 'BAB IV · HARI ANUGERAH', 6],
 ];
+// gambar jelas (asal) bagi setiap fail sulit
+const JELAS = (k: string) => (k.startsWith('b') || k === 'c05' ? `v8/hidup/${k}.jpg` : `v8/hidup/u_${k}.jpg`);
 const BUKA_T: number[] = [];
 {
   let t = beatAfter('sovereign', BUKA + LS0, 3) - LS0; // 3 rentak: tajuk REDACTION REMOVED
@@ -126,8 +132,11 @@ const Nyahkabur: React.FC = () => {
   const cop = ci(lf, sapu, sapu + 5, 0, 1, Easing.out(Easing.back(2)));
   return (
     <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
-      <Img src={staticFile(`v8/hidup/${k}.jpg`)} style={{...st, filter: 'saturate(0.6) brightness(0.8)'}} />
-      <Img src={staticFile(`v8/hidup/u_${k}.jpg`)} style={{...st, clipPath: `inset(0 ${(1 - x) * 100}% 0 0)`}} />
+      <AbsoluteFill style={{clipPath: `inset(0 0 0 ${x * 100}%)`}}>
+        <Img src={staticFile(`v8/hidup/r_${k}.jpg`)} style={{...st, filter: 'saturate(0.6) brightness(0.8)'}} />
+        <Img src={staticFile(`v8/hidup/r_${k}_bar.png`)} style={st} />
+      </AbsoluteFill>
+      <Img src={staticFile(JELAS(k))} style={{...st, clipPath: `inset(0 ${(1 - x) * 100}% 0 0)`}} />
       {x > 0 && x < 1 ? <div style={{position: 'absolute', left: x * 1920 - 3, top: 0, width: 6, height: 1080, background: CYAN, boxShadow: `0 0 30px 8px ${CYAN}`}} /> : null}
       <AbsoluteFill style={{background: '#fff', opacity: 0.35 * Math.exp(-lf / 2.5)}} />
       <AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 18%, transparent 78%, rgba(0,0,0,0.6) 100%)'}} />
