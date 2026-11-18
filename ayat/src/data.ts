@@ -16,6 +16,8 @@ export const AUDIO_FILE = ayat.audioFile;
 export const DURATION = Math.ceil((INTRO + AUDIO_END + OUTRO) * FPS);
 
 export const RUJUKAN = ayat.rujukan;
+/** Nama akaun yang dipapar sepanjang video ('' = tiada). */
+export const HANDLE = '@abraryusof';
 
 /**
  * Kumpulan frasa. `from`/`to` = nombor perkataan (1-based, inklusif).

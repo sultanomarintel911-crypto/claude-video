@@ -6,7 +6,7 @@ import '@fontsource/montserrat/700.css';
 import '@fontsource/cormorant-garamond/500-italic.css';
 import '@fontsource/nunito/600.css';
 import '@fontsource/nunito/800.css';
-import {AUDIO_END, AUDIO_FILE, C, FPS, GROUPS, H, INTRO, RUJUKAN, W, WORDS, groupEnd, groupStart} from './data';
+import {AUDIO_END, AUDIO_FILE, C, HANDLE, FPS, GROUPS, H, INTRO, RUJUKAN, W, WORDS, groupEnd, groupStart} from './data';
 
 // ---------- pembantu ----------
 const ease = Easing.bezier(0.33, 0, 0.2, 1);
@@ -434,6 +434,11 @@ export const Video: React.FC = () => {
 			<div style={{position: 'absolute', top: 1500, left: 0, right: 0, textAlign: 'center', fontFamily: 'Cormorant Garamond', fontStyle: 'italic', fontSize: 46, color: C.gold, opacity: titleOp * ramp(a, AUDIO_END, AUDIO_END + 1)}}>
 				{RUJUKAN}
 			</div>
+			{HANDLE && (
+				<div style={{position: 'absolute', top: 196, left: 0, right: 0, textAlign: 'center', fontFamily: 'Montserrat', fontWeight: 700, fontSize: 28, letterSpacing: 5, color: C.text, opacity: 0.72, textShadow: '0 2px 12px rgba(0,0,0,0.35)'}}>
+					{HANDLE.toUpperCase()}
+				</div>
+			)}
 			<Sequence from={Math.round(INTRO * FPS)}>
 				<Audio src={staticFile(AUDIO_FILE)} />
 			</Sequence>

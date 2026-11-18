@@ -15,7 +15,7 @@ Projek: `ayat/` (Remotion 4, React, TypeScript). Contoh siap: Al-Ahzab 33:59 →
 - Watak manusia tanpa wajah (bujur muka kosong). Wanita sentiasa bertudung.
 - Sentiasa ingatkan pengguna menyemak teks Arab dengan mushaf sebelum terbit.
 - Jangan tiru gaya akaun lain (contoh: @deenanddinar — hijau malam, bulan, bintang emas, watak krim). Kekalkan identiti sendiri (lihat Tema).
-- Nama akaun / watermark: jangan letak kecuali pengguna minta.
+- Nama akaun: `HANDLE` dalam `src/data.ts` (lalai `@abraryusof`), dipapar di atas tengah sepanjang video, huruf besar renggang, legap 0.72. Set `''` untuk buang.
 
 ## Aliran kerja
 1. **Pilih ayat.** Kalau pengguna beri topik (cth. "labuhkan tudung"), cadangkan ayat paling tepat & sebut alternatif (cth. 24:31 vs 33:59). Ayat panjang (>~40 s bacaan) → cadang potong ke frasa berkaitan.
