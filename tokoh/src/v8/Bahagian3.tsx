@@ -13,7 +13,7 @@ import {ci, easeOut, Embers, FilmLook, Gold, Gold3D, GOLD, GOLD_GRAD, Rays, SANS
 import {CUT_GRAD} from '../data';
 import {Brackets, GlitchBands, HexGrid, ProgressBar, Scanlines, Scramble, TypedLine} from '../scifi';
 import {BANDAR, City, DUNGUN, Globe, lerpRot} from './Globe';
-import {beatAfter, pulseAt, snapBeat} from './beat';
+import {beatAfter, beatIndex, pulseAt, snapBeat} from './beat';
 
 const FPS = 30;
 const f = (s: number) => Math.round(s * FPS);
@@ -45,17 +45,22 @@ const BUKA_T: number[] = [];
 const SEKOLAH = BUKA_T[BUKA_T.length - 1];
 const PANEL = ['s01', 's02', 's03', 's04', 's05', 's06', 's07'];
 const PANEL_TAG = ['SUBJECT IDENTIFIED', 'PENOLONG KETUA MURID', 'PENGERUSI · TV PSS', 'KETUA RUMAH TEMENGGUNG', 'AJK TUNAS KADET REMAJA', 'NILAM · 4 BINTANG', 'KEPIMPINAN · KERJASAMA'];
-const PANEL_T = PANEL.map((_, i) => snapLS(SEKOLAH + i * 2.0));
-const DULU = snapLS(SEKOLAH + PANEL.length * 2.0);
+const ikutRentak = (t0: number, rentak: number[]) => {
+  const out = [t0];
+  for (const n of rentak) out.push(beatAfter('sovereign', out[out.length - 1] + LS0, n) - LS0);
+  return out;
+};
+const PANEL_T = ikutRentak(SEKOLAH, PANEL.map(() => 4));
+const DULU = PANEL_T.pop() as number;
 const SUKAN = snapLS(DULU + 5.0);
 const WARP = ['k01', 'k02', 'k03', 'k04', 'k05', 'k06', 'k07', 'k08', 'k09'];
 const WARP_TAG = ['SUKAN TAHUNAN', 'PODIUM', 'PINGAT · SEKOLAH', 'PINGAT · DAERAH', 'MERENTAS DESA', 'PINGAT', 'BOLA BALING · KETIGA ZON SURA', 'BOLA BALING · KETIGA MSSD DUNGUN', 'BERKUDA'];
-const WARP_T = WARP.map((_, i) => snapLS(SUKAN + i * 0.93));
-const LARI = snapLS(SUKAN + WARP.length * 0.93);
+const WARP_T = ikutRentak(SUKAN, [2, 2, 2, 2, 1, 1, 1, 1, 2]);
+const LARI = WARP_T.pop() as number;
 const SKUASY = snapLS(LARI + 5.0);
 const INTL = 45.95 + (SEKOLAH - 5.0); // -> hentakan Clockwork (misi antarabangsa)
 const SQ = ['q01', 'q02', 'q03', 'q04', 'q05', 'q06', 'q07', 'q08', 'q10'];
-const SQ_T = SQ.map((_, i) => SKUASY + ((INTL - SKUASY) * i) / SQ.length);
+const SQ_T = SQ.map((_, i) => (i === 0 ? SKUASY : snapLS(SKUASY + ((INTL - SKUASY) * i) / SQ.length)));
 const SQ_STAMP: Record<number, [string, string]> = {2: ['JOHAN', 'MSSD DUNGUN'], 5: ['JOHAN', 'MSST TERENGGANU'], 8: ['MSSM 2026', 'PERINGKAT KEBANGSAAN']};
 // misi antarabangsa (relatif INTL)
 type Misi = {city: number; t: number; len: number; foto: string[]; tajuk: string; sub: string};
@@ -73,6 +78,9 @@ const FAM: Array<[string, number]> = [
   ['f07', 26.1], ['f08', 29.0], ['f09', 32.0], ['f10', 37.0],
 ];
 const FAM_END = 41.4;
+FAM.forEach((x) => {
+  if (x[1] > 0) x[1] = snapBeat('morning', x[1] + 1.2) - 1.2; // masa lagu = t + 1.2
+});
 const PENUTUP = KELUARGA + FAM_END;
 const AKHIR = PENUTUP + 15.0;
 // VO keluarga (VO_KELUARGA, 37 s) bermula VO_AT saat selepas KELUARGA; masa sari kata dari transkripsi
@@ -112,8 +120,8 @@ const Nyahkabur: React.FC = () => {
   const L = f(BUKA_T[i + 1] - BUKA_T[i]);
   const sapu = Math.min(10, Math.max(5, Math.round(L * 0.45))); // imbasan buka kabur
   const x = ci(lf, 1, sapu, 0, 1, easeOut);
-  const tumbuk = 0.06 * Math.exp(-lf / 4);
-  const sk = 1.03 + 0.04 * (lf / L) + 0.02 * p + tumbuk;
+  const tumbuk = 0.16 * Math.exp(-lf / 5);
+  const sk = 1.03 + 0.04 * (lf / L) + 0.03 * p + tumbuk;
   const st: React.CSSProperties = {position: 'absolute', width: 1920, height: 1080, left: 0, top: 0, transform: `scale(${sk})`};
   const cop = ci(lf, sapu, sapu + 5, 0, 1, Easing.out(Easing.back(2)));
   return (
@@ -121,6 +129,7 @@ const Nyahkabur: React.FC = () => {
       <Img src={staticFile(`v8/hidup/${k}.jpg`)} style={{...st, filter: 'saturate(0.6) brightness(0.8)'}} />
       <Img src={staticFile(`v8/hidup/u_${k}.jpg`)} style={{...st, clipPath: `inset(0 ${(1 - x) * 100}% 0 0)`}} />
       {x > 0 && x < 1 ? <div style={{position: 'absolute', left: x * 1920 - 3, top: 0, width: 6, height: 1080, background: CYAN, boxShadow: `0 0 30px 8px ${CYAN}`}} /> : null}
+      <AbsoluteFill style={{background: '#fff', opacity: 0.35 * Math.exp(-lf / 2.5)}} />
       <AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 18%, transparent 78%, rgba(0,0,0,0.6) 100%)'}} />
       <div style={{position: 'absolute', left: 70, top: 50, fontFamily: MONO, fontWeight: 700, fontSize: 30, letterSpacing: 6, color: CYAN, background: 'rgba(0,0,0,0.55)', padding: '6px 14px', textShadow: '0 0 10px rgba(127,243,255,0.6)'}}>
         ARCHIVE {String(i + 1).padStart(2, '0')}/{String(BUKA_FOTO.length).padStart(2, '0')} · {tag}
@@ -241,7 +250,7 @@ const DuluKini: React.FC<{len: number}> = ({len}) => {
   const w_ = (CUT_GRAD.w / CUT_GRAD.h) * H_;
   return (
     <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
-      <Img src={img('s00')} style={{position: 'absolute', width: 1920, height: 1080, objectFit: 'cover', transform: `scale(${1.04 + 0.04 * (fr / L)})`, filter: `saturate(${1 - 0.6 * wipe}) brightness(${1 - 0.35 * wipe})`}} />
+      <Img src={img('s00')} style={{position: 'absolute', width: 1920, height: 1080, objectFit: 'cover', transform: `translateX(${-560 * wipe}px) scale(${1.04 + 0.04 * (fr / L)})`, filter: `saturate(${1 - 0.6 * wipe}) brightness(${1 - 0.35 * wipe})`}} />
       {/* kini: menyapu dari kanan */}
       <AbsoluteFill style={{clipPath: `inset(0 0 0 ${100 - wipe * 50}%)`, background: 'radial-gradient(ellipse at 75% 45%, #3a2a10 0%, #0a0703 70%)'}}>
         <Rays cx={1440} cy={430} opacity={0.5} />
@@ -381,9 +390,15 @@ const Antarabangsa: React.FC = () => {
 };
 
 const Uplink: React.FC<{m: Misi; lf: number}> = ({m, lf}) => {
+  // Clockwork: masa lagu = m.t + 104.5 pada mula bandar; tukar gambar setiap k rentak
+  const cw0 = m.t + 104.5;
+  const nb = Math.max(1, beatIndex('clockwork_collapse', cw0 + m.len - 0.2) - beatIndex('clockwork_collapse', cw0));
+  const k = Math.max(1, Math.floor(nb / m.foto.length));
+  const bi = beatIndex('clockwork_collapse', cw0 + lf / FPS + 0.03) - beatIndex('clockwork_collapse', cw0 + 0.03);
+  const j = Math.min(m.foto.length - 1, Math.floor(bi / k));
+  const tj = j === 0 ? 0 : f(beatAfter('clockwork_collapse', cw0 + 0.03, j * k) - cw0);
+  const jf = lf - tj;
   const per = f(m.len) / m.foto.length;
-  const j = Math.min(m.foto.length - 1, Math.floor(lf / per));
-  const jf = lf - j * per;
   const scan = Easing.out(Easing.cubic)(ci(jf, 0, 10));
   const lbl = ci(lf, 4, 18);
   const X = 900;

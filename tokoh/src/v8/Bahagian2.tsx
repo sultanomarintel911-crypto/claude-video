@@ -80,13 +80,14 @@ const Foto: React.FC<{src: string; len: number; i: number; music: number}> = ({s
   const pantas = len < 1.2; // potongan keras tepat pada rentak
   const inn = pantas ? 1 : ci(fr, 0, 6);
   const out = pantas ? 1 : 1 - ci(fr, L - 4, L);
-  const tumbuk = 0.06 * Math.exp(-fr / 4); // hentakan zum setiap kali gambar masuk pada rentak
+  const tumbuk = 0.16 * Math.exp(-fr / 5); // hentakan zum kuat setiap kali gambar masuk pada rentak
   const sk = 1.03 + 0.05 * u + 0.02 * p + tumbuk;
   const st: React.CSSProperties = {position: 'absolute', width: 1920, height: 1080, left: 0, top: 0};
   return (
     <AbsoluteFill style={{background: '#000', opacity: inn * out, overflow: 'hidden'}}>
       <Img src={staticFile(src)} style={{...st, transform: `translateX(${dir * 14 * (u - 0.5)}px) scale(${sk})`}} />
       <AbsoluteFill style={{background: '#fff', opacity: 0.06 * p, mixBlendMode: 'soft-light'}} />
+      <AbsoluteFill style={{background: '#fff', opacity: 0.35 * Math.exp(-fr / 2.5)}} />
       <Vignette strength={0.55} />
     </AbsoluteFill>
   );
