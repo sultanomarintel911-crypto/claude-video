@@ -55,16 +55,17 @@ const ikutRentak = (t0: number, rentak: number[]) => {
   for (const n of rentak) out.push(beatAfter('sovereign', out[out.length - 1] + LS0, n) - LS0);
   return out;
 };
-const PANEL_T = ikutRentak(SEKOLAH, PANEL.map(() => 3));
+const PANEL_T = ikutRentak(SEKOLAH, [3, 3, 3, 3, 3, 3, 2]);
 const JAWATAN_T0 = PANEL_T.pop() as number;
 // semua jawatan disandang dikumpul dalam satu senarai (gaya sama dengan senarai penyertaan)
 const JAWATAN: Array<[string, string, string]> = [
   ['LEMBAGA PENGAWAS', 'PENOLONG KETUA MURID', 'SK SULTAN OMAR · 2026'],
   ['KELAB & PERSATUAN', 'PENGERUSI', 'TV PSS'],
   ['RUMAH SUKAN', 'KETUA RUMAH', 'TEMENGGUNG'],
+  ['SUKAN & PERMAINAN', 'KETUA RUMAH', 'HOKI'],
   ['BADAN BERUNIFORM', 'AHLI JAWATANKUASA', 'TUNAS KADET REMAJA SEKOLAH'],
 ];
-const JAWATAN_B = ikutRentak(JAWATAN_T0, [1, 1, 1, 1, 3]); // tajuk, 4 kad tepat pada rentak, tahan 3 rentak
+const JAWATAN_B = ikutRentak(JAWATAN_T0, [1, 1, 1, 1, 1, 3]); // tajuk, 4 kad tepat pada rentak, tahan 3 rentak
 const DULU = JAWATAN_B[JAWATAN_B.length - 1];
 const SUKAN = snapLS(DULU + 5.0);
 const WARP = ['k01', 'k02', 'k03', 'k04', 'k05', 'k06', 'k07', 'k08', 'k09'];
@@ -263,7 +264,7 @@ const Jawatan: React.FC<{len: number}> = ({len}) => {
   const n = Math.round(JAWATAN.length * Easing.out(Easing.cubic)(ci(fr, 4, 22)));
   const p = pulseAt('sovereign', t0 + fr / FPS + LS0, 0.2, 0.7);
   const imbas = (fr % 70) / 70;
-  const sah = ci(fr, b[4] + 4, b[4] + 12, 0, 1, Easing.out(Easing.back(2)));
+  const sah = ci(fr, b[5] + 4, b[5] + 12, 0, 1, Easing.out(Easing.back(2)));
   return (
     <AbsoluteFill style={{background: 'radial-gradient(ellipse at center, #0d1418 0%, #010203 75%)', opacity: ci(fr, 0, 6) * (1 - ci(fr, L - 8, L)), overflow: 'hidden'}}>
       <HexGrid opacity={0.1 + 0.06 * p} />
@@ -274,16 +275,16 @@ const Jawatan: React.FC<{len: number}> = ({len}) => {
         <Gold size={170} spacing={4}>{String(n).padStart(2, '0')}</Gold>
         <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 44, letterSpacing: 16, color: '#fff'}}>JAWATAN DISANDANG</div>
       </div>
-      <div style={{position: 'absolute', left: 200, right: 200, top: 420, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 34}}>
+      <div style={{position: 'absolute', left: 110, right: 110, top: 420, display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 30}}>
         {JAWATAN.map(([kat, jaw, unit], i) => {
           const s = b[i];
           const q = ci(fr, s, s + 8, 0, 1, easeOut);
           const tumbuk = fr >= s ? 0.1 * Math.exp(-(fr - s) / 4) : 0;
           const kilat = fr >= s ? 0.5 * Math.exp(-(fr - s) / 3) : 0;
           return (
-            <div key={jaw + unit} style={{position: 'relative', opacity: q, transform: `perspective(900px) rotateX(${(1 - q) * 70}deg) translateY(${(1 - q) * 60}px) scale(${1 + tumbuk})`, border: `1.5px solid ${CYAN}`, background: `rgba(127,243,255,${0.06 + kilat * 0.3})`, padding: '30px 34px', boxShadow: `0 0 ${24 + 40 * kilat}px rgba(127,243,255,${0.15 + kilat})`, overflow: 'hidden'}}>
+            <div key={jaw + unit} style={{gridColumn: `${i === 3 ? 2 : i === 4 ? 4 : i * 2 + 1} / span 2`, position: 'relative', opacity: q, transform: `perspective(900px) rotateX(${(1 - q) * 70}deg) translateY(${(1 - q) * 60}px) scale(${1 + tumbuk})`, border: `1.5px solid ${CYAN}`, background: `rgba(127,243,255,${0.06 + kilat * 0.3})`, padding: '28px 28px', boxShadow: `0 0 ${24 + 40 * kilat}px rgba(127,243,255,${0.15 + kilat})`, overflow: 'hidden'}}>
               <div style={{fontFamily: MONO, fontSize: 18, letterSpacing: 4, color: CYAN}}>ROLE · {String(i + 1).padStart(2, '0')} · {kat}</div>
-              <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, color: GOLD, marginTop: 10, lineHeight: 1.15, textShadow: '0 2px 12px rgba(0,0,0,0.8)'}}>
+              <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 33, color: GOLD, marginTop: 10, lineHeight: 1.15, textShadow: '0 2px 12px rgba(0,0,0,0.8)'}}>
                 <Scramble text={jaw} reveal={ci(fr, s, s + 10)} seed={'jw' + i} />
               </div>
               <div style={{fontFamily: SANS, fontWeight: 500, fontSize: 26, letterSpacing: 3, color: '#fff', marginTop: 6}}>{unit}</div>
@@ -641,8 +642,8 @@ for (let k = 0; k < 18; k++) SFX.push([AKSES + 0.1 + k * 0.12, 'sfx/taip', 0.25]
 BUKA_T.slice(0, -1).forEach((t) => SFX.push([t, 'sfx/imbasan', 0.4], [t + 0.35, 'sfx/bip', 0.35]));
 PANEL_T.forEach((t) => SFX.push([t - 0.6, 'sfx/whoosh_pendek', 0.4], [t, 'sfx/blip', 0.3]));
 SFX.push([JAWATAN_T0, 'sfx/hud_boot', 0.45]);
-JAWATAN_B.slice(1, 5).forEach((t) => SFX.push([t, 'sfx/impact_lembut', 0.5], [t, 'sfx/bip', 0.35]));
-SFX.push([JAWATAN_B[4] + 0.15, 'sfx/impact_besar', 0.5]);
+JAWATAN_B.slice(1, 6).forEach((t) => SFX.push([t, 'sfx/impact_lembut', 0.5], [t, 'sfx/bip', 0.35]));
+SFX.push([JAWATAN_B[5] + 0.15, 'sfx/impact_besar', 0.5]);
 SFX.push([DULU + 1.0, 'sfx/imbasan', 0.4], [DULU + 2.2, 'sfx/swish_teks', 0.35]);
 WARP_T.forEach((t, i) => SFX.push([t, i === 0 ? 'sfx/warp' : 'sfx/whoosh_pendek', i === 0 ? 0.6 : 0.35]));
 SFX.push([LARI, 'sfx/impact_lembut', 0.6], [LARI + 0.1, 'sfx/whoosh_panjang', 0.4]);
