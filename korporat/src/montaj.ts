@@ -21,7 +21,7 @@ export const BLOCKS: Block[] = [
   {kind: 'hologram', id: 'ko', dur: 5.0, foto: 'montaj/wajah_ko.jpg', sisi: 'kiri', whipOut: true, card: {at: 0.9, no: '04', nama: 'ABU SEMAN BIN MAT SALLEH', jawatan: 'PENOLONG KANAN KOKURIKULUM'}},
   {kind: 'hologram', id: 'ppki', dur: 5.4, foto: 'montaj/wajah_ppki.jpg', sisi: 'kanan', card: {at: 0.9, no: '05', nama: 'BAHARUDIN BIN ISMAIL', jawatan: 'PENOLONG KANAN PENDIDIKAN KHAS'}},
   {kind: 'data', id: 'data', dur: 7.0},
-  {kind: 'akhir', id: 'akhir', dur: 5.0},
+  {kind: 'akhir', id: 'akhir', dur: 6.0},
 ];
 
 export const pieceDur = (p: Piece) => (p.to - p.from) / p.rate;

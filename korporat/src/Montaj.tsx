@@ -267,23 +267,29 @@ const DataBlock: React.FC = () => {
 // ---------------------------------------------------------------- penutup
 const AkhirBlock: React.FC<{fd: number}> = ({fd}) => {
   const fr = useCurrentFrame();
-  const p = ci(fr, 4, 26, 0, 1, easeOut);
+  const p = ci(fr, 6, 28, 0, 1, easeOut);
   const out = 1 - ci(fr, fd - 20, fd);
+  const z = interpolate(fr, [0, fd], [1.08, 1.12]);
   return (
     <AbsoluteFill style={{background: '#000', opacity: out}}>
-      <OffthreadVideo src={staticFile('montaj/bendera.mp4')} trimBefore={Math.round(3.0 * MFPS)} muted style={{width: W, height: H, objectFit: 'cover', filter: 'brightness(0.55) saturate(1.1)'}} />
-      <AbsoluteFill style={{background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.75) 100%)'}} />
-      <AbsoluteFill style={{alignItems: 'center', justifyContent: 'center', textAlign: 'center'}}>
-        <div style={{fontFamily: MONO, fontSize: 26, letterSpacing: 10, color: CYAN, opacity: p}}>BARISAN KEPIMPINAN 2026</div>
-        <div style={{transform: `scale(${1.15 - 0.15 * p})`, opacity: p, marginTop: 14}}>
-          <Gold size={120} spacing={8} shine={ci(fr, 20, 60)}>
+      <AbsoluteFill style={{transform: `scale(${z})`, transformOrigin: '30% 30%'}}>
+        <OffthreadVideo src={staticFile('montaj/gb_senja_b.mp4')} muted style={{width: W, height: H, objectFit: 'cover', filter: 'brightness(0.9) saturate(1.1)'}} />
+      </AbsoluteFill>
+      <AbsoluteFill style={{background: 'linear-gradient(90deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.45) 35%, rgba(0,0,0,0) 55%)'}} />
+      <div style={{position: 'absolute', left: 120, top: 0, height: H, display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+        <div style={{fontFamily: MONO, fontSize: 24, letterSpacing: 10, color: CYAN, opacity: p}}>BARISAN KEPIMPINAN 2026</div>
+        <div style={{transform: `translateX(${(1 - p) * -40}px)`, opacity: p, marginTop: 10}}>
+          <Gold size={150} spacing={8} shine={ci(fr, 24, 64)}>
             SKeSO
           </Gold>
         </div>
-        <div style={{fontFamily: ORB, fontWeight: 700, fontSize: 40, letterSpacing: 10, color: '#fff', opacity: ci(fr, 18, 34), marginTop: 6, textShadow: '0 0 16px rgba(98,230,255,0.8)'}}>
-          BE EXCELLENT · MERENTAS KECEMERLANGAN
-        </div>
-      </AbsoluteFill>
+        <div style={{width: 520 * ci(fr, 16, 36, 0, 1, easeOut), height: 2, background: GOLD, boxShadow: `0 0 10px ${GOLD}`, margin: '16px 0 18px'}} />
+        {['BE EXCELLENT', 'MERENTAS KECEMERLANGAN'].map((t, i) => (
+          <div key={t} style={{fontFamily: ORB, fontWeight: 700, fontSize: 36, letterSpacing: 7, color: '#fff', opacity: ci(fr, 22 + i * 8, 36 + i * 8), lineHeight: 1.5, textShadow: '0 0 16px rgba(98,230,255,0.7), 0 3px 10px #000'}}>
+            {t}
+          </div>
+        ))}
+      </div>
     </AbsoluteFill>
   );
 };
