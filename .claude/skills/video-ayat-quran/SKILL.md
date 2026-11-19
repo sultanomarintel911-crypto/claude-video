@@ -10,6 +10,7 @@ Projek: `ayat/` (Remotion 4, React, TypeScript). Contoh siap:
 - Al-Baqarah 2:120 → `ayat_2_120_teguh_petunjuk.mp4` (komposisi `AyatYahudiNasrani`, `src/v_002120.tsx`)
 - Al-Baqarah 2:153 (sabar) → `ayat_2_153_sabar_3d.mp4` (komposisi `AyatSabar`, `src/v_002153.tsx`) — **gaya Kristal 3D**, qari Abdul Basit
 - Ar-Rum 30:54 (lemah–kuat–beruban) → `ayat_30_54_kitaran_kehidupan.mp4` (komposisi `AyatKitaranHidup`, `src/v_030054.tsx`)
+- Ar-Rum 30:54 versi VectorCraft + EffectCraft → `ayat_30_54_vectorcraft_effectcraft.mp4` (komposisi `AyatKitaranHidupCraft`)
 - Hadis Bukhari 7320 "lubang biawak" → `hadis_lubang_biawak_bukhari_7320.mp4` (komposisi `HadisLubangBiawak`, `src/v_hadis_bukhari_7320.tsx`)
 
 Satu fail `src/v_<sss><aaa>.tsx` bagi setiap ayat; jangan tindih video lama.
@@ -93,6 +94,14 @@ Bila pengguna minta gaya lain / 3D. Berdiri sendiri (tidak guna `Shell`/`Sky`), 
 - Simbol: kristal (hati mukmin, naik ke atas bila orang solat muncul), batu + hujan (ujian), cincin perisai (sabar), lima tiang + sejadah (solat), pancaran dari atas (pertolongan Allah — Allah tidak digambarkan), riak lantai pada perkataan kunci.
 - Render lebih lambat (~2.5 min, `--concurrency=2`), fail ~19 MB.
 
+## Aliran VectorCraft + EffectCraft (bila pengguna minta "VectorCraft"/"EffectCraft")
+Aplikasi sumber terbuka ArtCraft (Rust): https://github.com/storytold/vectorcraft dan https://github.com/storytold/effectcraft.
+- Klon (`GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 ...` ke `/home/user/storytold/`) dan bina CLI: `cargo build --release -p vectorcraft-cli` (~17 min) dan `-p effectcraft-cli` (~14 min). Binari di `target/release/`.
+- **VectorCraft** (`craft/vectorcraft_lukis.py`): setiap lapisan = satu dokumen 1080×1920 Pixels latar lutsinar; arahan `shape.ellipse|rectangle`, `path.create {d}`, `paint.setFill/setStroke`, `stroke.set`, `object.setProps {opacity}`, `effect.apply` (`stylize.outerGlow`, `stylize.innerGlow`, `stylize.feather`…) melalui `vectorcraft-cli run --commands F.json --export L.png --export L.vectorcraft`. Koordinat y ke bawah. Geometri dijana Python (`craft/geometri_30_54.py`).
+- **EffectCraft** (`craft/effectcraft_animasi.py`): skrip gaya After Effects (`effectcraft-cli script F.jsx --empty`): `importFile` + `comp.layers.add`, keyframe `setValueAtTime`, ekspresi, kesan `Linear Wipe` (Wipe Angle 180 = dedah dari bawah), `Glow`, `CC Light Rays`, `CC Particle World` (Particle Type 3 = Faded Sphere, indeks bermula 1), `Add Grain` pada adjustment layer. Semak dengan `render-frame --time S`, render penuh `render P.ecproj --comp C --out bg.mp4 --audio off` (~14 min CPU untuk 38 s).
+- **Remotion** hanya menindih teks/audio: `Shell` dengan prop `bg={<OffthreadVideo src=... />}` (lihat `src/v_030054_craft.tsx`). Teks Al-Quran kekal dalam Remotion demi ketepatan.
+- Mampatkan output akhir (`ffmpeg -crf 25 -preset slow`) — butiran filem membesarkan fail. `public/craft/` tidak di-commit (jana semula dengan skrip).
+
 ## Video hadis
 - Teks Arab dari fawazahmed0/hadith-api (jsDelivr, tanpa kunci): `python3 scripts/ambil_hadis.py <kitab> <no> --groups 5,4,... --baca 10,6,...` → `src/data/hadis_<kitab>_<no>.json`. Sanad dibuang automatik (matan = selepas tanda petik pertama). Edisi `ind-<kitab>` (Indonesia) boleh jadi rujukan terjemahan; terjemahan Melayu disusun sendiri — minta pengguna semak.
 - **Semak nombor hadis**: penomboran Muslim dalam API ini berbeza daripada Abdul Baqi (cth. 2669 bukan hadis yang sama). Petik hanya nombor yang disahkan dari teks yang diambil.
@@ -104,4 +113,4 @@ Bila pengguna minta gaya lain / 3D. Berdiri sendiri (tidak guna `Shell`/`Sky`), 
 - `remotion.config.ts` guna Chromium di `/opt/pw-browsers/chromium_headless_shell-1243/...`; laraskan jika laluan lain.
 - api.quran.com menolak User-Agent Python lalai — skrip sudah hantar `User-Agent: curl/8`.
 - Bilangan segmen ≠ bilangan perkataan → skrip berhenti; semak tanda waqaf/simbol khas secara manual. Tanda hizb `۞` di awal ayat dilekatkan pada perkataan pertama secara automatik.
-- "VectorCraft"/"EffectsCraft" bukan skill/plugin yang tersedia — vektor & kesan dikodkan sendiri (SVG + Remotion).
+
