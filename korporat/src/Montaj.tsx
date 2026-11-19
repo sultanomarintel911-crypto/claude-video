@@ -25,10 +25,10 @@ const KadNama: React.FC<{c: Card}> = ({c}) => {
   const jaw = ci(fr, 18, 30, 0, 1, easeOut);
   const shine = ci(fr, 26, 56);
   const lines = c.nama.split('\n');
-  const x0 = 110;
   const y0 = H - 128 - 92 - lines.length * 62;
-  const w = Math.max(760, Math.max(...lines.map((l) => l.length)) * (lines.length > 1 ? 40 : 47) + 100);
+  const w = Math.max(760, Math.max(...lines.map((l) => l.length)) * (lines.length > 1 ? 44 : 53) + 110, c.jawatan.length * 27 + 110);
   const h = 70 + lines.length * 62 + 70;
+  const x0 = c.side === 'kanan' ? W - 110 - w : 110;
   return (
     <AbsoluteFill style={{pointerEvents: 'none'}}>
       <AbsoluteFill style={{background: 'linear-gradient(0deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 30%, transparent 50%)', opacity: panel}} />
@@ -46,7 +46,7 @@ const KadNama: React.FC<{c: Card}> = ({c}) => {
           backdropFilter: 'blur(6px)',
           opacity: panel,
           transform: `scale(${1.25 - 0.25 * slam})`,
-          transformOrigin: `${x0}px ${y0 + h}px`,
+          transformOrigin: `${c.side === 'kanan' ? x0 + w : x0}px ${y0 + h}px`,
           padding: '26px 40px',
           boxSizing: 'border-box',
         }}
@@ -59,7 +59,7 @@ const KadNama: React.FC<{c: Card}> = ({c}) => {
             <Scramble text={l} reveal={reveal} seed={`n${c.no}${i}`} />
           </Gold>
         ))}
-        <div style={{fontFamily: ORB, fontWeight: 700, fontSize: 30, letterSpacing: 7, color: '#fff', marginTop: 10, opacity: jaw, transform: `translateX(${(1 - jaw) * -30}px)`, textShadow: '0 0 14px rgba(98,230,255,0.8)'}}>
+        <div style={{fontFamily: ORB, fontWeight: 700, fontSize: 30, letterSpacing: 7, whiteSpace: 'nowrap', color: '#fff', marginTop: 10, opacity: jaw, transform: `translateX(${(1 - jaw) * -30}px)`, textShadow: '0 0 14px rgba(98,230,255,0.8)'}}>
           {c.jawatan}
         </div>
       </div>
@@ -152,25 +152,47 @@ const TajukBlock: React.FC<{teks: string; kecil: string; fd: number}> = ({teks, 
   );
 };
 
-// ---------------------------------------------------------------- hologram (klip belum ada)
-const HologramBlock: React.FC<{foto: string; card: Card}> = ({foto, card}) => {
+// ---------------------------------------------------------------- hologram pengenalan
+const LOG = ['> IMBASAN BIOMETRIK', '> PADANAN WAJAH ........ 99.8%', '> REKOD PENTADBIR DITEMUI', '> AKSES: DISAHKAN'];
+const HologramBlock: React.FC<{foto: string; card: Card; sisi: 'kiri' | 'kanan'; seed: string}> = ({foto, card, sisi, seed}) => {
   const fr = useCurrentFrame();
-  const p = ci(fr, 0, 24, 0, 1, easeOut);
-  const scan = (fr * 9) % 520;
+  const p = ci(fr, 0, 20, 0, 1, easeOut);
+  const fx = sisi === 'kanan' ? 1340 : 580;
+  const fy = 420;
+  const pw = 400;
+  const ph = 500;
+  const scan = interpolate(fr, [4, 34], [0, ph], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const scanOn = fr < 40;
+  const glitch = fr < 10 ? (fr % 3 === 0 ? 14 : -10) * (1 - fr / 10) : 0;
+  const logX = sisi === 'kanan' ? 120 : 1340;
+  const kad: Card = {...card, side: sisi === 'kanan' ? 'kiri' : 'kanan'};
   return (
-    <AbsoluteFill style={{background: 'radial-gradient(ellipse at 60% 40%, #0d2a4a 0%, #02040a 80%)'}}>
+    <AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 40%, #0d2a4a 0%, #02040a 80%)'}}>
       <HexGrid opacity={0.2} />
-      <Stars n={90} seed="hg" opacity={0.5} />
-      <HudRings cx={1300} cy={400} r={250} p={p} />
-      <div style={{position: 'absolute', left: 1300 - 200, top: 400 - 260, width: 400, height: 520, borderRadius: 16, overflow: 'hidden', opacity: p, boxShadow: `0 0 50px rgba(98,230,255,0.45)`}}>
-        <Img src={staticFile(foto)} style={{width: 400, height: 520, objectFit: 'cover', filter: 'saturate(0.6) contrast(1.1)'}} />
-        <AbsoluteFill style={{background: 'linear-gradient(0deg, rgba(98,230,255,0.35), rgba(98,230,255,0.08))', mixBlendMode: 'screen'}} />
-        <div style={{position: 'absolute', left: 0, top: scan, width: 400, height: 6, background: CYAN, boxShadow: `0 0 18px ${CYAN}`, opacity: 0.8}} />
-        <Scanlines opacity={0.5} />
+      <Stars n={90} seed={seed} opacity={0.5} />
+      <HudRings cx={fx} cy={fy} r={265} p={p} />
+      <div style={{position: 'absolute', left: fx - pw / 2 + glitch, top: fy - ph / 2, width: pw, height: ph, borderRadius: 16, overflow: 'hidden', opacity: p, boxShadow: '0 0 60px rgba(98,230,255,0.45)', transform: `scale(${1.08 - 0.08 * p})`}}>
+        <Img src={staticFile(foto)} style={{width: pw, height: ph, objectFit: 'cover', objectPosition: '50% 20%', filter: 'saturate(0.75) contrast(1.08) brightness(1.05)'}} />
+        <AbsoluteFill style={{background: 'linear-gradient(0deg, rgba(98,230,255,0.32), rgba(98,230,255,0.06))', mixBlendMode: 'screen'}} />
+        {scanOn && <div style={{position: 'absolute', left: 0, top: scan, width: pw, height: 5, background: CYAN, boxShadow: `0 0 22px ${CYAN}`}} />}
+        {scanOn && <div style={{position: 'absolute', left: 0, top: 0, width: pw, height: scan, background: 'rgba(98,230,255,0.12)'}} />}
+        <Scanlines opacity={0.45} />
       </div>
-      <div style={{position: 'absolute', left: 1000, top: 690, width: 600, textAlign: 'center', fontFamily: MONO, fontSize: 18, letterSpacing: 4, color: CYAN, opacity: 0.8 * p}}>[ KLIP KELAS PPKI SEDANG DIJANA ]</div>
+      <Brackets rect={[fx - pw / 2 - 26, fy - ph / 2 - 26, fx + pw / 2 + 26, fy + ph / 2 + 26]} p={ci(fr, 6, 22)} />
+      <div style={{position: 'absolute', left: logX, top: 180, fontFamily: MONO, fontSize: 22, lineHeight: 1.8, color: CYAN, textShadow: `0 0 8px ${CYAN}`}}>
+        {LOG.map((l, i) => {
+          const st = 4 + i * 9;
+          if (fr < st) return null;
+          const n = Math.min(l.length, Math.floor((fr - st) * 2.2));
+          return (
+            <div key={i} style={{color: i === LOG.length - 1 ? '#5dff9b' : CYAN}}>
+              {l.slice(0, n)}
+            </div>
+          );
+        })}
+      </div>
       <Sequence from={Math.round(card.at * MFPS)}>
-        <KadNama c={card} />
+        <KadNama c={kad} />
       </Sequence>
     </AbsoluteFill>
   );
@@ -295,12 +317,12 @@ export const MontajPentadbir: React.FC = () => (
   <AbsoluteFill style={{background: '#000'}}>
     {TL.map(({b, f0, fd}, i) => {
       const prev = i > 0 ? TL[i - 1].b : null;
-      const masuk = !!(prev && prev.kind === 'klip' && prev.whipOut);
-      const keluar = b.kind === 'klip' && !!b.whipOut;
+      const masuk = !!(prev && (prev.kind === 'klip' || prev.kind === 'hologram') && prev.whipOut);
+      const keluar = (b.kind === 'klip' || b.kind === 'hologram') && !!b.whipOut;
       let body: React.ReactNode = null;
       if (b.kind === 'klip') body = <KlipBlock b={b} fd={fd} />;
       if (b.kind === 'tajuk') body = <TajukBlock teks={b.teks} kecil={b.kecil} fd={fd} />;
-      if (b.kind === 'hologram') body = <HologramBlock foto={b.foto} card={b.card} />;
+      if (b.kind === 'hologram') body = <HologramBlock foto={b.foto} card={b.card} sisi={b.sisi} seed={b.id} />;
       if (b.kind === 'data') body = <DataBlock />;
       if (b.kind === 'akhir') body = <AkhirBlock fd={fd} />;
       return (

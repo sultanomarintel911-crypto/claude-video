@@ -60,7 +60,7 @@ energy = np.zeros(N)
 def seg(a, b, v):
     energy[int(a * SR):int(b * SR)] = v
 for e in tl['ev']:
-    v = {'klip': 0.8, 'tajuk': 0.6, 'hologram': 0.25, 'data': 1.0, 'akhir': 1.0}[e['kind']]
+    v = {'klip': 0.8, 'tajuk': 0.6, 'hologram': 0.85, 'data': 1.0, 'akhir': 1.0}[e['kind']]
     if e['id'] in ('dungun', 'bangunan'):
         v = 0.3
     seg(e['start'], e['start'] + e['dur'], v)
