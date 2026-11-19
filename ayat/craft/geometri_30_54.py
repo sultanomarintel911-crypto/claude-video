@@ -67,8 +67,10 @@ layers = {}
 for d in range(MAXD + 1):
     layers[f"pokok_d{d}"] = [dict(kind="path", d=capsule(s), fill="#3a1a35") for s in segs if s["d"] == d]
 # daun: kekal & gugur, versi berwarna & beruban
-for name, sel in (("daun_kekal", False), ("daun_gugur", True)):
-    ls = [l for l in leaves if l["fall"] == sel]
+# daun gugur dipecah 6 kumpulan (ikut fasa rawak) supaya gugur berperingkat
+groups = [("daun_kekal", [l for l in leaves if not l["fall"]])]
+groups += [(f"daun_gugur{g}", [l for l in leaves if l["fall"] and int(l["ph"] * 6) == g]) for g in range(6)]
+for name, ls in groups:
     layers[name] = [dict(kind="ellipse", cx=l["x"], cy=l["y"], rx=l["r"], ry=l["r"], fill=l["c"]) for l in ls]
     layers[name + "_uban"] = [dict(kind="ellipse", cx=l["x"], cy=l["y"], rx=l["r"], ry=l["r"], fill="#f6f1ec") for l in ls]
 
