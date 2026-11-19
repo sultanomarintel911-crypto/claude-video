@@ -27,7 +27,7 @@ const KadNama: React.FC<{c: Card}> = ({c}) => {
   const lines = c.nama.split('\n');
   const x0 = 110;
   const y0 = H - 128 - 92 - lines.length * 62;
-  const w = 1120;
+  const w = Math.max(760, Math.max(...lines.map((l) => l.length)) * (lines.length > 1 ? 40 : 47) + 100);
   const h = 70 + lines.length * 62 + 70;
   return (
     <AbsoluteFill style={{pointerEvents: 'none'}}>
