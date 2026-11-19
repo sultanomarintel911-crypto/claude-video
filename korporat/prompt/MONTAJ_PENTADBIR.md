@@ -224,22 +224,23 @@ Lampirkan lembaran watak + `lokasi/17_hub_ppki_microsoft.jpg` + `lokasi/16_hub_p
 > Hero shot sinematik 16:9, sudut rendah dari paras pinggang, gaya poster filem. Encik Baharudin
 > (tepat seperti lembaran watak: wajah, songkok hitam, misai dan janggut nipis, sut hitam, kemeja putih
 > berpetak halus, tali leher merah, penyepit tali leher emas, lencana bulat biru di dada kiri, tanda nama
-> BAHARUDIN) berdiri tegak dengan senyuman hangat di dalam Hub Digital PPKI (rujuk foto: dinding biru
-> muda dengan awan dan logo Microsoft kecil, TV di dinding, lantai jubin hitam-putih, meja rendah
-> berwarna-warni dengan permukaan bercorak). Di meja di belakangnya, seorang murid lelaki berkeperluan
-> khas berseragam harian (kemeja putih lengan pendek, lencana perisai hijau, seluar biru tua) duduk di
-> hadapan iPad, digambarkan dengan hormat dan bermaruah, kabur di latar. Pencahayaan siang lembut dari
+> BAHARUDIN) berdiri tegak dengan senyuman hangat di dalam **kelas PPKI** yang ceria (rujuk foto: dinding biru
+> muda, Smart TV di dinding, lantai jubin hitam-putih, meja rendah berwarna-warni, sudut bacaan dan
+> hasil kerja murid di dinding). Di belakangnya, empat murid berkeperluan khas berseragam harian
+> (lelaki: kemeja putih lengan pendek, lencana perisai hijau, seluar biru tua; perempuan: baju kurung
+> dan tudung labuh putih) duduk di meja menggunakan iPad, digambarkan dengan hormat dan bermaruah,
+> kabur di latar. Pencahayaan siang lembut dari
 > tingkap, gred teal-oren hangat. Fotorealistik. Tiada tulisan tambahan.
 
 **Langkah 2: image-to-video**
 ```json
 {
   "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan, gaya trailer, nada hangat.",
-  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, songkok, sut hitam, kemeja putih berpetak, tali leher merah, penyepit emas, lencana bulat biru dan tanda nama BAHARUDIN, wajah dan pakaian murid, serta Hub Digital PPKI (dinding biru berawan, lantai jubin hitam-putih, meja berwarna-warni).",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, songkok, sut hitam, kemeja putih berpetak, tali leher merah, penyepit emas, lencana bulat biru dan tanda nama BAHARUDIN, wajah dan pakaian murid, serta kelas PPKI (dinding biru muda, Smart TV, lantai jubin hitam-putih, meja berwarna-warni).",
   "urutan": [
     {
       "masa": "0–1.5 saat",
-      "aksi": "Satu jalur cahaya biru-emas meluncur masuk perlahan melalui tingkap dan bertukar menjadi kilauan lembut yang turun ke atas iPad murid di belakang guru. Skrin iPad menyala dengan cahaya warna-warni.",
+      "aksi": "Satu jalur cahaya biru-emas meluncur masuk perlahan melalui tingkap dan bertukar menjadi kilauan lembut yang turun ke atas iPad seorang murid lelaki di meja belakang guru. Skrin iPad menyala dengan cahaya warna-warni.",
       "kamera": "Kamera statik, sudut rendah seperti imej permulaan."
     },
     {
@@ -249,7 +250,7 @@ Lampirkan lembaran watak + `lokasi/17_hub_ppki_microsoft.jpg` + `lokasi/16_hub_p
     },
     {
       "masa": "3.5–6.5 saat",
-      "aksi": "Guru duduk di sebelah murid dan membimbing tangan murid menyentuh skrin iPad dengan lembut. Murid tersenyum lebar dan ketawa gembira. Guru tersenyum bangga memandang murid.",
+      "aksi": "Guru berjalan ke meja itu, duduk di sebelah murid dan membimbing tangan murid menyentuh skrin iPad dengan lembut. Murid tersenyum lebar dan ketawa gembira; rakan sekelas di sebelah bertepuk tangan. Guru tersenyum bangga memandang murid.",
       "kamera": "Melengkung perlahan ke sisi pada paras mata murid, kedalaman medan cetek, gerak perlahan."
     },
     {
