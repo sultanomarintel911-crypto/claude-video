@@ -196,8 +196,8 @@ export const Texts: React.FC<{a: number; ay: Ayat}> = ({a, ay}) => (
 			const arSize = ar > 44 ? 74 : ar > 34 ? 82 : 98;
 			const trSize = g.tr.length > 95 ? 39 : 44;
 			return (
-				<div key={gi} style={{position: 'absolute', left: 60, right: 60, top: 1262, opacity: vis, textAlign: 'center'}}>
-					<div style={{direction: 'rtl', fontFamily: ay.arFont, fontSize: arSize, lineHeight: 1.65, color: C.text}}>
+				<div key={gi} style={{position: 'absolute', left: 60, right: 60, top: 1236, opacity: vis, textAlign: 'center'}}>
+					<div style={{direction: 'rtl', fontFamily: ay.arFont, fontSize: arSize, lineHeight: 1.8, color: C.text}}>
 						{ws.map((w, i) => {
 							const said = a >= w.start - 0.05;
 							const now = a >= w.start - 0.05 && a < w.end;
@@ -217,7 +217,7 @@ export const Texts: React.FC<{a: number; ay: Ayat}> = ({a, ay}) => (
 							);
 						})}
 					</div>
-					<div style={{fontFamily: 'Nunito', fontWeight: 600, fontSize: trSize, lineHeight: 1.42, color: C.text, marginTop: 6, padding: '0 20px'}}>
+					<div style={{fontFamily: 'Nunito', fontWeight: 600, fontSize: trSize, lineHeight: 1.42, color: C.text, marginTop: 44, padding: '0 20px'}}>
 						{tr.map((w, i) => {
 							const k = Math.max(0, Math.min(1, prog - i));
 							return (

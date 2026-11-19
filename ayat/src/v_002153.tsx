@@ -357,7 +357,7 @@ const Card: React.FC<{a: number}> = ({a}) => {
 								);
 							})}
 						</div>
-						<div style={{textAlign: 'center', fontFamily: 'DM Sans', fontWeight: 500, fontSize: 40, lineHeight: 1.4, color: K.text, marginTop: 14}}>
+						<div style={{textAlign: 'center', fontFamily: 'DM Sans', fontWeight: 500, fontSize: 40, lineHeight: 1.4, color: K.text, marginTop: 34}}>
 							{tr.map((w, i) => {
 								const k = Math.max(0, Math.min(1, prog - i));
 								return (

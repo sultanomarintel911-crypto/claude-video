@@ -59,6 +59,7 @@ Satu fail `src/v_<sss><aaa>.tsx` bagi setiap ayat; jangan tindih video lama.
 Pembantu animasi dalam `core.tsx`: `ramp(x,x0,x1)` 0→1 ber-easing; `window_(x,s,e,d)` muncul/hilang; `pop(x,s)` lantun masuk; `rng(seed)` rawak tetap (deterministik — wajib untuk Remotion, jangan guna `Math.random`).
 
 Teks: perkataan Arab belum dibaca pudar (0.22), sedang dibaca = warna sorotan + glow, sudah dibaca = putih. Terjemahan muncul linear sepanjang frasa.
+**Jarak teks:** harakat bawah (kasrah, kasratain) terkeluar dari kotak baris — Arab `lineHeight: 1.8` dan terjemahan `marginTop: 44` (gaya Subuh) / `34` (kad 3D). Sentiasa semak frasa yang ada kasrah di baris bawah dengan render frame skala 1 dan zum.
 
 ## Tema semasa: "Subuh" (identiti kita)
 - Langit ungu tua `#1d0f2e` → `#6a2d5c` → `#e3866f` → ufuk peach `#f8c38c`; matahari `#ffe2b0` di ufuk belakang watak; awan bergerak; bukit 3 lapis.
