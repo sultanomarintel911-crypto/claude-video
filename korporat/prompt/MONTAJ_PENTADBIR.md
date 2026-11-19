@@ -213,34 +213,60 @@ Imej permulaan: jana seperti `PROMPT_4_PK_KO.md` (4A).
 ```
 *Speed ramp:* saya perlahankan detik kaki menyentuh bola (×0.25), kemudian lajukan bola ke gawang (×2), diselaraskan dengan hentakan dram.
 
-### 4.5 · PK PENDIDIKAN KHAS: detik emosi
-⏳ Menunggu lembaran watak Encik Baharudin bin Ismail. Lokasi: `lokasi/17_hub_ppki_microsoft.jpg`.
+### 4.5 · PK PENDIDIKAN KHAS: Encik Baharudin bin Ismail (detik emosi)
+**Rupa (lembaran watak CIKGU BAHARUDDIN):** songkok hitam, misai dan janggut nipis, sut hitam dua
+butang, kemeja **putih berpetak halus**, tali leher **merah**, penyepit tali leher emas, **lencana
+bulat biru** Pendidikan Khas di dada kiri, tanda nama "BAHARUDIN" dengan jata negara, kasut hitam.
+
+**Langkah 1: hero shot (Nano Banana / Gemini)**
+Lampirkan lembaran watak + `lokasi/17_hub_ppki_microsoft.jpg` + `lokasi/16_hub_ppki_google.jpg`:
+
+> Hero shot sinematik 16:9, sudut rendah dari paras pinggang, gaya poster filem. Encik Baharudin
+> (tepat seperti lembaran watak: wajah, songkok hitam, misai dan janggut nipis, sut hitam, kemeja putih
+> berpetak halus, tali leher merah, penyepit tali leher emas, lencana bulat biru di dada kiri, tanda nama
+> BAHARUDIN) berdiri tegak dengan senyuman hangat di dalam Hub Digital PPKI (rujuk foto: dinding biru
+> muda dengan awan dan logo Microsoft kecil, TV di dinding, lantai jubin hitam-putih, meja rendah
+> berwarna-warni dengan permukaan bercorak). Di meja di belakangnya, seorang murid lelaki berkeperluan
+> khas berseragam harian (kemeja putih lengan pendek, lencana perisai hijau, seluar biru tua) duduk di
+> hadapan iPad, digambarkan dengan hormat dan bermaruah, kabur di latar. Pencahayaan siang lembut dari
+> tingkap, gred teal-oren hangat. Fotorealistik. Tiada tulisan tambahan.
+
+**Langkah 2: image-to-video**
 ```json
 {
   "format": "Video fotorealistik sinematik 16:9, sekitar 8 saat, satu syot berterusan, gaya trailer, nada hangat.",
-  "rujukan": "Gunakan imej permulaan. Kekalkan wajah dan pakaian PK Pendidikan Khas dan murid, serta Hub Digital PPKI.",
+  "rujukan": "Gunakan imej permulaan. Kekalkan wajah, songkok, sut hitam, kemeja putih berpetak, tali leher merah, penyepit emas, lencana bulat biru dan tanda nama BAHARUDIN, wajah dan pakaian murid, serta Hub Digital PPKI (dinding biru berawan, lantai jubin hitam-putih, meja berwarna-warni).",
   "urutan": [
     {
-      "masa": "0–3 saat",
-      "aksi": "Murid PPKI menyentuh skrin iPad dengan teragak-agak; PK Pendidikan Khas membimbing tangannya dengan lembut.",
-      "kamera": "Dolly-in sangat perlahan pada paras mata murid, kedalaman medan cetek."
+      "masa": "0–1.5 saat",
+      "aksi": "Satu jalur cahaya biru-emas meluncur masuk perlahan melalui tingkap dan bertukar menjadi kilauan lembut yang turun ke atas iPad murid di belakang guru. Skrin iPad menyala dengan cahaya warna-warni.",
+      "kamera": "Kamera statik, sudut rendah seperti imej permulaan."
     },
     {
-      "masa": "3–6 saat",
-      "aksi": "Murid tersenyum lebar dan ketawa gembira; PK Pendidikan Khas tersenyum bangga memandang murid.",
-      "kamera": "Alih fokus perlahan dari tangan ke wajah kedua-duanya. Gerak perlahan."
+      "masa": "1.5–3.5 saat",
+      "aksi": "Guru menoleh ke belakang memandang murid, terkejut dan kagum melihat cahaya pada iPad.",
+      "kamera": "Dolly zoom lembut (kesan vertigo perlahan): kamera bergerak ke hadapan sambil zum keluar, bilik di belakang meregang perlahan."
     },
     {
-      "masa": "6–8 saat",
-      "aksi": "PK Pendidikan Khas berdiri dan memandang lensa dengan senyuman hangat.",
-      "kamera": "Sudut rendah lembut (low-angle), tahan dua saat."
+      "masa": "3.5–6.5 saat",
+      "aksi": "Guru duduk di sebelah murid dan membimbing tangan murid menyentuh skrin iPad dengan lembut. Murid tersenyum lebar dan ketawa gembira. Guru tersenyum bangga memandang murid.",
+      "kamera": "Melengkung perlahan ke sisi pada paras mata murid, kedalaman medan cetek, gerak perlahan."
+    },
+    {
+      "masa": "6.5–8 saat",
+      "aksi": "Guru memandang lensa dengan senyuman hangat, tangan masih di bahu murid.",
+      "kamera": "Tahan dua saat, kemudian whip pan perlahan ke kanan dengan kabur gerak."
     }
   ],
+  "skrin": "Skrin iPad dipalingkan sedikit dari kamera, hanya cahaya warna-warni kelihatan, tiada tulisan.",
   "nada": "Hangat, inklusif, bermaruah. Bukan simpati berlebihan.",
+  "pencahayaan": "Cahaya siang lembut dari tingkap, gred teal-oren hangat.",
   "audio": "Tiada dialog, tiada narasi, tiada suara manusia. Hanya bunyi ambien semula jadi yang perlahan.",
-  "negatif": "Jangan herotkan wajah murid, tiada tulisan."
+  "negatif": "Jangan ubah wajah atau songkok, jangan herotkan wajah murid, jangan karikatur murid, jangan tambah orang lain, tiada tulisan tambahan."
 }
 ```
+*Suntingan: muzik reda seketika (detik emosi) → kad nama "BAHARUDIN BIN ISMAIL / PENOLONG KANAN
+PENDIDIKAN KHAS" → whip pan ke finale dengan bass drop.*
 
 ### 4.6 · FINALE: barisan pentadbir
 Imej permulaan: jana dengan kelima-lima lembaran watak + `lokasi/01_gerbang_1956_senja.jpg`.
