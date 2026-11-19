@@ -8,6 +8,7 @@ description: Buat video pendek menegak (9:16, Reels/TikTok/Shorts) bagi satu aya
 Projek: `ayat/` (Remotion 4, React, TypeScript). Contoh siap:
 - Al-Ahzab 33:59 → `ayat_tudung_33_59.mp4` (komposisi `AyatTudung`, `src/v_033059.tsx`)
 - Al-Baqarah 2:120 → `ayat_2_120_teguh_petunjuk.mp4` (komposisi `AyatYahudiNasrani`, `src/v_002120.tsx`)
+- Al-Baqarah 2:153 (sabar) → `ayat_2_153_sabar_3d.mp4` (komposisi `AyatSabar`, `src/v_002153.tsx`) — **gaya Kristal 3D**, qari Abdul Basit
 - Hadis Bukhari 7320 "lubang biawak" → `hadis_lubang_biawak_bukhari_7320.mp4` (komposisi `HadisLubangBiawak`, `src/v_hadis_bukhari_7320.tsx`)
 
 Satu fail `src/v_<sss><aaa>.tsx` bagi setiap ayat; jangan tindih video lama.
@@ -75,6 +76,18 @@ Teks: perkataan Arab belum dibaca pudar (0.22), sedang dibaca = warna sorotan + 
 - **Tiada pelindung**: kubah cahaya pecah berkecai.
 - **Ikut jejak** (hadis 7320): bukit pasir, jejak gelap → lubang; jejak terang memijak tepat di atasnya + penanda jengkal/hasta + bunyi tapak; biawak masuk lubang.
 Untuk tema baharu (solat, sedekah, ibu bapa, sabar), tambah komponen SVG ringkas yang sama gaya: bentuk rata, tiada wajah, warna dari `C`.
+
+## Qari (recitation_id quran.com, semua ada masa perkataan)
+1 Abdul Basit mujawwad · 2 Abdul Basit murattal · 3 as-Sudais · 4 asy-Syatri · 5 ar-Rifa'i · 6 al-Husary · 7 Alafasy (lalai) · 9 al-Minshawi murattal · 10 asy-Syuraim. Contoh: `python3 scripts/ambil_data.py 2:153 2`.
+
+## Gaya kedua: "Kristal 3D" (`src/v_002153.tsx`)
+Bila pengguna minta gaya lain / 3D. Berdiri sendiri (tidak guna `Shell`/`Sky`), hanya kongsi `makeAyat`, `parseTr`, pembantu animasi.
+- Three.js melalui `@remotion/three` + `@react-three/fiber@8` + `three@0.170` (`ThreeCanvas`). Semua animasi dikira daripada frame (`a`), jangan guna `useFrame`/jam.
+- Kamera dikawal komponen `Rig` (`useThree().camera.position.set` + `lookAt`). Format menegak sempitkan pandangan mendatar — jarak kamera ~14–19 unit supaya objek tidak terlalu besar. Semak tiada objek menghalang subjek dari sudut kamera.
+- Palet ais/cyan atas hitam biru (`#04070d`, `#7fe9ff`, `#2cc9e8`); lantai grid, kabus, habuk zarah.
+- Teks dalam kad kaca (backdrop-filter) di bawah; Arab = Scheherazade New 700, perkataan semasa terangkat + cahaya cyan; terjemahan DM Sans muncul dari kabur. Tajuk = Space Grotesk timbul (text-shadow berlapis). Nama akaun kiri atas dengan titik cyan.
+- Simbol: kristal (hati mukmin), batu + hujan (ujian), cincin perisai (sabar), lima tiang (solat), pancaran dari atas (pertolongan Allah — Allah tidak digambarkan), riak lantai pada perkataan kunci.
+- Render lebih lambat (~2.5 min, `--concurrency=2`), fail ~19 MB.
 
 ## Video hadis
 - Teks Arab dari fawazahmed0/hadith-api (jsDelivr, tanpa kunci): `python3 scripts/ambil_hadis.py <kitab> <no> --groups 5,4,... --baca 10,6,...` → `src/data/hadis_<kitab>_<no>.json`. Sanad dibuang automatik (matan = selepas tanda petik pertama). Edisi `ind-<kitab>` (Indonesia) boleh jadi rujukan terjemahan; terjemahan Melayu disusun sendiri — minta pengguna semak.

@@ -163,7 +163,7 @@ export const Lantern: React.FC<{x: number; len: number; k: number; t: number}> =
 };
 
 // ---------- teks ----------
-const parseTr = (s: string) => {
+export const parseTr = (s: string) => {
 	const out: {w: string; gold: boolean}[] = [];
 	let gold = false;
 	for (const raw of s.split(' ')) {
