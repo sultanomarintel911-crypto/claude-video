@@ -86,7 +86,8 @@ Bila pengguna minta gaya lain / 3D. Berdiri sendiri (tidak guna `Shell`/`Sky`), 
 - Kamera dikawal komponen `Rig` (`useThree().camera.position.set` + `lookAt`). Format menegak sempitkan pandangan mendatar — jarak kamera ~14–19 unit supaya objek tidak terlalu besar. Semak tiada objek menghalang subjek dari sudut kamera.
 - Palet ais/cyan atas hitam biru (`#04070d`, `#7fe9ff`, `#2cc9e8`); lantai grid, kabus, habuk zarah.
 - Teks dalam kad kaca (backdrop-filter) di bawah; Arab = Scheherazade New 700, perkataan semasa terangkat + cahaya cyan; terjemahan DM Sans muncul dari kabur. Tajuk = Space Grotesk timbul (text-shadow berlapis). Nama akaun kiri atas dengan titik cyan.
-- Simbol: kristal (hati mukmin), batu + hujan (ujian), cincin perisai (sabar), lima tiang (solat), pancaran dari atas (pertolongan Allah — Allah tidak digambarkan), riak lantai pada perkataan kunci.
+- **Orang solat 3D** (`src/Musalli.tsx`): lelaki tanpa wajah berjubah + kopiah, kapsul/sfera. Pose `diri/takbir/qiyam/rukuk/sujud` (FK untuk kaki & badan, IK 2-tulang untuk tangan); `mixPose` + kerangka masa `KEYS`. Hadap profil 3/4 ke kamera (`FACE`) supaya rukuk/sujud jelas. Semak setiap pose dengan render frame. Boleh guna semula untuk ayat solat lain.
+- Simbol: kristal (hati mukmin, naik ke atas bila orang solat muncul), batu + hujan (ujian), cincin perisai (sabar), lima tiang + sejadah (solat), pancaran dari atas (pertolongan Allah — Allah tidak digambarkan), riak lantai pada perkataan kunci.
 - Render lebih lambat (~2.5 min, `--concurrency=2`), fail ~19 MB.
 
 ## Video hadis

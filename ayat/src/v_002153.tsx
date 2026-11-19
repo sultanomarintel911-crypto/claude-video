@@ -19,6 +19,7 @@ import '@fontsource/dm-sans/700.css';
 import {FPS, H, HANDLE, INTRO, W, makeAyat} from './data';
 import data from './data/002153.json';
 import {parseTr, pop, ramp, rng, window_} from './core';
+import {Musalli, POSES, mixPose} from './Musalli';
 
 export const ay = makeAyat(data, [
 	{from: 1, to: 3, tr: 'Wahai sekalian *orang-orang yang beriman*!', scene: 'seru'},
@@ -49,15 +50,19 @@ const Rig: React.FC<{a: number}> = ({a}) => {
 	const toSeru = ramp(a, S.seru - 0.5, S.sabar);
 	const toSolat = ramp(a, S.solat - 0.3, S.solat + 2.5);
 	const toBersama = ramp(a, S.bersama - 0.2, END + 0.5);
-	const R = 19 - 5 * toSeru + 2 * toSolat + 2 * toBersama;
-	const Y = 3 + 2.6 * toSolat + 3.2 * toBersama;
+	const toFig = ramp(a, S.sabar - 0.2, S.sabar + 2.2);
+	const R = 19 - 5 * toSeru - 4.6 * toFig - 0.4 * toSolat + 2.4 * toBersama;
+	const Y = 3 + 1.1 * toFig + 1.3 * toSolat + 2.6 * toBersama;
 	const th = -0.25 + a * 0.02 + 0.5 * toSolat;
 	const storm = window_(a, S.sabar + 0.2, S.solat + 0.8, 0.8);
 	const shake = storm * 0.06;
 	camera.position.set(Math.sin(th) * R + Math.sin(a * 23) * shake, Y + Math.sin(a * 31) * shake, Math.cos(th) * R);
-	camera.lookAt(0, 0.75 + 0.5 * toBersama, 0);
+	camera.lookAt(0, 0.75 + 0.15 * toFig + 0.3 * toBersama, 0);
 	return null;
 };
+
+/** 0→1: kristal naik ke atas apabila orang beriman muncul (babak sabar). */
+const lift = (a: number) => ramp(a, S.sabar - 0.2, S.sabar + 1.2);
 
 const Crystal: React.FC<{a: number; t: number}> = ({a, t}) => {
 	const born = pop(a, S.seru + 0.2);
@@ -66,7 +71,7 @@ const Crystal: React.FC<{a: number; t: number}> = ({a, t}) => {
 	const glow = 0.25 + ramp(a, S.bersama, S.bersama + 2) * 1.4 + Math.max(0, 1 - Math.abs(a - Wd[9].start) / 0.8) * 0.8;
 	const hitJ = window_(a, S.sabar + 0.2, Wd[4].start, 0.3) * 0.05;
 	return (
-		<group position={[Math.sin(t * 40) * hitJ, CRY_Y + Math.sin(t * 1.4) * 0.12, 0]} rotation={[0.3, t * 0.5, 0.15]} scale={0.95 * Math.max(0.001, s)}>
+		<group position={[Math.sin(t * 40) * hitJ, CRY_Y + lift(a) * 2.1 + Math.sin(t * 1.4) * 0.12, 0]} rotation={[0.3, t * 0.5, 0.15]} scale={0.95 * (1 - 0.55 * lift(a)) * Math.max(0.001, s)}>
 			<mesh>
 				<icosahedronGeometry args={[1, 0]} />
 				<meshStandardMaterial color={K.ice} emissive={K.cyan} emissiveIntensity={glow} metalness={0.2} roughness={0.12} flatShading transparent opacity={0.92} />
@@ -80,12 +85,66 @@ const Crystal: React.FC<{a: number; t: number}> = ({a, t}) => {
 	);
 };
 
+// ---------- orang solat ----------
+/** Kerangka pose ikut masa audio: berdiri dalam ribut (sabar), solat pada "وَٱلصَّلَوٰةِ", sujud hingga akhir. */
+const KEYS: [number, keyof typeof POSES][] = (() => {
+	const w = Wd[5].start; // وَٱلصَّلَوٰةِ
+	return [
+		[-99, 'diri'],
+		[w, 'diri'],
+		[w + 0.45, 'takbir'],
+		[w + 0.85, 'takbir'],
+		[w + 1.3, 'qiyam'],
+		[w + 1.65, 'qiyam'],
+		[w + 2.25, 'rukuk'],
+		[w + 2.65, 'rukuk'],
+		[w + 3.1, 'diri'],
+		[w + 3.25, 'diri'],
+		[w + 4.05, 'sujud'],
+	];
+})();
+const poseAt = (a: number) => {
+	let i = 0;
+	while (i + 1 < KEYS.length && KEYS[i + 1][0] <= a) i++;
+	if (i + 1 >= KEYS.length) return POSES[KEYS[i][1]];
+	const [t0, p0] = KEYS[i];
+	const [t1, p1] = KEYS[i + 1];
+	return mixPose(POSES[p0], POSES[p1], ramp(a, t0, t1));
+};
+/** Menghadap sisi kamera (profil 3/4) supaya rukuk & sujud jelas. */
+const FACE = -(1.13 + Math.PI / 2 + 0.3);
+
+const Worshipper: React.FC<{a: number}> = ({a}) => {
+	const op = ramp(a, S.sabar + 0.1, S.sabar + 0.9);
+	if (op <= 0) return null;
+	const glow = 0.12 + ramp(a, S.bersama + 0.3, S.bersama + 2.2) * 0.75 + Math.max(0, 1 - Math.abs(a - Wd[9].start) / 0.8) * 0.4;
+	const mat = ramp(a, S.sabar + 0.3, S.solat);
+	return (
+		<group rotation={[0, FACE, 0]}>
+			{/* sejadah */}
+			<group scale={[1, 1, 1]} position={[0, 0, 0]}>
+				<mesh position={[0, 0.006, 0]}>
+					<boxGeometry args={[1.42 * mat, 0.012, 0.76 * mat]} />
+					<meshStandardMaterial color={K.cyan} emissive={K.cyan} emissiveIntensity={0.8} />
+				</mesh>
+				<mesh position={[0, 0.014, 0]}>
+					<boxGeometry args={[1.34 * mat, 0.012, 0.68 * mat]} />
+					<meshStandardMaterial color="#0d3a4a" emissive="#0a5566" emissiveIntensity={0.35} roughness={0.8} />
+				</mesh>
+			</group>
+			<group position={[0, 0.02, 0]}>
+				<Musalli pose={poseAt(a)} color="#e9fbff" emissive={K.cyan} glow={glow} opacity={op < 1 ? op : 1} />
+			</group>
+		</group>
+	);
+};
+
 const Shield: React.FC<{a: number; t: number}> = ({a, t}) => {
-	const k = ramp(a, S.sabar + 0.3, Wd[4].start + 0.4) * (1 - ramp(a, S.bersama + 1, S.bersama + 2.5) * 0.6);
+	const k = ramp(a, S.sabar + 0.3, Wd[4].start + 0.4) * (1 - ramp(a, S.solat, S.solat + 1.2) * 0.8);
 	const flash = Math.max(0, 1 - Math.abs(a - Wd[4].start) / 0.5);
 	if (k <= 0.001) return null;
 	return (
-		<group position={[0, CRY_Y, 0]}>
+		<group position={[0, CRY_Y - lift(a) * 0.75, 0]}>
 			{[0, 1, 2].map((i) => (
 				<mesh key={i} rotation={[Math.PI / 2 + i * 0.9 + t * 0.6 * (i % 2 ? -1 : 1), i * 0.7 + t * 0.4, 0]} scale={k * (1 + flash * 0.15)}>
 					<torusGeometry args={[1.75 + i * 0.12, 0.022 + flash * 0.02, 12, 140]} />
@@ -149,8 +208,8 @@ const Pillars: React.FC<{a: number}> = ({a}) => (
 			if (h <= 0.01) return null;
 			// kamera berada pada sudut 0.92–1.35 rad (π/2 − th) semasa tiang kelihatan: letak di antara dua tiang
 			const ang = (i / 5) * Math.PI * 2 + 1.13 + Math.PI / 5;
-			const x = Math.cos(ang) * 3.3;
-			const z = Math.sin(ang) * 3.3;
+			const x = Math.cos(ang) * 4.2;
+			const z = Math.sin(ang) * 4.2;
 			return (
 				<group key={i} position={[x, 0, z]}>
 					<mesh position={[0, h / 2, 0]}>
@@ -236,6 +295,7 @@ const Scene: React.FC<{a: number; t: number}> = ({a, t}) => (
 		<gridHelper args={[60, 60, '#1f7d96', '#0e3646']} position={[0, 0.01, 0]} />
 		<Dust a={a} />
 		<Crystal a={a} t={t} />
+		<Worshipper a={a} />
 		<Shield a={a} t={t} />
 		<Rocks a={a} />
 		<Rain a={a} />
