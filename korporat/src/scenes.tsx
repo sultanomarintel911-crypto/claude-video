@@ -215,7 +215,6 @@ export const KadPentadbir: React.FC<{jawatan: string; nama: string; foto: string
         <div style={{fontFamily: ORB, fontWeight: 900, fontSize: 62, letterSpacing: 3, color: C.cyan, transform: `skewX(-10deg) translateX(${(1 - t1) * -80}px)`, opacity: t1, textShadow: `0 0 18px ${C.cyan}`}}>{jawatan}</div>
         <div style={{fontFamily: ORB, fontWeight: 700, fontSize: 44, letterSpacing: 5, color: '#ffd23d', marginTop: 14, transform: `translateX(${(1 - t2) * -60}px)`, opacity: t2, textShadow: '0 3px 10px rgba(0,0,0,.6)'}}>{nama}</div>
       </div>
-      <Img src={staticFile('montaj/logo_strip.png')} style={{position: 'absolute', left: 60, top: 870, width: 480, opacity: plate}} />
     </AbsoluteFill>
   );
 };
