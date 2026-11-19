@@ -259,7 +259,9 @@ export const Shell: React.FC<{
 	extra?: React.ReactNode;
 	/** Kedudukan tajuk (px dari atas). */
 	titleTop?: number;
-}> = ({ay, title, sub, bright, stage, extra, titleTop}) => {
+	/** Latar siap (cth. video EffectCraft): menggantikan Sky + stage. */
+	bg?: React.ReactNode;
+}> = ({ay, title, sub, bright, stage, extra, titleTop, bg}) => {
 	const f = useCurrentFrame();
 	const t = f / FPS;
 	const a = t - INTRO;
@@ -268,9 +270,10 @@ export const Shell: React.FC<{
 	const refOp = ramp(a, -0.3, 0.4) * (1 - ramp(a, END + 0.6, END + 1.2));
 	return (
 		<AbsoluteFill style={{backgroundColor: C.bottom}}>
+			{bg}
 			<svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{position: 'absolute'}}>
-				<Sky t={t} bright={bright(a)} />
-				{stage(t, a)}
+				{!bg && <Sky t={t} bright={bright(a)} />}
+				{!bg && stage(t, a)}
 				<rect x={0} y={GROUND + 20} width={W} height={H - GROUND} fill="url(#fadeDown)" />
 				<defs>
 					<linearGradient id="fadeDown" x1="0" y1="0" x2="0" y2="1">
