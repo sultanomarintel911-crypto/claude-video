@@ -1,0 +1,2 @@
+[{"command":"select.all","params":{}},
+ {"command":"effect.apply","params":{"effect":"stylize.outerGlow","params":{"mode":"screen","color":"#38e8ff","opacity":85.0,"blur":14.0}}}]

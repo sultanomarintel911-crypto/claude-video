@@ -8,7 +8,7 @@ import React from 'react';
 import {AbsoluteFill, Audio, interpolate, random, Sequence, staticFile, useCurrentFrame} from 'remotion';
 import {FPS, Seg, SEGS, VO_FILE} from './data';
 import {BabTag, glitchAmt, GlitchOverlay, Grade, Hud, Label} from './fx';
-import {Bio, Emas, Kertas, Klip, Statistik, Tutup} from './scenes';
+import {Bio, Emas, KadPentadbir, Kertas, Klip, Statistik, Tutup} from './scenes';
 
 const SegView: React.FC<{s: Seg}> = ({s}) => {
   switch (s.kind) {
@@ -22,6 +22,8 @@ const SegView: React.FC<{s: Seg}> = ({s}) => {
       return <Emas s={s} />;
     case 'tutup':
       return <Tutup />;
+    case 'kad':
+      return <KadPentadbir jawatan="GPK HAL EHWAL MURID" nama="ROAZMI BIN MOHAMAD" foto="montaj/wajah_hem.jpg" fd={s.fd} />;
     default:
       return (
         <AbsoluteFill>

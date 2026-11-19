@@ -207,13 +207,16 @@ const DataBlock: React.FC = () => {
       <HexGrid opacity={0.18} />
       <Stars n={120} seed="dt" opacity={0.6} />
       <AbsoluteFill style={{justifyContent: 'center', alignItems: 'center'}}>
-        <div style={{fontFamily: MONO, fontSize: 24, letterSpacing: 10, color: CYAN, opacity: head}}>// DATA PEMBUDAYAAN DIGITAL</div>
-        <div style={{opacity: head, transform: `scale(${1.2 - 0.2 * head})`, marginTop: 10}}>
-          <Gold size={74} spacing={6} shine={ci(fr, 10, 40)}>
-            SKeSO DALAM ANGKA
+        <div style={{fontFamily: MONO, fontSize: 22, letterSpacing: 10, color: CYAN, opacity: head}}>// SK SULTAN OMAR · DUNGUN</div>
+        <div style={{opacity: head, transform: `scale(${1.2 - 0.2 * head})`, marginTop: 10, textAlign: 'center'}}>
+          <Gold size={68} spacing={5} shine={ci(fr, 10, 40)}>
+            DATA PEMBUDAYAAN DIGITAL
+          </Gold>
+          <Gold size={96} spacing={10} shine={ci(fr, 18, 48)} style={{marginTop: 4}}>
+            SKeSO
           </Gold>
         </div>
-        <div style={{display: 'flex', gap: 36, marginTop: 54}}>
+        <div style={{display: 'flex', gap: 36, marginTop: 40}}>
           {DATA_KAD.map((s, i) => {
             const a = 10 + i * 8;
             const p = ci(fr, a, a + 12, 0, 1, easeOut);

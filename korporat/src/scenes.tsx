@@ -129,15 +129,16 @@ export const Statistik: React.FC<{s: Seg}> = ({s}) => {
 // ---------- Klimaks: Anugerah EMAS DUTA 2026 ----------
 const FOTO: Array<[string, number, number, number, number]> = [
   // [fail, mula(s), tempoh(s), zoom awal, zoom akhir]
-  ['img/dscf2470.jpg', 3.4, 4.4, 1.0, 1.12],
-  ['img/dscf2473.jpg', 7.6, 3.3, 1.14, 1.02],
-  ['img/dscf2468.jpg', 10.7, 3.3, 1.0, 1.1],
+  // susunan kronologi: serahan piala -> video majlis -> gambar lain
+  ['img/dscf2468.jpg', 0.0, 3.4, 1.0, 1.1],
+  ['img/dscf2470.jpg', 7.0, 3.4, 1.0, 1.12],
+  ['img/dscf2473.jpg', 10.6, 3.4, 1.14, 1.02],
 ];
 export const Emas: React.FC<{s: Seg}> = ({s}) => {
   const frame = useCurrentFrame();
   const t = frame / FPS;
   const flash = interpolate(frame, [0, 3, 14], [1, 1, 0], clamp);
-  const vidOp = interpolate(t, [3.2, 3.8], [1, 0], clamp);
+  const vidOp = interpolate(t, [3.0, 3.5, 6.6, 7.1], [0, 1, 1, 0], clamp);
   const ttl = interpolate(frame, [4, 14], [2.2, 1], {...clamp, easing: Easing.out(Easing.cubic)});
   const ttlOp = interpolate(frame, [4, 10], [0, 1], clamp);
   const shake = frame >= 10 && frame < 22 ? (Math.sin(frame * 7) * (22 - frame)) / 2 : 0;
@@ -145,15 +146,17 @@ export const Emas: React.FC<{s: Seg}> = ({s}) => {
   return (
     <AbsoluteFill style={{background: '#000', transform: `translate(${shake}px, ${shake * 0.6}px)`}}>
       {FOTO.map(([src, a, d, z0, z1], i) => {
-        const op = interpolate(t, [a - 0.5, a, a + d, a + d + 0.5], [0, 1, 1, i === FOTO.length - 1 ? 1 : 0], clamp);
+        const op = a === 0 ? interpolate(t, [0, d, d + 0.5], [1, 1, 0], clamp) : interpolate(t, [a - 0.5, a, a + d, a + d + 0.5], [0, 1, 1, i === FOTO.length - 1 ? 1 : 0], clamp);
         if (op <= 0) return null;
         const z = interpolate(t, [a - 0.5, a + d + 0.5], [z0, z1]);
         return <Img key={src} src={staticFile(src)} style={{position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: op, transform: `scale(${z})`, filter: 'saturate(1.15) contrast(1.05)'}} />;
       })}
       {vidOp > 0 && (
-        <AbsoluteFill style={{opacity: vidOp}}>
-          <OffthreadVideo src={staticFile('video/emas_stabil.mp4')} trimBefore={Math.round(0.5 * FPS)} muted style={{width: '100%', height: '100%', objectFit: 'cover', transform: 'scale(1.06)'}} />
-        </AbsoluteFill>
+        <Sequence from={Math.round(3.0 * FPS)} layout="none">
+          <AbsoluteFill style={{opacity: vidOp}}>
+            <OffthreadVideo src={staticFile('video/emas_stabil.mp4')} trimBefore={Math.round(0.5 * FPS)} muted style={{width: '100%', height: '100%', objectFit: 'cover', transform: 'scale(1.06)'}} />
+          </AbsoluteFill>
+        </Sequence>
       )}
       <AbsoluteFill style={{background: 'linear-gradient(0deg, rgba(10,6,0,.92) 0%, rgba(10,6,0,.55) 26%, rgba(0,0,0,0) 46%)'}} />
       <AbsoluteFill style={{background: `linear-gradient(100deg, transparent ${sweep - 10}%, rgba(255,220,120,.18) ${sweep}%, transparent ${sweep + 10}%)`, mixBlendMode: 'screen'}} />
@@ -184,6 +187,34 @@ export const Tutup: React.FC = () => {
         <div style={{fontFamily: SANS, fontWeight: 600, fontSize: 32, color: '#cfe6ff', marginTop: 6, letterSpacing: 3}}>Merentas Kecemerlangan</div>
         <div style={{fontFamily: MONO, fontSize: 22, color: C.emas, marginTop: 40, letterSpacing: 3}}>MICROSOFT SHOWCASE SCHOOL 2026–2027 · ANUGERAH EMAS DUTA 2026</div>
       </div>
+    </AbsoluteFill>
+  );
+};
+
+// ---------- Kad nama pentadbir (gaya kad lama; bingkai HUD dijana dengan VectorCraft) ----------
+export const KadPentadbir: React.FC<{jawatan: string; nama: string; foto: string; fd: number}> = ({jawatan, nama, foto, fd}) => {
+  const frame = useCurrentFrame();
+  const plate = interpolate(frame, [0, 10], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+  const ring = interpolate(frame, [2, 14], [0.6, 1], {...clamp, easing: Easing.out(Easing.back(1.6))});
+  const t1 = interpolate(frame, [6, 16], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+  const t2 = interpolate(frame, [12, 22], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+  const out = interpolate(frame, [fd - 6, fd], [1, 0], clamp);
+  const cx = 1380;
+  const cy = 520;
+  const r = 244;
+  return (
+    <AbsoluteFill style={{background: 'radial-gradient(ellipse at 40% 45%, #13285a 0%, #0b1a3c 55%, #060d22 100%)', opacity: out}}>
+      <AbsoluteFill style={{opacity: plate, transform: `translateX(${(1 - plate) * 60}px)`}}>
+        <Img src={staticFile('montaj/kad_plate_vc.png')} style={{width: '100%', height: '100%'}} />
+      </AbsoluteFill>
+      <div style={{position: 'absolute', left: cx - r, top: cy - r, width: r * 2, height: r * 2, borderRadius: '50%', overflow: 'hidden', transform: `scale(${ring})`, background: '#c9ccd2'}}>
+        <Img src={staticFile(foto)} style={{position: 'absolute', left: -(800 * 0.62 - r * 2) / 2, top: -40, width: 800 * 0.62, height: 1000 * 0.62, objectFit: 'cover'}} />
+      </div>
+      <div style={{position: 'absolute', right: 1920 - 1110, top: 330, textAlign: 'right'}}>
+        <div style={{fontFamily: ORB, fontWeight: 900, fontSize: 62, letterSpacing: 3, color: C.cyan, transform: `skewX(-10deg) translateX(${(1 - t1) * -80}px)`, opacity: t1, textShadow: `0 0 18px ${C.cyan}`}}>{jawatan}</div>
+        <div style={{fontFamily: ORB, fontWeight: 700, fontSize: 44, letterSpacing: 5, color: '#ffd23d', marginTop: 14, transform: `translateX(${(1 - t2) * -60}px)`, opacity: t2, textShadow: '0 3px 10px rgba(0,0,0,.6)'}}>{nama}</div>
+      </div>
+      <Img src={staticFile('montaj/logo_strip.png')} style={{position: 'absolute', left: 60, top: 870, width: 480, opacity: plate}} />
     </AbsoluteFill>
   );
 };
