@@ -63,3 +63,14 @@ Render akhir hanya selepas pratonton diluluskan:
 ```bash
 npm run final
 ```
+
+## Kemas kini (versi 2)
+- Babak **enrolmen** dibuang.
+- Bahagian **VO SKESO** (GB hingga PK Pendidikan Khas bercakap) dibuang, akan diganti kemudian.
+- PK HEM lama (Razulddin) diganti klip **PK HEM baharu (Roazmi bin Mohamad)**: PKHEM_4 (berjalan, tablet, panel hologram).
+  PKHEM_6 tidak digunakan (ada tampalan bendera asing pada blazer).
+- Kad nama PK HEM baharu: bingkai HUD direka sebagai SVG dan dirender dengan **VectorCraft**
+  (`vectorcraft-cli run`, kesan *Outer Glow*); fail sumber di `prompt/vectorcraft/`.
+- Anugerah Emas disusun ikut kronologi: serahan piala → video majlis → gambar lain.
+- Montaj: tajuk besar **DATA PEMBUDAYAAN DIGITAL SKeSO**, dengan zarah emas dijana oleh **EffectCraft**
+  (Particle Emitter 2D + Glow, WebM VP9 beralfa); langkah di `prompt/effectcraft/burst.json`.

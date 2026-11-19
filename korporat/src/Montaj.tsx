@@ -206,6 +206,7 @@ const DataBlock: React.FC = () => {
     <AbsoluteFill style={{background: 'radial-gradient(ellipse at center, #1a2f5a 0%, #03050c 78%)'}}>
       <HexGrid opacity={0.18} />
       <Stars n={120} seed="dt" opacity={0.6} />
+      <OffthreadVideo src={staticFile('montaj/zarah_ec.webm')} transparent muted style={{position: 'absolute', inset: 0, width: W, height: H, mixBlendMode: 'screen', top: -50}} />
       <AbsoluteFill style={{justifyContent: 'center', alignItems: 'center'}}>
         <div style={{fontFamily: MONO, fontSize: 22, letterSpacing: 10, color: CYAN, opacity: head}}>// SK SULTAN OMAR · DUNGUN</div>
         <div style={{opacity: head, transform: `scale(${1.2 - 0.2 * head})`, marginTop: 10, textAlign: 'center'}}>

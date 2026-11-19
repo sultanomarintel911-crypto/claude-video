@@ -1,0 +1,200 @@
+[
+ {
+  "command": "file.newProject",
+  "params": {}
+ },
+ {
+  "command": "comp.new",
+  "params": {
+   "name": "Burst",
+   "width": 1920,
+   "height": 1080,
+   "frameRate": 30,
+   "duration": 3.5,
+   "background": "#000000",
+   "open": true
+  }
+ },
+ {
+  "command": "layer.newSolid",
+  "params": {
+   "name": "Zarah",
+   "color": "#000000",
+   "width": 1920,
+   "height": 1080
+  }
+ },
+ {
+  "command": "effect.apply",
+  "params": {
+   "effect": "Particle Emitter 2D"
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/birthRate",
+   "value": 3.0
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/birthRate",
+   "value": 0.0,
+   "time": 0.9
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/birthRate",
+   "value": 3.0,
+   "time": 0.0
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/longevity",
+   "value": 1.8
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/producer/position",
+   "value": [
+    960,
+    290
+   ]
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/producer/radiusX",
+   "value": 620
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/producer/radiusY",
+   "value": 50
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/physics/velocity",
+   "value": 1.6
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/physics/gravity",
+   "value": -0.15
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/physics/resistance",
+   "value": 2.5
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/particle/particleType",
+   "value": 2
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/particle/birthSize",
+   "value": 0.45
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/particle/deathSize",
+   "value": 0.08
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/particle/sizeVariation",
+   "value": 60
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/particle/maxOpacity",
+   "value": 100
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/particle/birthColor",
+   "value": [
+    1.0,
+    0.92,
+    0.6,
+    1.0
+   ]
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/particle/deathColor",
+   "value": [
+    1.0,
+    0.62,
+    0.12,
+    1.0
+   ]
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#1/particle/transferMode",
+   "value": 2
+  }
+ },
+ {
+  "command": "effect.apply",
+  "params": {
+   "effect": "Glow"
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#2/radius",
+   "value": 28
+  }
+ },
+ {
+  "command": "prop.set",
+  "params": {
+   "path": "effects/#2/intensity",
+   "value": 1.6
+  }
+ },
+ {
+  "command": "file.save",
+  "params": {
+   "path": "burst.ecproj"
+  }
+ }
+]
