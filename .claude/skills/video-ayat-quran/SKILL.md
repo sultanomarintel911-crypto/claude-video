@@ -19,9 +19,11 @@ Satu fail `src/v_<sss><aaa>.tsx` bagi setiap ayat; jangan tindih video lama.
 - **Jangan sekali-kali taip teks Al-Quran secara manual.** Teks Uthmani, masa perkataan dan terjemahan mesti datang dari `scripts/ambil_data.py` (api.quran.com).
 - Terjemahan: Abdullah Muhammad Basmeih (resource 39). Boleh pecah ikut frasa & ringkaskan kurungan, tapi jangan ubah maksud.
 - **Tiada muzik.** Audio bacaan sahaja.
-- **Jangan lukis** Allah, Nabi, malaikat, atau individu tertentu (isteri/anak Nabi, sahabat). Ganti dengan simbol: cahaya, tanglung, matahari, orang awam tanpa nama.
+- **Jangan lukis** Allah, Nabi, malaikat, atau individu tertentu (isteri/anak Nabi, sahabat). Ganti dengan simbol: cahaya, bintang 8 penjuru, matahari, orang awam tanpa nama.
 - Watak manusia tanpa wajah (bujur muka kosong). Wanita sentiasa bertudung.
-- Ayat tentang kaum/agama lain (Yahudi, Nasrani, musyrikin): visual **simbolik sahaja** (jalan, simpang, cahaya, kabus). Jangan lukis watak kaum itu, simbol agama mereka (salib, bintang Daud), atau karikatur. Fokus pada keteguhan orang beriman, bukan merendahkan orang lain.
+- Ayat tentang kaum/agama lain (Yahudi, Nasrani): **lambang mudah faham** (pilihan pengguna). Islam = puncak gunung paling tinggi dengan Al-Quran bercahaya; agama lain = simpang menurun ke lembah dengan papan tanda ✡ / ✝ yang dilukis sempurna (jangan dirosak, dibakar atau diejek). Tiada watak kaum itu, tiada karikatur.
+- **Jangan guna tanglung** (pengguna: nampak budaya Cina). Ganti dengan bintang 8 penjuru (corak geometri Islam), nur (titik cahaya), mihrab, atau Al-Quran.
+- **Jangan lukis orang solat** (pengguna minta tukar konsep). Lambang solat = sejadah + mihrab + lima tiang cahaya; hati (kristal/nur) turun ke sejadah.
 - Sentiasa ingatkan pengguna menyemak teks Arab dengan mushaf sebelum terbit.
 - Jangan tiru gaya akaun lain (contoh: @deenanddinar — hijau malam, bulan, bintang emas, watak krim). Kekalkan identiti sendiri (lihat Tema).
 - Nama akaun: `HANDLE` dalam `src/data.ts` (lalai `@abraryusof`), dipapar di atas tengah sepanjang video, huruf besar renggang, legap 0.72. Set `''` untuk buang.
@@ -69,13 +71,13 @@ Teks: perkataan Arab belum dibaca pudar (0.22), sedang dibaca = warna sorotan + 
 
 ## Perpustakaan simbol (boleh guna semula)
 - **Wahyu/seruan**: pancaran cahaya turun + riak bulatan di tanah.
-- **Golongan orang**: tanglung menyala satu-satu, barisan watak bangkit berperingkat.
+- **Golongan orang**: bintang 8 penjuru menyala satu-satu, barisan watak bangkit berperingkat.
 - **Menutup aurat**: tudung `Woman.drape` 0→1 (dada → betis) + kilauan di hujung + anak panah.
 - **Dikenali/kemuliaan**: aura + gelang mengembang pada perkataan kunci.
 - **Perlindungan**: kubah cahaya dilukis (pathLength + dashoffset), zigzag gangguan terpantul.
 - **Rahmat/ampunan**: matahari naik, sinar berputar, hujan cahaya.
-- **Petunjuk vs jalan lain** (2:120): jalan lurus ke matahari menyala emas, simpang kelabu ke tepi dengan anak panah tarikan, tanglung berdiri (cahaya iman).
-- **Hawa nafsu / amaran**: kabus gelap dari tepi, langit malap, tanglung berkelip.
+- **Petunjuk vs jalan lain** (2:120): gunung, jalan zigzag ke puncak (Al-Quran atas rehal bercahaya) menyala emas, simpang ke lembah dengan papan tanda ✡ / ✝ dan anak panah tarikan, nur mendaki ke puncak; wahyu turun ke Al-Quran di puncak.
+- **Hawa nafsu / amaran**: kabus gelap dari tepi, langit malap, nur berkelip (Al-Quran di puncak tetap bercahaya).
 - **Tiada pelindung**: kubah cahaya pecah berkecai.
 - **Kitaran hidup** (30:54): pokok prosedural (cabang rekursif, tumbuh ikut `g`), benih → anak pokok ditiup angin → pokok kuat (batang menebal) → daun memutih (uban) & gugur → bunga pelbagai jenis mekar. Kesan: debunga bercahaya, light leak (`mixBlendMode: screen`), butiran filem (`feTurbulence`, seed ikut frame).
 - `Shell` ada prop `titleTop` jika tajuk penutup bertindih dengan visual.
@@ -91,8 +93,8 @@ Bila pengguna minta gaya lain / 3D. Berdiri sendiri (tidak guna `Shell`/`Sky`), 
 - Kamera dikawal komponen `Rig` (`useThree().camera.position.set` + `lookAt`). Format menegak sempitkan pandangan mendatar — jarak kamera ~14–19 unit supaya objek tidak terlalu besar. Semak tiada objek menghalang subjek dari sudut kamera.
 - Palet ais/cyan atas hitam biru (`#04070d`, `#7fe9ff`, `#2cc9e8`); lantai grid, kabus, habuk zarah.
 - Teks dalam kad kaca (backdrop-filter) di bawah; Arab = Scheherazade New 700, perkataan semasa terangkat + cahaya cyan; terjemahan DM Sans muncul dari kabur. Tajuk = Space Grotesk timbul (text-shadow berlapis). Nama akaun kiri atas dengan titik cyan.
-- **Orang solat 3D** (`src/Musalli.tsx`): lelaki tanpa wajah berjubah + kopiah, kapsul/sfera. Pose `diri/takbir/qiyam/rukuk/sujud` (FK untuk kaki & badan, IK 2-tulang untuk tangan); `mixPose` + kerangka masa `KEYS`. Hadap profil 3/4 ke kamera (`FACE`) supaya rukuk/sujud jelas. Semak setiap pose dengan render frame. Boleh guna semula untuk ayat solat lain.
-- Simbol: kristal (hati mukmin, naik ke atas bila orang solat muncul), batu + hujan (ujian), cincin perisai (sabar), lima tiang + sejadah (solat), pancaran dari atas (pertolongan Allah — Allah tidak digambarkan), riak lantai pada perkataan kunci.
+- **Solat (3D)**: mihrab bergerbang runcing (`THREE.ExtrudeGeometry` dari `Shape`, ceruk bercahaya) naik dari lantai di belakang kristal menghadap kamera; sejadah terbentang ke arah mihrab; kristal turun ke sejadah. `src/Musalli.tsx` (watak orang solat) tidak digunakan lagi.
+- Simbol: kristal (hati mukmin, turun ke sejadah semasa solat), batu + hujan (ujian), cincin perisai (sabar), lima tiang + sejadah + mihrab (solat), pancaran dari atas (pertolongan Allah — Allah tidak digambarkan), riak lantai pada perkataan kunci.
 - Render lebih lambat (~2.5 min, `--concurrency=2`), fail ~19 MB.
 
 ## Aliran VectorCraft + EffectCraft (bila pengguna minta "VectorCraft"/"EffectCraft")

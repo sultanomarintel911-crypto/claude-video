@@ -1,7 +1,23 @@
 import React from 'react';
 import {C, W, makeAyat} from './data';
 import data from './data/033059.json';
-import {GROUND, Lantern, Shell, Woman, pop, ramp, rng, window_} from './core';
+import {GROUND, Shell, Woman, pop, ramp, rng, window_} from './core';
+
+/** Bintang 8 penjuru (corak geometri Islam), bercahaya. */
+const Star8: React.FC<{x: number; y: number; k: number; t: number}> = ({x, y, k, t}) => {
+	if (k <= 0) return null;
+	const sq = (r: number) => `M ${-r} ${-r} L ${r} ${-r} L ${r} ${r} L ${-r} ${r} Z`;
+	return (
+		<g transform={`translate(${x} ${y}) scale(${k}) rotate(${t * 12})`} opacity={Math.min(1, k)}>
+			<circle r={110} fill="url(#glow)" opacity={0.5} />
+			<path d={sq(30)} fill={C.gold} />
+			<path d={sq(30)} fill={C.gold} transform="rotate(45)" />
+			<path d={sq(19)} fill={C.goldDeep} />
+			<path d={sq(19)} fill={C.goldDeep} transform="rotate(45)" />
+			<circle r={10} fill={C.creamLight} />
+		</g>
+	);
+};
 
 export const ay = makeAyat(data, [
 	{from: 1, to: 3, tr: 'Wahai *Nabi*, suruhlah', scene: 'wahyu'},
@@ -72,9 +88,9 @@ const Stage: React.FC<{t: number; a: number}> = ({t, a}) => {
 			)}
 
 			{/* B */}
-			<Lantern x={250} len={330} k={lanterns[0]} t={t} />
-			<Lantern x={540} len={420} k={lanterns[1]} t={t} />
-			<Lantern x={830} len={360} k={lanterns[2]} t={t} />
+			<Star8 x={250} y={360} k={lanterns[0]} t={t} />
+			<Star8 x={540} y={450} k={lanterns[1]} t={t} />
+			<Star8 x={830} y={390} k={lanterns[2]} t={t} />
 			{[0, 1, 3, 4].map((i) => {
 				const k = rowIn(i) * sideOut;
 				if (k <= 0) return null;
