@@ -5,9 +5,11 @@
   "scripts": {
     "studio": "remotion studio src/index.ts",
     "render": "remotion render src/index.ts AyatTudung out/ayat_tudung_33_59.mp4 --crf=18 --concurrency=4",
-    "render:2-120": "remotion render src/index.ts AyatYahudiNasrani out/ayat_2_120_teguh_petunjuk.mp4 --crf=18 --concurrency=4"
+    "render:2-120": "remotion render src/index.ts AyatYahudiNasrani out/ayat_2_120_teguh_petunjuk.mp4 --crf=18 --concurrency=4",
+    "render:hadis-bukhari-7320": "remotion render src/index.ts HadisLubangBiawak out/hadis_lubang_biawak_bukhari_7320.mp4 --crf=18 --concurrency=4"
   },
   "dependencies": {
+    "@fontsource/amiri": "^5.3.0",
     "@fontsource/amiri-quran": "^5.2.0",
     "@fontsource/cormorant-garamond": "^5.2.0",
     "@fontsource/montserrat": "^5.3.0",

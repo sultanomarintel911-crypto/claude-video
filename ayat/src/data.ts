@@ -17,7 +17,7 @@ export type Word = {ar: string; start: number; end: number};
  */
 export type Group = {from: number; to: number; tr: string; scene: string};
 
-type AyatJson = {key: string; rujukan: string; audioFile: string; duration: number; words: {ar: string; start: number; end: number}[]};
+type AyatJson = {key: string; rujukan: string; audioFile: string; duration: number; arFont?: string; words: {ar: string; start: number; end: number}[]};
 
 export const makeAyat = (json: AyatJson, groups: Group[]) => {
 	const words: Word[] = json.words.map((w) => ({ar: w.ar, start: w.start / 1000, end: w.end / 1000}));
@@ -30,6 +30,10 @@ export const makeAyat = (json: AyatJson, groups: Group[]) => {
 		key: json.key,
 		rujukan: json.rujukan,
 		audioFile: json.audioFile,
+		/** Amiri Quran untuk ayat; Amiri biasa untuk hadis. */
+		arFont: json.arFont ?? 'Amiri Quran',
+		/** Hadis: audio ambien bermula dari frame 0 (tiada bacaan). */
+		ambient: json.audioFile.startsWith('ambien'),
 		words,
 		groups,
 		audioEnd,

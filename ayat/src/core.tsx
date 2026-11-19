@@ -1,6 +1,7 @@
 import React from 'react';
 import {AbsoluteFill, Audio, Easing, Sequence, interpolate, staticFile, useCurrentFrame} from 'remotion';
 import '@fontsource/amiri-quran';
+import '@fontsource/amiri/400.css';
 import '@fontsource/montserrat/500.css';
 import '@fontsource/montserrat/700.css';
 import '@fontsource/cormorant-garamond/500-italic.css';
@@ -196,7 +197,7 @@ export const Texts: React.FC<{a: number; ay: Ayat}> = ({a, ay}) => (
 			const trSize = g.tr.length > 95 ? 39 : 44;
 			return (
 				<div key={gi} style={{position: 'absolute', left: 60, right: 60, top: 1262, opacity: vis, textAlign: 'center'}}>
-					<div style={{direction: 'rtl', fontFamily: 'Amiri Quran', fontSize: arSize, lineHeight: 1.65, color: C.text}}>
+					<div style={{direction: 'rtl', fontFamily: ay.arFont, fontSize: arSize, lineHeight: 1.65, color: C.text}}>
 						{ws.map((w, i) => {
 							const said = a >= w.start - 0.05;
 							const now = a >= w.start - 0.05 && a < w.end;
@@ -243,7 +244,7 @@ export const Title: React.FC<{op: number; utama: string; sub: string}> = ({op, u
 					</span>
 				))}
 			</div>
-			<div style={{fontFamily: 'Cormorant Garamond', fontStyle: 'italic', fontWeight: 500, fontSize: 44, color: C.gold, marginTop: 6}}>{sub}</div>
+			<div style={{fontFamily: "'Cormorant Garamond', 'Amiri'", fontStyle: 'italic', fontWeight: 500, fontSize: 44, color: C.gold, marginTop: 6}}>{sub}</div>
 		</div>
 	);
 
@@ -254,7 +255,9 @@ export const Shell: React.FC<{
 	sub: string;
 	bright: (a: number) => number;
 	stage: (t: number, a: number) => React.ReactNode;
-}> = ({ay, title, sub, bright, stage}) => {
+	/** Elemen tambahan di luar SVG (cth. kesan bunyi). */
+	extra?: React.ReactNode;
+}> = ({ay, title, sub, bright, stage, extra}) => {
 	const f = useCurrentFrame();
 	const t = f / FPS;
 	const a = t - INTRO;
@@ -288,7 +291,8 @@ export const Shell: React.FC<{
 					{HANDLE.toUpperCase()}
 				</div>
 			)}
-			<Sequence from={Math.round(INTRO * FPS)}>
+			{extra}
+			<Sequence from={ay.ambient ? 0 : Math.round(INTRO * FPS)}>
 				<Audio src={staticFile(ay.audioFile)} />
 			</Sequence>
 		</AbsoluteFill>

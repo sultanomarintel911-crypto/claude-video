@@ -8,6 +8,7 @@ description: Buat video pendek menegak (9:16, Reels/TikTok/Shorts) bagi satu aya
 Projek: `ayat/` (Remotion 4, React, TypeScript). Contoh siap:
 - Al-Ahzab 33:59 → `ayat_tudung_33_59.mp4` (komposisi `AyatTudung`, `src/v_033059.tsx`)
 - Al-Baqarah 2:120 → `ayat_2_120_teguh_petunjuk.mp4` (komposisi `AyatYahudiNasrani`, `src/v_002120.tsx`)
+- Hadis Bukhari 7320 "lubang biawak" → `hadis_lubang_biawak_bukhari_7320.mp4` (komposisi `HadisLubangBiawak`, `src/v_hadis_bukhari_7320.tsx`)
 
 Satu fail `src/v_<sss><aaa>.tsx` bagi setiap ayat; jangan tindih video lama.
 
@@ -72,7 +73,15 @@ Teks: perkataan Arab belum dibaca pudar (0.22), sedang dibaca = warna sorotan + 
 - **Petunjuk vs jalan lain** (2:120): jalan lurus ke matahari menyala emas, simpang kelabu ke tepi dengan anak panah tarikan, tanglung berdiri (cahaya iman).
 - **Hawa nafsu / amaran**: kabus gelap dari tepi, langit malap, tanglung berkelip.
 - **Tiada pelindung**: kubah cahaya pecah berkecai.
+- **Ikut jejak** (hadis 7320): bukit pasir, jejak gelap → lubang; jejak terang memijak tepat di atasnya + penanda jengkal/hasta + bunyi tapak; biawak masuk lubang.
 Untuk tema baharu (solat, sedekah, ibu bapa, sabar), tambah komponen SVG ringkas yang sama gaya: bentuk rata, tiada wajah, warna dari `C`.
+
+## Video hadis
+- Teks Arab dari fawazahmed0/hadith-api (jsDelivr, tanpa kunci): `python3 scripts/ambil_hadis.py <kitab> <no> --groups 5,4,... --baca 10,6,...` → `src/data/hadis_<kitab>_<no>.json`. Sanad dibuang automatik (matan = selepas tanda petik pertama). Edisi `ind-<kitab>` (Indonesia) boleh jadi rujukan terjemahan; terjemahan Melayu disusun sendiri — minta pengguna semak.
+- **Semak nombor hadis**: penomboran Muslim dalam API ini berbeza daripada Abdul Baqi (cth. 2669 bukan hadis yang sama). Petik hanya nombor yang disahkan dari teks yang diambil.
+- Tiada audio bacaan: masa perkataan dijana (`--perkataan` saat/perkataan, `--wpm` kelajuan baca terjemahan). Audio = `public/ambien_angin.mp3` (angin, dijana ffmpeg, bermula frame 0) + `public/tapak.wav` sebagai kesan bunyi melalui prop `extra` pada `Shell`. Tiada muzik.
+- Fon Arab hadis = Amiri biasa (`arFont` dalam JSON), bukan Amiri Quran — bezakan hadis daripada ayat.
+- Jangan lukis Nabi ﷺ; "Sabda Nabi ﷺ" boleh dalam teks.
 
 ## Teknikal
 - `remotion.config.ts` guna Chromium di `/opt/pw-browsers/chromium_headless_shell-1243/...`; laraskan jika laluan lain.
