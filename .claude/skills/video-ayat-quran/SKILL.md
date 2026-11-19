@@ -5,7 +5,11 @@ description: Buat video pendek menegak (9:16, Reels/TikTok/Shorts) bagi satu aya
 
 # Video Ayat Al-Quran (Remotion)
 
-Projek: `ayat/` (Remotion 4, React, TypeScript). Contoh siap: Al-Ahzab 33:59 → `ayat_tudung_33_59.mp4`.
+Projek: `ayat/` (Remotion 4, React, TypeScript). Contoh siap:
+- Al-Ahzab 33:59 → `ayat_tudung_33_59.mp4` (komposisi `AyatTudung`, `src/v_033059.tsx`)
+- Al-Baqarah 2:120 → `ayat_2_120_teguh_petunjuk.mp4` (komposisi `AyatYahudiNasrani`, `src/v_002120.tsx`)
+
+Satu fail `src/v_<sss><aaa>.tsx` bagi setiap ayat; jangan tindih video lama.
 
 ## Prinsip wajib (adab & ketepatan)
 - **Jangan sekali-kali taip teks Al-Quran secara manual.** Teks Uthmani, masa perkataan dan terjemahan mesti datang dari `scripts/ambil_data.py` (api.quran.com).
@@ -13,6 +17,7 @@ Projek: `ayat/` (Remotion 4, React, TypeScript). Contoh siap: Al-Ahzab 33:59 →
 - **Tiada muzik.** Audio bacaan sahaja.
 - **Jangan lukis** Allah, Nabi, malaikat, atau individu tertentu (isteri/anak Nabi, sahabat). Ganti dengan simbol: cahaya, tanglung, matahari, orang awam tanpa nama.
 - Watak manusia tanpa wajah (bujur muka kosong). Wanita sentiasa bertudung.
+- Ayat tentang kaum/agama lain (Yahudi, Nasrani, musyrikin): visual **simbolik sahaja** (jalan, simpang, cahaya, kabus). Jangan lukis watak kaum itu, simbol agama mereka (salib, bintang Daud), atau karikatur. Fokus pada keteguhan orang beriman, bukan merendahkan orang lain.
 - Sentiasa ingatkan pengguna menyemak teks Arab dengan mushaf sebelum terbit.
 - Jangan tiru gaya akaun lain (contoh: @deenanddinar — hijau malam, bulan, bintang emas, watak krim). Kekalkan identiti sendiri (lihat Tema).
 - Nama akaun: `HANDLE` dalam `src/data.ts` (lalai `@abraryusof`), dipapar di atas tengah sepanjang video, huruf besar renggang, legap 0.72. Set `''` untuk buang.
@@ -26,26 +31,28 @@ Projek: `ayat/` (Remotion 4, React, TypeScript). Contoh siap: Al-Ahzab 33:59 →
    ```
    Tulis `src/ayat.json` (perkataan + masa ms, rujukan, tempoh) dan `public/<sss><aaa>.mp3`. Skrip mencetak senarai perkataan bernombor dengan masa.
 3. **Sahkan masa** dengan profil kekuatan bunyi: hentian (≈ −20 dB atau lebih rendah) mesti jatuh pada sempadan perkataan yang ada tanda waqaf. Skrip semakan ringkas: decode ke 8 kHz mono via ffmpeg, RMS per 100 ms, cetak dB relatif.
-4. **Pecah frasa** dalam `src/data.ts` → `GROUPS`: `{from, to, tr, scene}` (nombor perkataan 1-based, inklusif). `tr` = terjemahan frasa itu; `*kata kunci*` disorot. Setiap frasa = satu babak; 3–7 perkataan Arab per frasa supaya muat 1–2 baris.
-5. **Reka babak** dalam `src/Video.tsx` → komponen `Stage`. Setiap babak ialah blok yang dikawal masa audio `a` dan `S.<scene>` (masa mula frasa). Guna `WORDS[i].start` untuk hentakan pada perkataan tertentu. Kemas kini jenis `SceneId` dan objek `S`.
-6. **Tukar tajuk** dalam komponen `Title` (cth. "Labuhkan *Tudungmu*") + subtajuk.
+4. **Fail ayat baharu** `src/v_<sss><aaa>.tsx` (salin corak `v_002120.tsx`): `export const ay = makeAyat(data, [GROUPS...])` dengan `{from, to, tr, scene}` (nombor perkataan 1-based, inklusif; `tr` terjemahan frasa, `*kata kunci*` disorot). 3–7 perkataan Arab per frasa. Saiz teks Arab/terjemahan menyesuai sendiri ikut panjang.
+5. **Reka babak** dalam komponen `Stage` fail itu, dikawal masa audio `a`, `ay.S.<scene>` (mula frasa) dan `ay.words[i].start` (hentakan perkataan). Bungkus dengan `<Shell ay title sub bright stage />` — `bright(a)` 0→1 = matahari naik + sinar.
+6. **Daftar** dalam `src/Root.tsx` (`<Composition id=... durationInFrames={ay.duration}>`) dan tambah skrip `render:<s>-<a>` dalam `package.json`. Tajuk: prop `title` (cth. "Teguh di Atas *Petunjuk*").
 7. **Pratonton** beberapa frame dan susun jadi satu helaian (semak dengan Read):
    ```bash
-   for fr in 30 140 260 ...; do npx remotion still src/index.ts AyatTudung out/s_$fr.png --frame=$fr --scale=0.4 --log=error; done
+   for fr in 30 140 260 ...; do npx remotion still src/index.ts <KompositionId> out/s_$fr.png --frame=$fr --scale=0.4 --log=error; done
    ffmpeg -v error -y -pattern_type glob -i 'out/s_*.png' -vf tile=4x2 out/sheet.png
    ```
    Frame = (INTRO + masa_audio) × 30.
-8. **Render**: `npm run render` → `out/ayat_tudung_33_59.mp4` (~45 s). Untuk ayat lain, tukar nama output dalam `package.json` (dan id Composition jika mahu). Salin ke akar repo, hantar kepada pengguna, commit & push.
+8. **Render**: `npm run render:<s>-<a>` (~50 s). Salin ke akar repo, hantar kepada pengguna, commit & push.
 
 ## Struktur kod
 | Fail | Isi |
 |---|---|
-| `scripts/ambil_data.py` | Ambil teks, segmen masa, terjemahan, nama surah, audio |
-| `src/ayat.json` | Data terjana — jangan sunting teks Arab di sini |
-| `src/data.ts` | `INTRO` (2.6 s), `OUTRO` (4.2 s), `GROUPS`, palet `C` |
-| `src/Video.tsx` | `Sky` (latar), `Woman`, `Lantern`, `Stage` (babak), `Texts` (Arab + terjemahan), `Title` |
+| `scripts/ambil_data.py` | Ambil teks, segmen masa, terjemahan, nama surah, audio → `src/data/<sss><aaa>.json` |
+| `src/data/*.json` | Data terjana — jangan sunting teks Arab di sini |
+| `src/data.ts` | `INTRO` (2.6 s), `OUTRO` (4.2 s), `HANDLE`, `makeAyat`, palet `C` |
+| `src/core.tsx` | Kongsi: pembantu animasi, `Sky`, `Woman`, `Lantern`, `Texts`, `Title`, `Shell` |
+| `src/v_*.tsx` | Satu ayat: GROUPS + `Stage` + komponen video |
+| `src/Root.tsx` | Daftar semua komposisi |
 
-Pembantu animasi dalam `Video.tsx`: `ramp(x,x0,x1)` 0→1 ber-easing; `window_(x,s,e,d)` muncul/hilang; `pop(x,s)` lantun masuk; `rng(seed)` rawak tetap (deterministik — wajib untuk Remotion, jangan guna `Math.random`).
+Pembantu animasi dalam `core.tsx`: `ramp(x,x0,x1)` 0→1 ber-easing; `window_(x,s,e,d)` muncul/hilang; `pop(x,s)` lantun masuk; `rng(seed)` rawak tetap (deterministik — wajib untuk Remotion, jangan guna `Math.random`).
 
 Teks: perkataan Arab belum dibaca pudar (0.22), sedang dibaca = warna sorotan + glow, sudah dibaca = putih. Terjemahan muncul linear sepanjang frasa.
 
@@ -62,6 +69,9 @@ Teks: perkataan Arab belum dibaca pudar (0.22), sedang dibaca = warna sorotan + 
 - **Dikenali/kemuliaan**: aura + gelang mengembang pada perkataan kunci.
 - **Perlindungan**: kubah cahaya dilukis (pathLength + dashoffset), zigzag gangguan terpantul.
 - **Rahmat/ampunan**: matahari naik, sinar berputar, hujan cahaya.
+- **Petunjuk vs jalan lain** (2:120): jalan lurus ke matahari menyala emas, simpang kelabu ke tepi dengan anak panah tarikan, tanglung berdiri (cahaya iman).
+- **Hawa nafsu / amaran**: kabus gelap dari tepi, langit malap, tanglung berkelip.
+- **Tiada pelindung**: kubah cahaya pecah berkecai.
 Untuk tema baharu (solat, sedekah, ibu bapa, sabar), tambah komponen SVG ringkas yang sama gaya: bentuk rata, tiada wajah, warna dari `C`.
 
 ## Teknikal

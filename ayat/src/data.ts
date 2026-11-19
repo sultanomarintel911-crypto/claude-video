@@ -1,5 +1,3 @@
-import ayat from './ayat.json';
-
 export const FPS = 30;
 export const W = 1080;
 export const H = 1920;
@@ -9,34 +7,39 @@ export const INTRO = 2.6;
 /** Saat selepas bacaan tamat (penutup). */
 export const OUTRO = 4.2;
 
-export type Word = {ar: string; start: number; end: number};
-export const WORDS: Word[] = ayat.words.map((w) => ({ar: w.ar, start: w.start / 1000, end: w.end / 1000}));
-export const AUDIO_END = ayat.duration;
-export const AUDIO_FILE = ayat.audioFile;
-export const DURATION = Math.ceil((INTRO + AUDIO_END + OUTRO) * FPS);
-
-export const RUJUKAN = ayat.rujukan;
 /** Nama akaun yang dipapar sepanjang video ('' = tiada). */
 export const HANDLE = '@abraryusof';
 
+export type Word = {ar: string; start: number; end: number};
 /**
- * Kumpulan frasa. `from`/`to` = nombor perkataan (1-based, inklusif).
- * Terjemahan: Abdullah Muhammad Basmeih, dipecah ikut frasa. *perkataan* = sorot emas.
+ * Frasa: `from`/`to` = nombor perkataan (1-based, inklusif).
+ * `tr` = terjemahan Basmeih bagi frasa itu; *perkataan* = sorotan. `scene` = nama babak.
  */
-export type Group = {from: number; to: number; tr: string; scene: SceneId};
-export type SceneId = 'wahyu' | 'wanita' | 'labuh' | 'dikenali' | 'dilindungi' | 'rahmat';
+export type Group = {from: number; to: number; tr: string; scene: string};
 
-export const GROUPS: Group[] = [
-	{from: 1, to: 3, tr: 'Wahai *Nabi*, suruhlah', scene: 'wahyu'},
-	{from: 4, to: 7, tr: 'isteri-isterimu, anak-anak perempuanmu serta *perempuan-perempuan yang beriman*,', scene: 'wanita'},
-	{from: 8, to: 11, tr: 'supaya *melabuhkan* pakaiannya bagi *menutup seluruh tubuhnya*;', scene: 'labuh'},
-	{from: 12, to: 15, tr: 'cara yang demikian lebih sesuai untuk mereka *dikenal* (sebagai perempuan yang baik-baik)', scene: 'dikenali'},
-	{from: 16, to: 17, tr: 'maka dengan itu mereka *tidak diganggu*.', scene: 'dilindungi'},
-	{from: 18, to: 21, tr: 'Dan Allah adalah *Maha Pengampun*, lagi *Maha Mengasihani*.', scene: 'rahmat'},
-];
+type AyatJson = {key: string; rujukan: string; audioFile: string; duration: number; words: {ar: string; start: number; end: number}[]};
 
-export const groupStart = (g: Group) => WORDS[g.from - 1].start;
-export const groupEnd = (i: number) => (i + 1 < GROUPS.length ? groupStart(GROUPS[i + 1]) : AUDIO_END + 0.6);
+export const makeAyat = (json: AyatJson, groups: Group[]) => {
+	const words: Word[] = json.words.map((w) => ({ar: w.ar, start: w.start / 1000, end: w.end / 1000}));
+	const audioEnd = json.duration;
+	const start = (i: number) => words[groups[i].from - 1].start;
+	const end = (i: number) => (i + 1 < groups.length ? start(i + 1) : audioEnd + 0.6);
+	/** Masa mula setiap babak, ikut nama. */
+	const S: Record<string, number> = Object.fromEntries(groups.map((g, i) => [g.scene, start(i)]));
+	return {
+		key: json.key,
+		rujukan: json.rujukan,
+		audioFile: json.audioFile,
+		words,
+		groups,
+		audioEnd,
+		start,
+		end,
+		S,
+		duration: Math.ceil((INTRO + audioEnd + OUTRO) * FPS),
+	};
+};
+export type Ayat = ReturnType<typeof makeAyat>;
 
 export const C = {
 	// Tema "Subuh": ungu tua → merah jambu → peach di ufuk.

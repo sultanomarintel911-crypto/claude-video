@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "studio": "remotion studio src/index.ts",
-    "render": "remotion render src/index.ts AyatTudung out/ayat_tudung_33_59.mp4 --crf=18 --concurrency=4"
+    "render": "remotion render src/index.ts AyatTudung out/ayat_tudung_33_59.mp4 --crf=18 --concurrency=4",
+    "render:2-120": "remotion render src/index.ts AyatYahudiNasrani out/ayat_2_120_teguh_petunjuk.mp4 --crf=18 --concurrency=4"
   },
   "dependencies": {
     "@fontsource/amiri-quran": "^5.2.0",

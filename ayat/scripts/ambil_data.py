@@ -1,4 +1,4 @@
-"""Ambil data satu ayat dari api.quran.com dan tulis src/ayat.json + public/<audio>.mp3.
+"""Ambil data satu ayat dari api.quran.com dan tulis src/data/<sss><aaa>.json + public/<audio>.mp3.
 
 Guna:  python3 scripts/ambil_data.py 33:59 [recitation_id]
   recitation_id lalai 7 = Mishary Alafasy (ada masa setiap perkataan).
@@ -46,7 +46,7 @@ out = {
     "terjemahan_penuh": tr,
     "words": [{"ar": w, "start": s[2], "end": s[3]} for w, s in zip(words, segs)],
 }
-json.dump(out, open("src/ayat.json", "w"), ensure_ascii=False, indent=1)
+json.dump(out, open(f"src/data/{int(surah):03d}{int(ayah):03d}.json", "w"), ensure_ascii=False, indent=1)
 print(out["rujukan"], "| audio", audio, f"{dur:.2f}s")
 print("Terjemahan:", tr)
 for i, w in enumerate(out["words"], 1):
