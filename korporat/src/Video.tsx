@@ -8,7 +8,7 @@ import React from 'react';
 import {AbsoluteFill, Audio, interpolate, random, Sequence, staticFile, useCurrentFrame} from 'remotion';
 import {FPS, Seg, SEGS, VO_FILE} from './data';
 import {BabTag, glitchAmt, GlitchOverlay, Grade, Hud, Label} from './fx';
-import {Bio, Emas, KadPentadbir, Kertas, Klip, Statistik, Tutup} from './scenes';
+import {Bio, Emas, KadPentadbir, Kertas, Klip, PanelHem, Statistik, Tutup} from './scenes';
 
 const SegView: React.FC<{s: Seg}> = ({s}) => {
   switch (s.kind) {
@@ -28,6 +28,7 @@ const SegView: React.FC<{s: Seg}> = ({s}) => {
       return (
         <AbsoluteFill>
           <Klip s={s} />
+          {s.id === 'hem_baru' && <PanelHem s={s} />}
         </AbsoluteFill>
       );
   }

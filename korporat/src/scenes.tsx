@@ -1,5 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, Easing, Img, interpolate, OffthreadVideo, Sequence, staticFile, useCurrentFrame} from 'remotion';
+import panelHem from './panel_hem.json';
 import {FPS, JALAN, Seg, STAT_KAD} from './data';
 import {C, MONO, Network, ORB, Particles, SANS, typed} from './fx';
 
@@ -216,5 +217,29 @@ export const KadPentadbir: React.FC<{jawatan: string; nama: string; foto: string
       </div>
       <Img src={staticFile('montaj/logo_strip.png')} style={{position: 'absolute', left: 60, top: 870, width: 480, opacity: plate}} />
     </AbsoluteFill>
+  );
+};
+
+// ---------- Isi panel hologram PK HEM (dijejak bingkai demi bingkai) ----------
+export const PanelHem: React.FC<{s: Seg}> = ({s}) => {
+  const frame = useCurrentFrame();
+  const src = s.from + (frame / FPS) * s.rate;
+  const i = Math.round((src - panelHem.t0) * panelHem.fps);
+  const b = (panelHem.boxes as Array<number[] | null>)[Math.max(0, Math.min(panelHem.boxes.length - 1, i))];
+  const op = interpolate(src, [5.0, 5.5], [0, 1], clamp);
+  if (!b || op <= 0) return null;
+  const inset = 16;
+  const x = b[0] + inset;
+  const y = b[1] + inset;
+  const w = b[2] - b[0] - inset * 2;
+  const h = w * 0.585 - inset * 2;
+  const scan = ((frame * 6) % (h + 40)) - 20;
+  return (
+    <div style={{position: 'absolute', left: x, top: y, width: w, height: h, overflow: 'hidden', borderRadius: 10, opacity: op * 0.93}}>
+      <Img src={staticFile('montaj/idme_aplikasi.jpg')} style={{width: '100%', height: '100%', objectFit: 'cover', objectPosition: '50% 0%', filter: 'saturate(0.9) brightness(1.05)'}} />
+      <AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(56,232,255,0.18), rgba(56,232,255,0.05))', mixBlendMode: 'screen'}} />
+      <AbsoluteFill style={{background: 'repeating-linear-gradient(0deg, rgba(0,20,40,.18) 0px, rgba(0,20,40,.18) 1px, transparent 1px, transparent 3px)'}} />
+      <div style={{position: 'absolute', left: 0, top: scan, width: '100%', height: 3, background: 'rgba(120,240,255,.7)', boxShadow: '0 0 12px #38e8ff'}} />
+    </div>
   );
 };
