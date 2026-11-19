@@ -23,12 +23,15 @@ seg = get(f"recitations/{REC}/by_ayah/{KEY}?fields=segments")["audio_files"][0]
 tr = get(f"quran/translations/39?verse_key={KEY}")["translations"][0]["text"]
 nama = get(f"chapters/{surah}")["chapter"]["name_simple"]
 
-words = []
+words, prefix = [], ""
 for tok in text.split(" "):
-    if len(tok) == 1 and words:  # tanda waqaf (ۚ ۗ ۖ) melekat pada perkataan sebelumnya
+    if len(tok) == 1 and not words:  # tanda hizb (۞) di awal: lekat pada perkataan pertama
+        prefix += tok + " "
+    elif len(tok) == 1:  # tanda waqaf (ۚ ۗ ۖ) melekat pada perkataan sebelumnya
         words[-1] += " " + tok
     else:
-        words.append(tok)
+        words.append(prefix + tok)
+        prefix = ""
 segs = seg["segments"]
 assert len(segs) == len(words), f"bilangan segmen {len(segs)} != perkataan {len(words)}: semak manual"
 

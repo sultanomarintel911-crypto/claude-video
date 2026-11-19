@@ -7,7 +7,8 @@
     "render": "remotion render src/index.ts AyatTudung out/ayat_tudung_33_59.mp4 --crf=18 --concurrency=4",
     "render:2-120": "remotion render src/index.ts AyatYahudiNasrani out/ayat_2_120_teguh_petunjuk.mp4 --crf=18 --concurrency=4",
     "render:hadis-bukhari-7320": "remotion render src/index.ts HadisLubangBiawak out/hadis_lubang_biawak_bukhari_7320.mp4 --crf=18 --concurrency=4",
-    "render:2-153": "remotion render src/index.ts AyatSabar out/ayat_2_153_sabar_3d.mp4 --crf=18 --concurrency=2"
+    "render:2-153": "remotion render src/index.ts AyatSabar out/ayat_2_153_sabar_3d.mp4 --crf=18 --concurrency=2",
+    "render:30-54": "remotion render src/index.ts AyatKitaranHidup out/ayat_30_54_kitaran_kehidupan.mp4 --crf=18 --concurrency=4"
   },
   "dependencies": {
     "@fontsource/amiri": "^5.3.0",

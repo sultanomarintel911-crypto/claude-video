@@ -9,6 +9,7 @@ Projek: `ayat/` (Remotion 4, React, TypeScript). Contoh siap:
 - Al-Ahzab 33:59 → `ayat_tudung_33_59.mp4` (komposisi `AyatTudung`, `src/v_033059.tsx`)
 - Al-Baqarah 2:120 → `ayat_2_120_teguh_petunjuk.mp4` (komposisi `AyatYahudiNasrani`, `src/v_002120.tsx`)
 - Al-Baqarah 2:153 (sabar) → `ayat_2_153_sabar_3d.mp4` (komposisi `AyatSabar`, `src/v_002153.tsx`) — **gaya Kristal 3D**, qari Abdul Basit
+- Ar-Rum 30:54 (lemah–kuat–beruban) → `ayat_30_54_kitaran_kehidupan.mp4` (komposisi `AyatKitaranHidup`, `src/v_030054.tsx`)
 - Hadis Bukhari 7320 "lubang biawak" → `hadis_lubang_biawak_bukhari_7320.mp4` (komposisi `HadisLubangBiawak`, `src/v_hadis_bukhari_7320.tsx`)
 
 Satu fail `src/v_<sss><aaa>.tsx` bagi setiap ayat; jangan tindih video lama.
@@ -74,6 +75,8 @@ Teks: perkataan Arab belum dibaca pudar (0.22), sedang dibaca = warna sorotan + 
 - **Petunjuk vs jalan lain** (2:120): jalan lurus ke matahari menyala emas, simpang kelabu ke tepi dengan anak panah tarikan, tanglung berdiri (cahaya iman).
 - **Hawa nafsu / amaran**: kabus gelap dari tepi, langit malap, tanglung berkelip.
 - **Tiada pelindung**: kubah cahaya pecah berkecai.
+- **Kitaran hidup** (30:54): pokok prosedural (cabang rekursif, tumbuh ikut `g`), benih → anak pokok ditiup angin → pokok kuat (batang menebal) → daun memutih (uban) & gugur → bunga pelbagai jenis mekar. Kesan: debunga bercahaya, light leak (`mixBlendMode: screen`), butiran filem (`feTurbulence`, seed ikut frame).
+- `Shell` ada prop `titleTop` jika tajuk penutup bertindih dengan visual.
 - **Ikut jejak** (hadis 7320): bukit pasir, jejak gelap → lubang; jejak terang memijak tepat di atasnya + penanda jengkal/hasta + bunyi tapak; biawak masuk lubang.
 Untuk tema baharu (solat, sedekah, ibu bapa, sabar), tambah komponen SVG ringkas yang sama gaya: bentuk rata, tiada wajah, warna dari `C`.
 
@@ -100,4 +103,5 @@ Bila pengguna minta gaya lain / 3D. Berdiri sendiri (tidak guna `Shell`/`Sky`), 
 ## Teknikal
 - `remotion.config.ts` guna Chromium di `/opt/pw-browsers/chromium_headless_shell-1243/...`; laraskan jika laluan lain.
 - api.quran.com menolak User-Agent Python lalai — skrip sudah hantar `User-Agent: curl/8`.
-- Bilangan segmen ≠ bilangan perkataan → skrip berhenti; semak tanda waqaf/simbol khas secara manual.
+- Bilangan segmen ≠ bilangan perkataan → skrip berhenti; semak tanda waqaf/simbol khas secara manual. Tanda hizb `۞` di awal ayat dilekatkan pada perkataan pertama secara automatik.
+- "VectorCraft"/"EffectsCraft" bukan skill/plugin yang tersedia — vektor & kesan dikodkan sendiri (SVG + Remotion).

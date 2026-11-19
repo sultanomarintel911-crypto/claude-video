@@ -234,9 +234,9 @@ export const Texts: React.FC<{a: number; ay: Ayat}> = ({a, ay}) => (
 );
 
 /** Tajuk: `utama` boleh ada *perkataan* untuk warna sorotan. */
-export const Title: React.FC<{op: number; utama: string; sub: string}> = ({op, utama, sub}) =>
+export const Title: React.FC<{op: number; utama: string; sub: string; top?: number}> = ({op, utama, sub, top = 420}) =>
 	op <= 0 ? null : (
-		<div style={{position: 'absolute', top: 420, left: 0, right: 0, textAlign: 'center', opacity: op, transform: `translateY(${(1 - op) * 16}px)`}}>
+		<div style={{position: 'absolute', top, left: 0, right: 0, textAlign: 'center', opacity: op, transform: `translateY(${(1 - op) * 16}px)`}}>
 			<div style={{fontFamily: 'Montserrat', fontWeight: 700, fontSize: 62, color: C.text, letterSpacing: 1}}>
 				{parseTr(utama).map((w, i) => (
 					<span key={i} style={{color: w.gold ? C.gold : C.text}}>
@@ -257,7 +257,9 @@ export const Shell: React.FC<{
 	stage: (t: number, a: number) => React.ReactNode;
 	/** Elemen tambahan di luar SVG (cth. kesan bunyi). */
 	extra?: React.ReactNode;
-}> = ({ay, title, sub, bright, stage, extra}) => {
+	/** Kedudukan tajuk (px dari atas). */
+	titleTop?: number;
+}> = ({ay, title, sub, bright, stage, extra, titleTop}) => {
 	const f = useCurrentFrame();
 	const t = f / FPS;
 	const a = t - INTRO;
@@ -278,7 +280,7 @@ export const Shell: React.FC<{
 					</linearGradient>
 				</defs>
 			</svg>
-			<Title op={titleOp} utama={title} sub={sub} />
+			<Title op={titleOp} utama={title} sub={sub} top={titleTop} />
 			<Texts a={a} ay={ay} />
 			<div style={{position: 'absolute', top: 1800, left: 0, right: 0, textAlign: 'center', fontFamily: 'Cormorant Garamond', fontStyle: 'italic', fontSize: 36, color: C.dim, opacity: refOp}}>
 				{ay.rujukan}
