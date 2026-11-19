@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "studio": "remotion studio src/index.ts",
+    "montaj": "remotion render src/index.ts MontajPentadbir out/_montaj.mp4 --scale=0.5 --crf=24 --concurrency=4 && ffmpeg -y -loglevel error -i out/_montaj.mp4 -c:v copy -c:a aac -b:a 256k out/pratonton_montaj.mp4",
     "preview": "remotion render src/index.ts KorporatSKeSO out/_mentah.mp4 --scale=0.5 --crf=26 --concurrency=4 && ffmpeg -y -loglevel error -i out/_mentah.mp4 -c:v copy -af \"alimiter=limit=0.85:attack=3:release=80:level=disabled,aresample=48000\" -c:a aac -b:a 256k out/pratonton.mp4",
     "final": "remotion render src/index.ts KorporatSKeSO out/_mentah.mp4 --crf=16 --concurrency=4 && ffmpeg -y -loglevel error -i out/_mentah.mp4 -c:v copy -af \"alimiter=limit=0.85:attack=3:release=80:level=disabled,aresample=48000\" -c:a aac -b:a 256k out/korporat_skeso_2026.mp4"
   },
