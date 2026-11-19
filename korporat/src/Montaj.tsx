@@ -172,8 +172,8 @@ const HologramBlock: React.FC<{foto: string; card: Card; sisi: 'kiri' | 'kanan';
       <Stars n={90} seed={seed} opacity={0.5} />
       <HudRings cx={fx} cy={fy} r={265} p={p} />
       <div style={{position: 'absolute', left: fx - pw / 2 + glitch, top: fy - ph / 2, width: pw, height: ph, borderRadius: 16, overflow: 'hidden', opacity: p, boxShadow: '0 0 60px rgba(98,230,255,0.45)', transform: `scale(${1.08 - 0.08 * p})`}}>
-        <Img src={staticFile(foto)} style={{width: pw, height: ph, objectFit: 'cover', objectPosition: '50% 20%', filter: 'saturate(0.75) contrast(1.08) brightness(1.05)'}} />
-        <AbsoluteFill style={{background: 'linear-gradient(0deg, rgba(98,230,255,0.32), rgba(98,230,255,0.06))', mixBlendMode: 'screen'}} />
+        <Img src={staticFile(foto)} style={{width: pw, height: ph, objectFit: 'cover', objectPosition: '50% 50%', filter: 'saturate(0.9) contrast(1.05)'}} />
+        <AbsoluteFill style={{background: 'linear-gradient(0deg, rgba(98,230,255,0.18), rgba(98,230,255,0.03))', mixBlendMode: 'screen'}} />
         {scanOn && <div style={{position: 'absolute', left: 0, top: scan, width: pw, height: 5, background: CYAN, boxShadow: `0 0 22px ${CYAN}`}} />}
         {scanOn && <div style={{position: 'absolute', left: 0, top: 0, width: pw, height: scan, background: 'rgba(98,230,255,0.12)'}} />}
         <Scanlines opacity={0.45} />
