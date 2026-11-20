@@ -28,7 +28,7 @@ const tc = (frame: number) => {
 };
 
 // ---------- HUD global (halus, di tepi skrin) ----------
-const SEMBUNYI_HUD = new Set(['bio', 'statistik', 'emas', 'tutup', 'emblem3d', 'terowong', 'graf3d']);
+const SEMBUNYI_HUD = new Set(['bio', 'statistik', 'emas', 'tutup', 'emblem3d', 'terowong', 'graf3d', 'maklumat']);
 export const Hud: React.FC = () => {
   const frame = useCurrentFrame();
   const s = SEGS.find((x) => frame >= x.f0 && frame < x.f0 + x.fd);
@@ -129,8 +129,7 @@ export const Label: React.FC<{text: string}> = ({text}) => {
   const x = interpolate(frame, [8, 24], [-40, 0], {...clamp, easing: Easing.out(Easing.cubic)});
   return (
     <div style={{position: 'absolute', right: 86, top: 150, opacity: op, transform: `translateX(${-x}px)`}}>
-      <div style={{fontFamily: MONO, fontSize: 18, color: C.cyan, letterSpacing: 3, textAlign: 'right'}}>// MODUL AKTIF</div>
-      <div style={{fontFamily: ORB, fontWeight: 900, fontSize: 38, color: C.putih, letterSpacing: 3, textShadow: '0 0 18px rgba(56,232,255,.9), 0 3px 8px #000', padding: '6px 18px', background: 'linear-gradient(270deg, rgba(0,20,40,.85), rgba(0,20,40,0))', borderRight: `4px solid ${C.cyan}`}}>
+      <div style={{fontFamily: ORB, fontWeight: 900, fontSize: 38, color: C.putih, letterSpacing: 3, textShadow: '0 0 18px rgba(56,232,255,.9), 0 3px 8px #000', padding: '6px 18px', background: 'linear-gradient(270deg, rgba(0,14,30,.92), rgba(0,14,30,.55))', borderRight: `4px solid ${C.cyan}`}}>
         {typed(text, frame - 12, 45)}
       </div>
     </div>

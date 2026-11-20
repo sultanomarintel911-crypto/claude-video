@@ -187,8 +187,8 @@
       "rate": 1,
       "energi": 1,
       "vo": "w",
-      "voFrom": 35.2,
-      "voTo": 52.6,
+      "voFrom": 36.2,
+      "voTo": 52.75,
       "label": "INOVASI · E-LEARNING WALK"
     },
     {
@@ -199,8 +199,8 @@
       "rate": 1,
       "energi": 1,
       "vo": "w",
-      "voFrom": 105.2,
-      "voTo": 114.5,
+      "voFrom": 106.0,
+      "voTo": 114.25,
       "label": "INOVASI · SKeSO APP"
     },
     {
@@ -211,8 +211,8 @@
       "rate": 1,
       "energi": 1,
       "vo": "w",
-      "voFrom": 131.2,
-      "voTo": 136.0
+      "voFrom": 131.95,
+      "voTo": 135.8
     },
     {
       "id": "statistik",
@@ -254,10 +254,8 @@
     },
     {
       "id": "maklumat",
-      "src": "video/korporat_bersih.mp4",
-      "from": 202.2,
-      "to": 205.9,
-      "rate": 1,
+      "kind": "maklumat",
+      "dur": 9.0,
       "energi": 1
     },
     {

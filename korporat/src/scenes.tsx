@@ -242,3 +242,77 @@ export const PanelHem: React.FC<{s: Seg}> = ({s}) => {
     </div>
   );
 };
+
+// ---------- Maklumat Sekolah: zum dari glob ke Terengganu, kemudian Dungun ----------
+const MK_SKALA = 1920 / 1672; // rekaan asal 1672x941
+const MK_TG = {x: 1297 * MK_SKALA, y: 468 * MK_SKALA}; // titik Terengganu dalam rekaan
+const MK_DG = {x: 1305 * MK_SKALA, y: 532 * MK_SKALA}; // Dungun: pesisir selatan Terengganu
+const MK_F = {x: 1293 * MK_SKALA, y: 490 * MK_SKALA}; // pusat zum
+const MK_INFO = [
+  {ikon: '📍', t: 'SK SULTAN OMAR, 23000 DUNGUN, TERENGGANU'},
+  {ikon: '☎', t: '09-848 1368'},
+  {ikon: 'f', t: 'facebook/sksultanomar'},
+  {ikon: '♪', t: 'TikTok · SKeSO'},
+];
+export const MaklumatSekolah: React.FC<{fd: number}> = ({fd}) => {
+  const frame = useCurrentFrame();
+  const t = frame / FPS;
+  const zum = interpolate(t, [0, 2.6, 5.6, 9], [1, 1.05, 2.95, 3.2], {...clamp, easing: Easing.inOut(Easing.cubic)});
+  const map = (p: {x: number; y: number}) => ({x: MK_F.x + (p.x - MK_F.x) * zum + (960 - MK_F.x) * interpolate(t, [2.6, 5.6], [0, 1], {...clamp, easing: Easing.inOut(Easing.cubic)}), y: MK_F.y + (p.y - MK_F.y) * zum + (540 - MK_F.y) * interpolate(t, [2.6, 5.6], [0, 1], {...clamp, easing: Easing.inOut(Easing.cubic)})});
+  const geser = {x: (960 - MK_F.x) * interpolate(t, [2.6, 5.6], [0, 1], {...clamp, easing: Easing.inOut(Easing.cubic)}), y: (540 - MK_F.y) * interpolate(t, [2.6, 5.6], [0, 1], {...clamp, easing: Easing.inOut(Easing.cubic)})};
+  const tg = map(MK_TG);
+  const dg = map(MK_DG);
+  const tgOp = interpolate(t, [3.4, 4.0, 5.6, 6.2], [0, 1, 1, 0.35], clamp);
+  const dgOp = interpolate(t, [5.4, 6.0], [0, 1], clamp);
+  const panel = interpolate(t, [6.0, 6.8], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+  const scan = interpolate(t, [2.6, 5.6], [-10, 110], clamp);
+  const out = interpolate(frame, [fd - 10, fd], [1, 0], clamp);
+  const nadi = (k: number) => ((t * 0.9 + k) % 1);
+  const Cincin: React.FC<{x: number; y: number; warna: string; r: number}> = ({x, y, warna, r}) => (
+    <>
+      {[0, 0.33, 0.66].map((k) => (
+        <div key={k} style={{position: 'absolute', left: x - r * (0.3 + nadi(k)), top: y - r * (0.3 + nadi(k)), width: 2 * r * (0.3 + nadi(k)), height: 2 * r * (0.3 + nadi(k)), borderRadius: '50%', border: `3px solid ${warna}`, opacity: 1 - nadi(k)}} />
+      ))}
+      <div style={{position: 'absolute', left: x - 9, top: y - 9, width: 18, height: 18, borderRadius: '50%', background: '#fff', boxShadow: `0 0 18px ${warna}, 0 0 36px ${warna}`}} />
+    </>
+  );
+  return (
+    <AbsoluteFill style={{background: '#021024', opacity: out, overflow: 'hidden'}}>
+      <AbsoluteFill style={{transform: `translate(${geser.x}px, ${geser.y}px) scale(${zum})`, transformOrigin: `${MK_F.x}px ${MK_F.y}px`}}>
+        <Img src={staticFile('montaj/maklumat_bg.jpg')} style={{width: 1920, height: 1080, objectFit: 'cover'}} />
+      </AbsoluteFill>
+      {/* garis imbasan semasa zum */}
+      {t > 2.6 && t < 5.8 && <div style={{position: 'absolute', left: 0, top: `${scan}%`, width: '100%', height: 4, background: 'rgba(120,240,255,.75)', boxShadow: '0 0 24px #38e8ff'}} />}
+      <AbsoluteFill style={{background: `radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,12,30,${interpolate(t, [3, 6], [0, 0.65], clamp)}) 100%)`}} />
+      {/* Terengganu */}
+      <div style={{opacity: tgOp}}>
+        <Cincin x={tg.x} y={tg.y} warna="#5dff9b" r={70} />
+      </div>
+      {/* Dungun */}
+      <div style={{opacity: dgOp}}>
+        <Cincin x={dg.x} y={dg.y} warna={C.cyan} r={130} />
+        <div style={{position: 'absolute', left: dg.x - 150, top: dg.y - 150, width: 300, height: 300, border: `2px solid ${C.cyan}`, borderRadius: 8, opacity: 0.5, transform: `scale(${interpolate(t, [5.4, 6.2], [1.6, 1], clamp)})`}} />
+        <div style={{position: 'absolute', left: dg.x + 40, top: dg.y - 26, height: 2, width: interpolate(t, [5.8, 6.4], [0, 230], clamp), background: C.cyan, boxShadow: `0 0 10px ${C.cyan}`}} />
+        <div style={{position: 'absolute', left: dg.x + 280, top: dg.y - 78, opacity: interpolate(t, [6.2, 6.6], [0, 1], clamp)}}>
+          <div style={{fontFamily: MONO, fontSize: 22, letterSpacing: 6, color: C.cyan}}>LOKASI DISAHKAN</div>
+          <div style={{fontFamily: ORB, fontWeight: 900, fontSize: 64, letterSpacing: 6, color: '#fff', textShadow: `0 0 20px ${C.cyan}`}}>DUNGUN</div>
+          <div style={{fontFamily: ORB, fontWeight: 700, fontSize: 26, letterSpacing: 5, color: '#5dff9b'}}>TERENGGANU · MALAYSIA</div>
+        </div>
+      </div>
+      {/* panel maklumat */}
+      <div style={{position: 'absolute', left: 80, top: 250, width: 720, opacity: panel, transform: `translateX(${(1 - panel) * -80}px)`}}>
+        <div style={{fontFamily: ORB, fontWeight: 900, fontSize: 60, letterSpacing: 6, color: '#fff', textShadow: `0 0 20px ${C.cyan}`}}>MAKLUMAT SEKOLAH</div>
+        <div style={{width: 520, height: 3, background: C.cyan, boxShadow: `0 0 12px ${C.cyan}`, margin: '14px 0 22px'}} />
+        {MK_INFO.map((m, i) => {
+          const p = interpolate(t, [6.3 + i * 0.18, 6.8 + i * 0.18], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+          return (
+            <div key={i} style={{display: 'flex', alignItems: 'center', gap: 22, marginBottom: 16, padding: '14px 22px', borderRadius: 16, background: 'rgba(4,24,48,.72)', border: '1.5px solid rgba(56,232,255,.55)', boxShadow: '0 0 24px rgba(56,232,255,.18)', opacity: p, transform: `translateX(${(1 - p) * -60}px)`}}>
+              <div style={{width: 54, height: 54, borderRadius: 12, background: 'rgba(56,232,255,.15)', border: `1.5px solid ${C.cyan}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: ORB, fontWeight: 900, fontSize: 28, color: '#fff'}}>{m.ikon}</div>
+              <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 30, color: '#fff', letterSpacing: 1}}>{m.t}</div>
+            </div>
+          );
+        })}
+      </div>
+    </AbsoluteFill>
+  );
+};
