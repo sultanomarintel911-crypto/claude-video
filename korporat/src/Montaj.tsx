@@ -8,6 +8,7 @@ import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/700.css';
 import React from 'react';
 import {AbsoluteFill, Audio, Easing, Img, interpolate, OffthreadVideo, Sequence, staticFile, useCurrentFrame} from 'remotion';
+import {Rangkaian3D} from './tiga';
 import {Block, Card, DATA_JALUR, DATA_KAD, MFPS, pieceDur, TL} from './montaj';
 import {ci, easeOut, Gold, GOLD, SANS, SERIF, Stars, Vignette} from './tk/components';
 import {Brackets, CYAN, GlitchText, HexGrid, HudRings, MONO, ORB, Scanlines, Scramble} from './tk/scifi';
@@ -168,8 +169,8 @@ const HologramBlock: React.FC<{foto: string; card: Card; sisi: 'kiri' | 'kanan';
   const kad: Card = {...card, side: sisi === 'kanan' ? 'kiri' : 'kanan'};
   return (
     <AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 40%, #0d2a4a 0%, #02040a 80%)'}}>
-      <HexGrid opacity={0.2} />
-      <Stars n={90} seed={seed} opacity={0.5} />
+      <HexGrid opacity={0.12} />
+      <Rangkaian3D seed={seed} opacity={0.75} />
       <HudRings cx={fx} cy={fy} r={265} p={p} />
       <div style={{position: 'absolute', left: fx - pw / 2 + glitch, top: fy - ph / 2, width: pw, height: ph, borderRadius: 16, overflow: 'hidden', opacity: p, boxShadow: '0 0 60px rgba(98,230,255,0.45)', transform: `scale(${1.08 - 0.08 * p})`}}>
         <Img src={staticFile(foto)} style={{width: pw, height: ph, objectFit: 'cover', objectPosition: '50% 50%', filter: 'saturate(0.9) contrast(1.05)'}} />

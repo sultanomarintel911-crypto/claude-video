@@ -2,6 +2,13 @@
   "_nota": "Senarai suntingan. Masa sumber dalam saat. dur = (to-from)/rate untuk video; 'dur' terus untuk babak grafik. bab = tag bab digital; energi = tenaga muzik (0-3); vo = stem suara latar (k=korporat mula 110 s, w=walk mula 10 s) dan julat [voFrom, voTo] masa sumber.",
   "segs": [
     {
+      "id": "emblem3d",
+      "kind": "emblem3d",
+      "dur": 5.5,
+      "energi": 1,
+      "hit": 2.4
+    },
+    {
       "id": "biometrik",
       "kind": "bio",
       "src": "video/biometrik.mp4",
@@ -148,14 +155,20 @@
       "energi": 2
     },
     {
+      "id": "terowong",
+      "kind": "terowong",
+      "dur": 2.6,
+      "energi": 2,
+      "teks": "03 // PEMBUDAYAAN DIGITAL"
+    },
+    {
       "id": "digitalisasi",
       "src": "video/korporat_bersih.mp4",
       "from": 176.2,
       "to": 185.5,
       "rate": 1,
       "energi": 2,
-      "hit": 1.4,
-      "bab": "03 // PEMBUDAYAAN DIGITAL"
+      "hit": 1.4
     },
     {
       "id": "era_kertas",
@@ -208,6 +221,12 @@
       "dur": 15.0,
       "energi": 3,
       "hit": 0.0
+    },
+    {
+      "id": "graf3d",
+      "kind": "graf3d",
+      "dur": 6.0,
+      "energi": 3
     },
     {
       "id": "hub",

@@ -8,6 +8,7 @@ import React from 'react';
 import {AbsoluteFill, Audio, interpolate, random, Sequence, staticFile, useCurrentFrame} from 'remotion';
 import {FPS, Seg, SEGS, VO_FILE} from './data';
 import {BabTag, glitchAmt, GlitchOverlay, Grade, Hud, Label} from './fx';
+import {Emblem3D, Graf3D, Terowong3D} from './tiga';
 import {Bio, Emas, KadPentadbir, Kertas, Klip, PanelHem, Statistik, Tutup} from './scenes';
 
 const SegView: React.FC<{s: Seg}> = ({s}) => {
@@ -22,6 +23,12 @@ const SegView: React.FC<{s: Seg}> = ({s}) => {
       return <Emas s={s} />;
     case 'tutup':
       return <Tutup />;
+    case 'emblem3d':
+      return <Emblem3D fd={s.fd} />;
+    case 'terowong':
+      return <Terowong3D fd={s.fd} teks="03 // PEMBUDAYAAN DIGITAL" />;
+    case 'graf3d':
+      return <Graf3D fd={s.fd} />;
     case 'kad':
       return <KadPentadbir jawatan="GPK HAL EHWAL MURID" nama="ROAZMI BIN MOHAMAD" foto="montaj/wajah_hem.jpg" fd={s.fd} />;
     default:
