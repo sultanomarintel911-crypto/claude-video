@@ -8,7 +8,8 @@
     "preview": "npm run gen && remotion render src/index.ts HaksLoop out/haks_preview.mp4 --scale=0.5 --crf=26 --concurrency=4",
     "render": "npm run gen && remotion render src/index.ts HaksLoop out/haks_loop_raw.mp4 --crf=16 --concurrency=4 && ffmpeg -loglevel error -y -i out/haks_loop_raw.mp4 -c copy -movflags +faststart out/haks_loop_10s.mp4 && ffmpeg -loglevel error -y -stream_loop 2 -i out/haks_loop_raw.mp4 -c copy -movflags +faststart out/haks_loop_30s.mp4",
     "render:gah": "npm run gen && remotion render src/index.ts HaksGah out/haks_gah_raw.mp4 --crf=16 --concurrency=4 && ffmpeg -loglevel error -y -i out/haks_gah_raw.mp4 -c copy -movflags +faststart out/haks_gah_12s.mp4 && ffmpeg -loglevel error -y -stream_loop 2 -i out/haks_gah_raw.mp4 -c copy -movflags +faststart out/haks_gah_36s.mp4",
-    "render:combo": "npm run gen && remotion render src/index.ts HaksCombo out/haks_combo_raw.mp4 --crf=16 --concurrency=4 && ffmpeg -loglevel error -y -i out/haks_combo_raw.mp4 -c copy -movflags +faststart out/haks_combo_22s.mp4 && ffmpeg -loglevel error -y -stream_loop 4 -i out/haks_combo_raw.mp4 -c copy -movflags +faststart out/haks_combo_110s.mp4"
+    "render:combo": "npm run gen && remotion render src/index.ts HaksCombo out/haks_combo_raw.mp4 --crf=16 --concurrency=4 && ffmpeg -loglevel error -y -i out/haks_combo_raw.mp4 -c copy -movflags +faststart out/haks_combo_22s.mp4 && ffmpeg -loglevel error -y -stream_loop 4 -i out/haks_combo_raw.mp4 -c copy -movflags +faststart out/haks_combo_110s.mp4",
+    "render:meteor": "npm run gen && remotion render src/index.ts HaksMeteor out/haks_meteor_raw.mp4 --crf=16 --concurrency=4 && ffmpeg -loglevel error -y -i out/haks_meteor_raw.mp4 -c copy -movflags +faststart out/haks_meteor_20s.mp4"
   },
   "dependencies": {
     "@fontsource/exo-2": "^5.3.0",

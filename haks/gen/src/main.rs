@@ -352,10 +352,11 @@ fn crc32(data: &[u8]) -> u32 {
     }
     !c
 }
-fn write_png(path: &str, w: usize, h: usize, rgb: &[u8]) {
+fn write_png(path: &str, w: usize, h: usize, rgb: &[u8]) { write_png_n(path, w, h, 3, rgb) }
+fn write_png_n(path: &str, w: usize, h: usize, ch: usize, rgb: &[u8]) {
     // zlib dengan blok "stored" (tanpa mampatan) — mudah & tanpa crate
-    let mut raw = Vec::with_capacity((w * 3 + 1) * h);
-    for y in 0..h { raw.push(0); raw.extend_from_slice(&rgb[y * w * 3..(y + 1) * w * 3]); }
+    let mut raw = Vec::with_capacity((w * ch + 1) * h);
+    for y in 0..h { raw.push(0); raw.extend_from_slice(&rgb[y * w * ch..(y + 1) * w * ch]); }
     let mut z = vec![0x78, 0x01];
     for (i, chunk) in raw.chunks(65535).enumerate() {
         let last = (i + 1) * 65535 >= raw.len();
@@ -378,7 +379,7 @@ fn write_png(path: &str, w: usize, h: usize, rgb: &[u8]) {
     let mut ihdr = Vec::new();
     ihdr.extend_from_slice(&(w as u32).to_be_bytes());
     ihdr.extend_from_slice(&(h as u32).to_be_bytes());
-    ihdr.extend_from_slice(&[8, 2, 0, 0, 0]);
+    ihdr.extend_from_slice(&[8, if ch == 4 { 6 } else { 2 }, 0, 0, 0]);
     chunk(b"IHDR", &ihdr);
     chunk(b"IDAT", &z);
     chunk(b"IEND", &[]);
@@ -436,6 +437,113 @@ fn planet_texture(rng: &mut Rng, path: &str) {
     eprintln!("haks-gen: tekstur planet {}×{} → {}", w, h, path);
 }
 
+// ---------------------------------------------------------------- Batu meteor (rock.png) + retakan lava (cracks.png, RGBA)
+fn worley(px: &[(f64, f64)], cells: usize, x: f64, y: f64) -> (f64, f64) {
+    // px: titik jitter satu per sel, grid cells×cells, berbalut
+    let (cx, cy) = ((x * cells as f64).floor() as i64, (y * cells as f64).floor() as i64);
+    let (mut f1, mut f2) = (9.0f64, 9.0f64);
+    for dy in -1..=1 {
+        for dx in -1..=1 {
+            let (gx, gy) = (cx + dx, cy + dy);
+            let (wx, wy) = (gx.rem_euclid(cells as i64) as usize, gy.rem_euclid(cells as i64) as usize);
+            let (jx, jy) = px[wy * cells + wx];
+            let fx = (gx as f64 + jx) / cells as f64;
+            let fy = (gy as f64 + jy) / cells as f64;
+            let d = ((fx - x).powi(2) + (fy - y).powi(2)).sqrt() * cells as f64;
+            if d < f1 { f2 = f1; f1 = d; } else if d < f2 { f2 = d; }
+        }
+    }
+    (f1, f2)
+}
+
+fn meteor_textures(rng: &mut Rng, rock_path: &str, crack_path: &str) {
+    let n = 1024usize;
+    let nz = Noise::new(rng);
+    let nz2 = Noise::new(rng);
+    // kawah
+    let craters: Vec<(f64, f64, f64, f64)> = (0..70)
+        .map(|_| {
+            let r = rng.range(0.008, 0.06).powf(1.0) ;
+            (rng.f(), rng.f(), r, rng.range(0.5, 1.0))
+        })
+        .collect();
+    // titik worley untuk dua skala retakan
+    let mk = |rng: &mut Rng, c: usize| (0..c * c).map(|_| (rng.range(0.1, 0.9), rng.range(0.1, 0.9))).collect::<Vec<_>>();
+    let (c1, c2) = (7usize, 17usize);
+    let w1 = mk(rng, c1);
+    let w2 = mk(rng, c2);
+
+    let mut hgt = vec![0f64; n * n];
+    let mut crack = vec![0f64; n * n];
+    for y in 0..n {
+        for x in 0..n {
+            let (u, v) = (x as f64 / n as f64, y as f64 / n as f64);
+            let mut hh = 0.55 * nz.fbm(u, v, 8, 6) + 0.25 * nz2.fbm(u, v, 32, 4);
+            for &(cx, cy, r, dep) in &craters {
+                let mut dx = (u - cx).abs();
+                if dx > 0.5 { dx = 1.0 - dx; }
+                let mut dy = (v - cy).abs();
+                if dy > 0.5 { dy = 1.0 - dy; }
+                let d = (dx * dx + dy * dy).sqrt() / r;
+                if d < 1.0 { hh -= 0.22 * dep * (1.0 - d * d); }
+                hh += 0.09 * dep * (-((d - 1.0) / 0.22).powi(2)).exp();
+            }
+            // retakan: tepi sel worley, dipecah oleh hingar supaya tidak bersambung sempurna
+            let (a1, b1) = worley(&w1, c1, u, v);
+            let (a2, b2) = worley(&w2, c2, u, v);
+            let wob = nz2.fbm(u, v, 16, 3);
+            let k1 = (1.0 - ((b1 - a1) / (0.045 + 0.05 * wob)).min(1.0)).powf(1.6) * ((nz.fbm(u + 0.3, v, 4, 3) - 0.38) / 0.15).clamp(0.0, 1.0);
+            let k2 = (1.0 - ((b2 - a2) / 0.05).min(1.0)).powf(2.0) * ((nz2.fbm(u, v + 0.2, 6, 3) - 0.58) / 0.1).clamp(0.0, 1.0) * 0.4;
+            let k = k1.max(k2);
+            crack[y * n + x] = k;
+            hgt[y * n + x] = hh - 0.12 * k;
+        }
+    }
+    let mut rock = vec![0u8; n * n * 3];
+    let mut cr = vec![0u8; n * n * 4];
+    let l = { let (x, y, z) = (-0.55f64, -0.6f64, 0.58f64); let m = (x * x + y * y + z * z).sqrt(); (x / m, y / m, z / m) };
+    for y in 0..n {
+        for x in 0..n {
+            let i = y * n + x;
+            let hx = hgt[y * n + (x + 1) % n] - hgt[y * n + (x + n - 1) % n];
+            let hy = hgt[((y + 1) % n) * n + x] - hgt[((y + n - 1) % n) * n + x];
+            let (nx, ny, nzv) = (-hx * 9.0, -hy * 9.0, 1.0);
+            let m = (nx * nx + ny * ny + nzv * nzv).sqrt();
+            let lam = ((nx * l.0 + ny * l.1 + nzv * l.2) / m).max(0.0);
+            let (u, v) = (x as f64 / n as f64, y as f64 / n as f64);
+            let tint = nz.fbm(u, v, 3, 3);
+            // albedo cerah: perak-kelabu dengan sedikit hangat/sejuk
+            let alb = lerp3([196.0, 204.0, 218.0], [222.0, 212.0, 196.0], (tint - 0.35) / 0.3);
+            let ao = (0.75 + 1.4 * (hgt[i] - 0.3)).clamp(0.6, 1.08);
+            let k = crack[i];
+            let sh = (0.52 + 0.78 * lam) * ao * (1.0 - 0.5 * k);
+            let c = [alb[0] * sh, alb[1] * sh, alb[2] * sh];
+            for j in 0..3 { rock[i * 3 + j] = c[j].clamp(0.0, 255.0) as u8; }
+            // retakan bercahaya: teras putih-kuning → oren
+            let g = lerp3([255.0, 120.0, 10.0], [255.0, 236.0, 150.0], k * k);
+            cr[i * 4] = g[0] as u8;
+            cr[i * 4 + 1] = g[1] as u8;
+            cr[i * 4 + 2] = g[2] as u8;
+            cr[i * 4 + 3] = (k.powf(0.8) * 255.0).clamp(0.0, 255.0) as u8;
+        }
+    }
+    write_png(rock_path, n, n, &rock);
+    write_png_n(crack_path, n, n, 4, &cr);
+    eprintln!("haks-gen: tekstur meteor → {}, {}", rock_path, crack_path);
+}
+
+// bara api naik dari huruf (per huruf: offset x, fasa, laju integer)
+fn embers(rng: &mut Rng, letters: usize, n: usize) -> J {
+    J::A((0..letters).map(|_| J::A((0..n).map(|_| J::O(vec![
+        ("x", J::N(rng.range(-0.5, 0.5))),
+        ("ph", J::N(rng.f())),
+        ("laps", J::I(rng.int(3, 6))),
+        ("r", J::N(rng.range(1.5, 4.0))),
+        ("sw", J::N(rng.range(6.0, 22.0))),
+        ("h", J::B(rng.chance(0.4))),
+    ])).collect())).collect())
+}
+
 fn main() {
     let path = std::env::args().nth(1).unwrap_or_else(|| "src/layout.json".into());
     let mut rng = Rng(SEED);
@@ -452,9 +560,12 @@ fn main() {
         ("stars", stars(&mut rng, 260)),
         ("warp", warp(&mut rng, 90)),
         ("sparks", sparks(&mut rng, 4, 26)),
+        ("embers", embers(&mut rng, 5, 14)),
     ]);
     if let Some(tex) = std::env::args().nth(2) {
         planet_texture(&mut rng, &tex);
+        let dir = std::path::Path::new(&tex).parent().map(|p| p.to_string_lossy().to_string()).unwrap_or(".".into());
+        meteor_textures(&mut rng, &format!("{}/rock.png", dir), &format!("{}/cracks.png", dir));
     }
     let mut s = String::new();
     doc.write(&mut s);

@@ -36,3 +36,17 @@ keluar 19.8 s → angkasa (bersambung lancar).
 ```bash
 npm run render:combo   # out/haks_combo_22s.mp4 + out/haks_combo_110s.mp4 (5× gelung)
 ```
+
+## Versi meteor tegak (`HaksMeteor`, 20 s)
+
+Huruf H·A·K·S·26 tegak dengan permukaan **batu meteor** (Rust: `public/rock.png` — hingar fBm + kawah +
+pencahayaan normal; `public/cracks.png` — retakan lava Worley, RGBA). Setiap huruf ialah slab 3D sebenar
+(11 lapisan `translateZ` + muka belakang) supaya pusingan pada paksi Y menunjukkan ketebalan. Muka batu cerah
++ garis luar gelap + pinggir sian supaya mudah dibaca dari jauh; retakan lava berdenyut, bara api naik.
+
+Urutan: angkasa → huruf jatuh sebagai meteor berapi satu-satu (1–3.65 s) → gah 4.05 s → ayunan + pusingan
+berantai (6.3 s), serentak (10 s), berselang arah (13 s) → menyala 16.5 s → melancar keluar 17.2 s → angkasa.
+
+```bash
+npm run render:meteor   # out/haks_meteor_20s.mp4
+```
