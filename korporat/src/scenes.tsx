@@ -1,3 +1,6 @@
+import '@fontsource/oxanium/700.css';
+import '@fontsource/oswald/600.css';
+import '@fontsource/russo-one/400.css';
 import React from 'react';
 import {AbsoluteFill, Easing, Img, interpolate, OffthreadVideo, Sequence, staticFile, useCurrentFrame} from 'remotion';
 import panelHem from './panel_hem.json';
@@ -212,8 +215,8 @@ export const KadPentadbir: React.FC<{jawatan: string; nama: string; foto: string
         <Img src={staticFile(foto)} style={{position: 'absolute', left: -(800 * 0.62 - r * 2) / 2, top: -40, width: 800 * 0.62, height: 1000 * 0.62, objectFit: 'cover'}} />
       </div>
       <div style={{position: 'absolute', right: 1920 - 1110, top: 330, textAlign: 'right'}}>
-        <div style={{fontFamily: ORB, fontWeight: 900, fontSize: 62, letterSpacing: 3, color: C.cyan, transform: `skewX(-10deg) translateX(${(1 - t1) * -80}px)`, opacity: t1, textShadow: `0 0 18px ${C.cyan}`}}>{jawatan}</div>
-        <div style={{fontFamily: ORB, fontWeight: 700, fontSize: 44, letterSpacing: 5, color: '#ffd23d', marginTop: 14, transform: `translateX(${(1 - t2) * -60}px)`, opacity: t2, textShadow: '0 3px 10px rgba(0,0,0,.6)'}}>{nama}</div>
+        <div style={{fontFamily: "'Oxanium', sans-serif", fontWeight: 700, fontSize: 88, letterSpacing: 2, color: '#4cf0f0', transform: `skewX(-12deg) translateX(${(1 - t1) * -80}px)`, opacity: t1, textShadow: '0 0 18px rgba(76,240,240,.75), 0 0 4px rgba(76,240,240,.9)'}}>{jawatan}</div>
+        <div style={{fontFamily: "'Oswald', sans-serif", fontWeight: 600, fontSize: 56, letterSpacing: 9, color: '#ffd23d', marginTop: 6, transform: `translateX(${(1 - t2) * -60}px)`, opacity: t2, textShadow: '0 3px 10px rgba(0,0,0,.6)'}}>{nama}</div>
       </div>
     </AbsoluteFill>
   );
