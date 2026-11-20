@@ -76,13 +76,21 @@
       "bab": "01 // PENGENALAN SEKOLAH"
     },
     {
-      "id": "gb_a",
-      "src": "video/korporat_bersih.mp4",
-      "from": 48.0,
-      "to": 58.0,
-      "rate": 1.6,
+      "id": "lima_guru",
+      "src": "video/lima_guru.mp4",
+      "from": 0.0,
+      "to": 4.0,
+      "rate": 0.8,
       "energi": 2,
       "bab": "02 // BARISAN KEPIMPINAN"
+    },
+    {
+      "id": "gb_excel",
+      "src": "video/gb_excel.mp4",
+      "from": 0.3,
+      "to": 10.0,
+      "rate": 1.4,
+      "energi": 2
     },
     {
       "id": "kad_1",
