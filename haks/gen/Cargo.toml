@@ -1,0 +1,10 @@
+[package]
+name = "haks-gen"
+version = "0.1.0"
+edition = "2021"
+description = "Penjana susun atur prosedur (litar, zarah, jubin piksel, gelombang) untuk video gelung HAKS"
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
