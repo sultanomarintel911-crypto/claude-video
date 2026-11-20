@@ -14,3 +14,14 @@ npm run render    # out/haks_loop_10s.mp4 + out/haks_loop_30s.mp4 (3× gelung)
 ```
 
 Tukar `SEED` dalam `gen/src/main.rs` untuk susun atur litar/zarah yang lain.
+
+## Versi "gah" (`HaksGah`, 12 s)
+
+Angkasa gelap + planet (tekstur dijana Rust ke `public/planet.png`) → warp & teras tenaga mengecas →
+HUD & litar dilukis → huruf H·A·K·S terbang masuk satu-satu (jejak cahaya, percikan, gelombang kejutan,
+goncangan kamera) → detik gah 3.85 s (kilatan, sinar, jalur kuning, latar biru poster) → logo hidup →
+huruf terbang keluar ke arah kamera → kembali ke angkasa (bersambung lancar).
+
+```bash
+npm run render:gah   # out/haks_gah_12s.mp4 + out/haks_gah_36s.mp4
+```

@@ -255,6 +255,187 @@ fn ring_ticks(rng: &mut Rng) -> J {
     J::A(out)
 }
 
+
+// ---------------------------------------------------------------- Bintang
+fn stars(rng: &mut Rng, n: usize) -> J {
+    let mut out = Vec::new();
+    for _ in 0..n {
+        let big = rng.chance(0.08);
+        out.push(J::O(vec![
+            ("x", J::N(rng.range(0.0, W))),
+            ("y", J::N(rng.range(0.0, H))),
+            ("r", J::N(if big { rng.range(1.6, 2.6) } else { rng.range(0.5, 1.5) })),
+            ("a", J::N(rng.range(0.35, 1.0))),
+            ("h", J::I(rng.int(1, 4))),
+            ("ph", J::N(rng.f())),
+            ("big", J::B(big)),
+            ("y2", J::B(rng.chance(0.15))),
+        ]));
+    }
+    J::A(out)
+}
+
+// ---------------------------------------------------------------- Streak warp (dari pusat ke luar)
+fn warp(rng: &mut Rng, n: usize) -> J {
+    let mut out = Vec::new();
+    for _ in 0..n {
+        out.push(J::O(vec![
+            ("ang", J::N(rng.range(0.0, 2.0 * PI) * 1000.0)),
+            ("d0", J::N(rng.range(40.0, 300.0))),
+            ("len", J::N(rng.range(120.0, 520.0))),
+            ("del", J::N(rng.range(0.0, 0.5))),
+            ("w", J::N(rng.range(1.0, 3.0))),
+            ("y", J::B(rng.chance(0.2))),
+        ]));
+    }
+    J::A(out)
+}
+
+// ---------------------------------------------------------------- Percikan hentaman (setiap huruf)
+fn sparks(rng: &mut Rng, letters: usize, n: usize) -> J {
+    let mut all = Vec::new();
+    for _ in 0..letters {
+        let mut v = Vec::new();
+        for _ in 0..n {
+            let a = rng.range(0.0, 2.0 * PI);
+            let sp = rng.range(180.0, 620.0);
+            v.push(J::O(vec![
+                ("vx", J::N(a.cos() * sp)),
+                ("vy", J::N(a.sin() * sp * 0.8)),
+                ("r", J::N(rng.range(1.5, 4.0))),
+                ("life", J::N(rng.range(0.45, 0.9))),
+                ("y", J::B(rng.chance(0.55))),
+            ]));
+        }
+        all.push(J::A(v));
+    }
+    J::A(all)
+}
+
+// ---------------------------------------------------------------- Tekstur planet (PNG, bersambung mendatar)
+struct Noise { perm: Vec<f64> }
+impl Noise {
+    fn new(rng: &mut Rng) -> Self { Noise { perm: (0..4096).map(|_| rng.f()).collect() } }
+    fn lat(&self, x: i64, y: i64, px: i64) -> f64 {
+        let xi = x.rem_euclid(px);
+        let h = (xi.wrapping_mul(73_856_093) ^ y.wrapping_mul(19_349_663)) as u64;
+        self.perm[(h.wrapping_mul(2_654_435_761) % 4096) as usize]
+    }
+    /// hingar nilai 2D, berkala dalam x dengan tempoh `px` sel kekisi
+    fn value(&self, x: f64, y: f64, px: i64) -> f64 {
+        let (x0, y0) = (x.floor(), y.floor());
+        let (fx, fy) = (x - x0, y - y0);
+        let s = |t: f64| t * t * (3.0 - 2.0 * t);
+        let (sx, sy) = (s(fx), s(fy));
+        let (ix, iy) = (x0 as i64, y0 as i64);
+        let a = self.lat(ix, iy, px) * (1.0 - sx) + self.lat(ix + 1, iy, px) * sx;
+        let b = self.lat(ix, iy + 1, px) * (1.0 - sx) + self.lat(ix + 1, iy + 1, px) * sx;
+        a * (1.0 - sy) + b * sy
+    }
+    fn fbm(&self, u: f64, v: f64, base: i64, oct: usize) -> f64 {
+        let (mut amp, mut sum, mut norm, mut p) = (0.5, 0.0, 0.0, base);
+        for o in 0..oct {
+            sum += amp * self.value(u * p as f64, v * p as f64 + o as f64 * 17.0, p);
+            norm += amp;
+            amp *= 0.5;
+            p *= 2;
+        }
+        sum / norm
+    }
+}
+
+fn crc32(data: &[u8]) -> u32 {
+    let mut c = 0xFFFF_FFFFu32;
+    for &b in data {
+        c ^= b as u32;
+        for _ in 0..8 { c = if c & 1 != 0 { 0xEDB8_8320 ^ (c >> 1) } else { c >> 1 }; }
+    }
+    !c
+}
+fn write_png(path: &str, w: usize, h: usize, rgb: &[u8]) {
+    // zlib dengan blok "stored" (tanpa mampatan) — mudah & tanpa crate
+    let mut raw = Vec::with_capacity((w * 3 + 1) * h);
+    for y in 0..h { raw.push(0); raw.extend_from_slice(&rgb[y * w * 3..(y + 1) * w * 3]); }
+    let mut z = vec![0x78, 0x01];
+    for (i, chunk) in raw.chunks(65535).enumerate() {
+        let last = (i + 1) * 65535 >= raw.len();
+        z.push(if last { 1 } else { 0 });
+        let n = chunk.len() as u16;
+        z.extend_from_slice(&n.to_le_bytes());
+        z.extend_from_slice(&(!n).to_le_bytes());
+        z.extend_from_slice(chunk);
+    }
+    let (mut a, mut b) = (1u32, 0u32);
+    for &x in &raw { a = (a + x as u32) % 65521; b = (b + a) % 65521; }
+    z.extend_from_slice(&((b << 16) | a).to_be_bytes());
+    let mut png = vec![0x89, b'P', b'N', b'G', 0x0D, 0x0A, 0x1A, 0x0A];
+    let mut chunk = |ty: &[u8], data: &[u8]| {
+        png.extend_from_slice(&(data.len() as u32).to_be_bytes());
+        let mut c = ty.to_vec(); c.extend_from_slice(data);
+        png.extend_from_slice(&c);
+        png.extend_from_slice(&crc32(&c).to_be_bytes());
+    };
+    let mut ihdr = Vec::new();
+    ihdr.extend_from_slice(&(w as u32).to_be_bytes());
+    ihdr.extend_from_slice(&(h as u32).to_be_bytes());
+    ihdr.extend_from_slice(&[8, 2, 0, 0, 0]);
+    chunk(b"IHDR", &ihdr);
+    chunk(b"IDAT", &z);
+    chunk(b"IEND", &[]);
+    std::fs::write(path, png).expect("gagal tulis PNG");
+}
+
+fn lerp3(a: [f64; 3], b: [f64; 3], t: f64) -> [f64; 3] {
+    let t = t.clamp(0.0, 1.0);
+    [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]
+}
+
+fn planet_texture(rng: &mut Rng, path: &str) {
+    let (w, h) = (2048usize, 512usize);
+    let land = Noise::new(rng);
+    let cloud = Noise::new(rng);
+    let lights = Noise::new(rng);
+    let mut px = vec![0u8; w * h * 3];
+    let ocean_deep = [4.0, 14.0, 48.0];
+    let ocean = [6.0, 28.0, 92.0];
+    let shore = [40.0, 150.0, 255.0];
+    let landc = [8.0, 40.0, 112.0];
+    let high = [30.0, 105.0, 205.0];
+    for y in 0..h {
+        for x in 0..w {
+            let u = x as f64 / w as f64;
+            let v = y as f64 / w as f64; // nisbah aspek 1:1 per sel
+            let e = land.fbm(u, v, 6, 6);
+            let mut c = if e < 0.5 {
+                lerp3(ocean_deep, ocean, (e - 0.25) / 0.25)
+            } else if e < 0.53 {
+                lerp3(ocean, shore, (e - 0.5) / 0.03)
+            } else {
+                lerp3(landc, high, (e - 0.53) / 0.25)
+            };
+            // garis pantai bercahaya
+            let edge = 1.0 - ((e - 0.515).abs() / 0.012).min(1.0);
+            c = lerp3(c, [90.0, 215.0, 255.0], edge * 0.75);
+            // lampu bandar kuning di darat
+            if e > 0.55 {
+                let l = lights.fbm(u, v, 256, 2);
+                let m = land.fbm(u, v, 24, 2); // gugusan bandar
+                if l > 0.74 && m > 0.5 { c = lerp3(c, [255.0, 214.0, 60.0], ((l - 0.74) / 0.06).min(1.0)); }
+            }
+            // awan
+            let cl = cloud.fbm(u + 0.0, v, 4, 5);
+            let ca = ((cl - 0.56) / 0.2).clamp(0.0, 1.0) * 0.4;
+            c = lerp3(c, [190.0, 225.0, 255.0], ca);
+            let i = (y * w + x) * 3;
+            px[i] = c[0].round() as u8;
+            px[i + 1] = c[1].round() as u8;
+            px[i + 2] = c[2].round() as u8;
+        }
+    }
+    write_png(path, w, h, &px);
+    eprintln!("haks-gen: tekstur planet {}×{} → {}", w, h, path);
+}
+
 fn main() {
     let path = std::env::args().nth(1).unwrap_or_else(|| "src/layout.json".into());
     let mut rng = Rng(SEED);
@@ -268,7 +449,13 @@ fn main() {
         ("particles", particles(&mut rng, 70)),
         ("wave", wave(&mut rng)),
         ("ticks", ring_ticks(&mut rng)),
+        ("stars", stars(&mut rng, 260)),
+        ("warp", warp(&mut rng, 90)),
+        ("sparks", sparks(&mut rng, 4, 26)),
     ]);
+    if let Some(tex) = std::env::args().nth(2) {
+        planet_texture(&mut rng, &tex);
+    }
     let mut s = String::new();
     doc.write(&mut s);
     std::fs::write(&path, &s).expect("gagal tulis layout");
