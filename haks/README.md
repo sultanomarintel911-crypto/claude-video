@@ -25,3 +25,14 @@ huruf terbang keluar ke arah kamera → kembali ke angkasa (bersambung lancar).
 ```bash
 npm run render:gah   # out/haks_gah_12s.mp4 + out/haks_gah_36s.mp4
 ```
+
+## Versi gabungan (`HaksCombo`, 22 s) — untuk dimainkan sepanjang program
+
+Angkasa → HAKS **melintang** (terbang masuk satu-satu, gah 3.85 s) → **transformasi** 9.2 s (setiap huruf
+melayang dalam lengkung Bezier + pusingan 3D ke susunan **menegak**, cincin HUD membesar, planet turun) →
+**"26"** naik dari bawah + gah kedua 11.3 s → kilauan atas→bawah, riak huruf, cahaya kuning antara huruf →
+keluar 19.8 s → angkasa (bersambung lancar).
+
+```bash
+npm run render:combo   # out/haks_combo_22s.mp4 + out/haks_combo_110s.mp4 (5× gelung)
+```
