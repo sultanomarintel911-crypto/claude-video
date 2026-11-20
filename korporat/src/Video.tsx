@@ -10,7 +10,7 @@ import {FPS, Seg, SEGS, VO_FILE} from './data';
 import {BabTag, glitchAmt, GlitchOverlay, Grade, Hud, Label} from './fx';
 import {Emblem3D, Graf3D, Terowong3D} from './tiga';
 import {MaklumatGlob} from './maklumat3d';
-import {Bio, Emas, KadPentadbir, Kertas, Klip, PanelHem, Statistik, Tutup} from './scenes';
+import {Bio, Emas, KadAsal, KadPentadbir, Kertas, Klip, PanelHem, Statistik, Tutup} from './scenes';
 
 const SegView: React.FC<{s: Seg}> = ({s}) => {
   switch (s.kind) {
@@ -33,7 +33,7 @@ const SegView: React.FC<{s: Seg}> = ({s}) => {
     case 'maklumat':
       return <MaklumatGlob fd={s.fd} />;
     case 'kad':
-      return <KadPentadbir jawatan="GPK HAL EHWAL MURID" nama="ROAZMI BIN MOHAMAD" foto="montaj/wajah_hem.jpg" fd={s.fd} />;
+      return <KadAsal jawatan="GPK HAL EHWAL MURID" nama="ROAZMI BIN MOHAMAD" fd={s.fd} />;
     default:
       return (
         <AbsoluteFill>

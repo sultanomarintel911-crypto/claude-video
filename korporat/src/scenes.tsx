@@ -1,5 +1,7 @@
 import '@fontsource/oxanium/700.css';
 import '@fontsource/oswald/600.css';
+import '@fontsource/oswald/700.css';
+import '@fontsource/oxanium/600.css';
 import '@fontsource/russo-one/400.css';
 import React from 'react';
 import {AbsoluteFill, Easing, Img, interpolate, OffthreadVideo, Sequence, staticFile, useCurrentFrame} from 'remotion';
@@ -316,6 +318,21 @@ export const MaklumatSekolah: React.FC<{fd: number}> = ({fd}) => {
           );
         })}
       </div>
+    </AbsoluteFill>
+  );
+};
+
+// ---------- Kad nama ikut kad asal (plat dibersihkan dari kad PK HEM lama) ----------
+export const KadAsal: React.FC<{jawatan: string; nama: string; fd: number; tt?: number; nt?: number; ts?: number; ns?: number; tl?: number; nl?: number}> = ({jawatan, nama, fd, tt = 79, nt = 66, ts = 8, ns = 6, tl = 418, nl = 504}) => {
+  const frame = useCurrentFrame();
+  const a = interpolate(frame, [2, 10], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+  const b = interpolate(frame, [6, 14], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+  const rate = 2.0 / (fd / FPS);
+  return (
+    <AbsoluteFill>
+      <OffthreadVideo src={staticFile('video/kad_hem_plate.mp4')} playbackRate={Math.min(1, rate)} muted style={{width: '100%', height: '100%'}} />
+      <div style={{position: 'absolute', left: 556 - 700, width: 1400, top: tl, textAlign: 'center', fontFamily: "'Oxanium', sans-serif", fontWeight: 600, fontSize: tt, lineHeight: 1, letterSpacing: ts, color: 'rgb(94,253,243)', transform: `skewX(-12deg) translateX(${(1 - a) * -60}px)`, opacity: a}}>{jawatan}</div>
+      <div style={{position: 'absolute', left: 556 - 700, width: 1400, top: nl, textAlign: 'center', fontFamily: "'Oswald', sans-serif", fontWeight: 700, fontSize: nt, lineHeight: 1, letterSpacing: ns, color: 'rgb(252,207,3)', transform: `translateX(${(1 - b) * -40}px)`, opacity: b}}>{nama}</div>
     </AbsoluteFill>
   );
 };
