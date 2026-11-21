@@ -49,7 +49,7 @@ tepi[a < 200] = 0
 # sempadan badge sendiri
 tepi |= cv2.Canny(a, 50, 150)
 ey, ex = np.where(tepi > 0)
-pilih = rng.random(len(ex)) < 0.55
+pilih = rng.random(len(ex)) < 0.85
 ex, ey = ex[pilih], ey[pilih]
 # isian jarang
 gy, gx = np.mgrid[3:bh:7, 3:bw:7]

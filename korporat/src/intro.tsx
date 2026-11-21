@@ -117,109 +117,247 @@ const dailTex = (seed: string, padat = 1) => {
   return t;
 };
 
+// ---------------------------------------------------------------- koreografi kamera
+// Gaya "fly-through" HUD: dekat-serong (Dutch angle) -> ikut benih (whip) ->
+// sudut rendah (low angle) -> kren naik serong -> gelongsor sisi (truck) ->
+// tarik ke belakang (pull-back reveal) -> tolak perlahan (push-in).
+type KF = {t: number; p: [number, number, number]; g: [number, number, number]; r: number};
+const KFS: KF[] = [
+  {t: 0.0, p: [-1.5, -0.9, 6.2], g: [-3.3, -0.1, 0.5], r: 0.28},
+  {t: 1.4, p: [-2.6, -0.5, 5.4], g: [-3.0, -0.1, 0.5], r: 0.22},
+  {t: 2.5, p: [-0.8, -1.3, 8.0], g: [0.2, 0.8, 0.5], r: 0.06},
+  {t: 3.9, p: [3.0, -4.2, 9.5], g: [0, 1.0, 0], r: -0.16},
+  {t: 5.7, p: [4.6, 3.0, 8.8], g: [0, 0.9, 0], r: -0.07},
+  {t: 7.3, p: [-4.6, 0.3, 8.0], g: [0.1, 0.8, 0], r: 0.1},
+  {t: 8.7, p: [-1.0, -0.6, 11.5], g: [0, -0.3, 0], r: 0.03},
+  {t: 9.5, p: [0, 0.3, 13.3], g: [0, 0.3, 0], r: 0},
+  {t: 11.0, p: [0, 0.3, 12.6], g: [0, 0.3, 0], r: 0},
+];
+const lengkungP = new THREE.CatmullRomCurve3(KFS.map((k) => new THREE.Vector3(...k.p)), false, 'centripetal');
+const lengkungG = new THREE.CatmullRomCurve3(KFS.map((k) => new THREE.Vector3(...k.g)), false, 'centripetal');
+export const posKamera = (t: number) => {
+  const n = KFS.length;
+  let i = 0;
+  while (i < n - 2 && t > KFS[i + 1].t) i++;
+  let u = cl((t - KFS[i].t) / (KFS[i + 1].t - KFS[i].t));
+  if (i === 0) u = u * u * 0.5 + u * 0.5; // mula lembut
+  if (i === n - 2) u = 1 - (1 - u) * (1 - u); // berhenti lembut
+  const s = (i + u) / (n - 1);
+  const r = THREE.MathUtils.lerp(KFS[i].r, KFS[i + 1].r, ss(u));
+  // goyang tangan halus
+  const p = lengkungP.getPoint(s).add(new THREE.Vector3(Math.sin(t * 0.9) * 0.05, Math.sin(t * 1.3) * 0.04, 0));
+  return {p, g: lengkungG.getPoint(s), r};
+};
+const pasang = (cam: THREE.Camera, t: number) => {
+  const k = posKamera(t);
+  cam.position.copy(k.p);
+  cam.lookAt(k.g);
+  cam.rotateZ(k.r);
+};
 const Kamera: React.FC<{t: number}> = ({t}) => {
   const {camera} = useThree();
-  const k = ss(cl((t - 1.5) / 2.9));
-  const dol = interpolate(t, [4.4, 9], [0, 1], {...clamp, easing: Easing.out(Easing.quad)});
-  const px = THREE.MathUtils.lerp(-2.4, 0, k);
-  const py = THREE.MathUtils.lerp(-0.3, 0.3, k);
-  const pz = THREE.MathUtils.lerp(7.2, 14.5, k) - dol * 1.4;
-  const tx = THREE.MathUtils.lerp(-2.2, 0, k);
-  const ty = THREE.MathUtils.lerp(-0.1, 0.3, k);
-  camera.position.set(px + Math.sin(t * 0.7) * 0.08, py, pz);
-  camera.lookAt(tx, ty, THREE.MathUtils.lerp(0.5, 0, k));
-  camera.rotateZ(THREE.MathUtils.lerp(0.06, 0, k));
+  pasang(camera, t);
   return null;
+};
+// Unjuran titik dunia ke skrin (untuk label DOM yang melekat pada objek 3D)
+const kamBayang = new THREE.PerspectiveCamera(40, W / H, 0.1, 300);
+const keSkrin = (t: number, x: number, y: number, z: number) => {
+  pasang(kamBayang, t);
+  kamBayang.updateMatrixWorld();
+  const v = new THREE.Vector3(x, y, z).project(kamBayang);
+  return {x: ((v.x + 1) / 2) * W, y: ((1 - v.y) / 2) * H};
+};
+
+// Panel HUD (gaya papan pemuka) di kiri & kanan badge
+const panelTex = (jenis: 'kiri' | 'kanan') => {
+  const c = document.createElement('canvas');
+  c.width = 1024;
+  c.height = 640;
+  const g = c.getContext('2d')!;
+  g.strokeStyle = CYAN;
+  g.fillStyle = CYAN;
+  g.shadowColor = CYAN;
+  g.shadowBlur = 10;
+  g.lineWidth = 4;
+  // bucu
+  const L = 70;
+  for (const [x, y, dx, dy] of [[8, 8, 1, 1], [1016, 8, -1, 1], [8, 632, 1, -1], [1016, 632, -1, -1]]) {
+    g.beginPath();
+    g.moveTo(x + dx * L, y);
+    g.lineTo(x, y);
+    g.lineTo(x, y + dy * L);
+    g.stroke();
+  }
+  g.globalAlpha = 0.35;
+  g.lineWidth = 2;
+  g.strokeRect(30, 30, 964, 580);
+  g.globalAlpha = 1;
+  g.font = 'bold 40px monospace';
+  g.fillText(jenis === 'kiri' ? 'SKeSO // SISTEM' : 'IDENTITI // SEKOLAH', 60, 95);
+  g.fillRect(60, 115, 300, 4);
+  g.font = '26px monospace';
+  if (jenis === 'kiri') {
+    const lab = ['DIGITAL', 'DELIMa', 'GURU', 'MURID', 'INOVASI'];
+    lab.forEach((l, i) => {
+      const h = 120 + random(`pb${i}`) * 260;
+      g.globalAlpha = 0.9;
+      g.fillRect(90 + i * 170, 560 - h, 70, h);
+      g.globalAlpha = 0.7;
+      g.fillText(l, 80 + i * 170, 600);
+    });
+  } else {
+    const baris = ['DAERAH : DUNGUN', 'NEGERI : TERENGGANU', 'MOTO   : RAJIN USAHA', '         TANGGA KEJAYAAN', 'STATUS : SHOWCASE SCHOOL'];
+    g.globalAlpha = 0.85;
+    baris.forEach((b, i) => g.fillText(b, 60, 190 + i * 62));
+    g.globalAlpha = 0.6;
+    g.lineWidth = 3;
+    for (const r of [40, 75, 110]) {
+      g.beginPath();
+      g.arc(860, 440, r, 0, Math.PI * 2);
+      g.stroke();
+    }
+    g.beginPath();
+    g.moveTo(860, 440);
+    g.lineTo(960, 380);
+    g.stroke();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+};
+const PanelHud: React.FC<{t: number}> = ({t}) => {
+  const kiri = useMemo(() => panelTex('kiri'), []);
+  const kanan = useMemo(() => panelTex('kanan'), []);
+  const a = interpolate(t, [6.9, 7.7], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+  const b = interpolate(t, [7.2, 8.0], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+  const op = (x: number) => x * 0.8 * (0.9 + 0.1 * Math.sin(t * 9));
+  return (
+    <>
+      <mesh position={[-5.9, 1.1, -0.6]} rotation={[0, 0.38, 0]} scale={[Math.max(a, 0.001), 1, 1]}>
+        <planeGeometry args={[3.3, 2.06]} />
+        <meshBasicMaterial map={kiri} transparent opacity={op(a)} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} toneMapped={false} />
+      </mesh>
+      <mesh position={[5.9, 1.1, -0.6]} rotation={[0, -0.38, 0]} scale={[Math.max(b, 0.001), 1, 1]}>
+        <planeGeometry args={[3.3, 2.06]} />
+        <meshBasicMaterial map={kanan} transparent opacity={op(b)} blending={THREE.AdditiveBlending} depthWrite={false} side={THREE.DoubleSide} toneMapped={false} />
+      </mesh>
+    </>
+  );
 };
 
 // ---------------------------------------------------------------- zarah badge
 type Badge = {
   n: number;
-  p0: Float32Array; // kedudukan benih di dandelion
-  c1: Float32Array;
-  c2: Float32Array;
+  p0: Float32Array; // benih di dandelion
+  c1: Float32Array; // titik kawalan tiupan angin
+  q0: Float32Array; // kedudukan dalam awan dron (sebelum diputar)
   tg: Float32Array; // sasaran di badge
-  col: Float32Array;
-  rel: Float32Array;
-  arr: Float32Array;
+  rel: Float32Array; // terlepas dari dandelion
+  endA: Float32Array; // tiba di awan
+  dep: Float32Array; // bertolak dari awan ke badge
+  arr: Float32Array; // mengunci di badge (ikut garis imbasan)
   ph: Float32Array;
+  tepi: Uint8Array;
 };
+
+// Imbasan binaan: bawah -> atas
+export const IMBAS0 = 4.4;
+export const IMBAS_DUR = 3.0;
+const TERBANG = 1.1; // masa dari awan ke sasaran (perlahan, mendarat lembut)
 
 const sediaBadge = (d: Data): Badge => {
   const b = d.badge;
   const n = b.x.length;
-  const o = {
+  const o: Badge = {
     n,
     p0: new Float32Array(n * 3),
     c1: new Float32Array(n * 3),
-    c2: new Float32Array(n * 3),
+    q0: new Float32Array(n * 3),
     tg: new Float32Array(n * 3),
-    col: new Float32Array(n * 3),
     rel: new Float32Array(n),
+    endA: new Float32Array(n),
+    dep: new Float32Array(n),
     arr: new Float32Array(n),
     ph: new Float32Array(n),
+    tepi: new Uint8Array(n),
   };
   for (let i = 0; i < n; i++) {
-    // arah rawak sfera untuk benih
     const u = random(`u${i}`) * 2 - 1;
     const v = random(`v${i}`) * Math.PI * 2;
     const s = Math.sqrt(1 - u * u);
     const dx = s * Math.cos(v);
-    const dy = u;
-    const dz = s * Math.sin(v);
     const rr = DR * (0.93 + random(`r${i}`) * 0.1);
-    const P = [D.x + dx * rr, D.y + dy * rr, D.z + dz * rr];
-    const T = [b.x[i] * BH, b.y[i] * BH + BY, 0];
-    const ang = Math.atan2(b.y[i], b.x[i]) + 1.9;
-    const rw = random(`w${i}`);
-    const C1 = [P[0] + 2.6 + 1.8 * rw, P[1] + 1.0 + 1.8 * random(`wy${i}`), P[2] + 1.6 * (random(`wz${i}`) - 0.3)];
-    const C2 = [T[0] + Math.cos(ang) * 3.3, T[1] + Math.sin(ang) * 3.3, 1.8 + random(`cz${i}`) * 1.5];
+    const P = [D.x + dx * rr, D.y + u * rr, D.z + s * Math.sin(v) * rr];
     o.p0.set(P, i * 3);
-    o.c1.set(C1, i * 3);
-    o.c2.set(C2, i * 3);
-    o.tg.set(T, i * 3);
-    o.col.set([b.c[i * 3], b.c[i * 3 + 1], b.c[i * 3 + 2]], i * 3);
-    // angin dari kiri: benih di sebelah kanan dahulu terlepas
+    o.c1.set([P[0] + 1.6 + 1.6 * random(`w${i}`), P[1] + 0.8 + 1.4 * random(`wy${i}`), P[2] + 1.2 * (random(`wz${i}`) - 0.3)], i * 3);
+    o.q0.set([(random(`qx${i}`) - 0.5) * 5.4, (random(`qy${i}`) - 0.5) * 4.6 + BY, (random(`qz${i}`) - 0.5) * 2.6], i * 3);
+    o.tg.set([b.x[i] * BH, b.y[i] * BH + BY, 0], i * 3);
+    o.tepi[i] = b.tepi[i];
     o.rel[i] = 1.5 + 0.65 * (1 - (dx + 1) / 2) + 0.3 * random(`rl${i}`);
-    // badge terbina dari atas ke bawah, garis tepi dahulu
-    const yn = 0.5 - b.y[i];
-    o.arr[i] = 3.7 + 1.05 * yn + 0.22 * random(`ar${i}`) - 0.25 * b.tepi[i];
+    const yb = b.y[i] + 0.5;
+    o.arr[i] = IMBAS0 + IMBAS_DUR * yb + (b.tepi[i] ? 0 : 0.45) + 0.12 * random(`ar${i}`);
+    o.dep[i] = o.arr[i] - TERBANG;
+    o.endA[i] = Math.min(o.rel[i] + 1.5, o.dep[i]);
     o.ph[i] = random(`ph${i}`) * 6.28;
   }
   return o;
 };
 
+// kedudukan dalam awan dron yang berputar perlahan
+const awan = (o: Badge, k: number, t: number, ph: number) => {
+  const a = 0.3 * t;
+  const x = o.q0[k];
+  const z = o.q0[k + 2];
+  return [x * Math.cos(a) - z * Math.sin(a), o.q0[k + 1] + 0.08 * Math.sin(t * 1.2 + ph), x * Math.sin(a) + z * Math.cos(a)];
+};
+
+// 0 = dandelion, 1 = tiupan/awan, 2 = terbang ke badge, 3 = terkunci
 const posBadge = (o: Badge, i: number, t: number, out: Float32Array, j: number) => {
   const k = i * 3;
-  if (t <= o.rel[i]) {
-    // berpusing perlahan di kepala dandelion
-    const a = t * 0.25;
-    const x = o.p0[k] - D.x;
-    const z = o.p0[k + 2] - D.z;
-    out[j] = D.x + x * Math.cos(a) - z * Math.sin(a);
-    out[j + 1] = o.p0[k + 1];
-    out[j + 2] = D.z + x * Math.sin(a) + z * Math.cos(a);
-    return 0;
-  }
+  const ph = o.ph[i];
   if (t >= o.arr[i]) {
     out[j] = o.tg[k];
     out[j + 1] = o.tg[k + 1];
     out[j + 2] = o.tg[k + 2];
+    return 3;
+  }
+  const rotD = (tt: number) => {
+    const a = tt * 0.25;
+    const x = o.p0[k] - D.x;
+    const z = o.p0[k + 2] - D.z;
+    return [D.x + x * Math.cos(a) - z * Math.sin(a), o.p0[k + 1], D.z + x * Math.sin(a) + z * Math.cos(a)];
+  };
+  if (t <= o.rel[i]) {
+    const q = rotD(t);
+    out[j] = q[0];
+    out[j + 1] = q[1];
+    out[j + 2] = q[2];
+    return 0;
+  }
+  if (t < o.dep[i]) {
+    const Q = awan(o, k, t, ph);
+    if (t < o.endA[i]) {
+      const s0 = (t - o.rel[i]) / (o.endA[i] - o.rel[i]);
+      const s = ss(s0);
+      const P = rotD(o.rel[i]);
+      const w = Math.sin(Math.PI * s0) * 0.18;
+      out[j] = bz(P[0], o.c1[k], Q[0] - 0.8, Q[0], s) + Math.sin(t * 2.1 + ph) * w;
+      out[j + 1] = bz(P[1], o.c1[k + 1], Q[1] + 0.5, Q[1], s) + Math.cos(t * 1.7 + ph) * w;
+      out[j + 2] = bz(P[2], o.c1[k + 2], Q[2] + 0.6, Q[2], s);
+    } else {
+      out[j] = Q[0];
+      out[j + 1] = Q[1];
+      out[j + 2] = Q[2];
+    }
     return 1;
   }
-  const s0 = (t - o.rel[i]) / (o.arr[i] - o.rel[i]);
-  const s = ss(s0);
-  const wob = Math.sin(Math.PI * s0) * 0.35;
-  const ph = o.ph[i];
-  const a = 0.25 * o.rel[i];
-  const x0 = o.p0[k] - D.x;
-  const z0 = o.p0[k + 2] - D.z;
-  const P0x = D.x + x0 * Math.cos(a) - z0 * Math.sin(a);
-  const P0z = D.z + x0 * Math.sin(a) + z0 * Math.cos(a);
-  out[j] = bz(P0x, o.c1[k], o.c2[k], o.tg[k], s) + Math.sin(t * 3.1 + ph) * wob;
-  out[j + 1] = bz(o.p0[k + 1], o.c1[k + 1], o.c2[k + 1], o.tg[k + 1], s) + Math.cos(t * 2.4 + ph) * wob;
-  out[j + 2] = bz(P0z, o.c1[k + 2], o.c2[k + 2], o.tg[k + 2], s) + Math.sin(t * 1.8 + ph * 1.3) * wob;
-  return 0.5;
+  const Q = awan(o, k, o.dep[i], ph);
+  const s = (t - o.dep[i]) / TERBANG;
+  const e = 1 - Math.pow(1 - s, 3);
+  out[j] = bz(Q[0], Q[0], o.tg[k], o.tg[k], e);
+  out[j + 1] = bz(Q[1], Q[1], o.tg[k + 1], o.tg[k + 1], e);
+  out[j + 2] = bz(Q[2], Q[2] + 0.8, 1.2, o.tg[k + 2], e);
+  return 2;
 };
 
 const BadgeZarah: React.FC<{o: Badge; t: number; op: number}> = ({o, t, op}) => {
@@ -233,9 +371,9 @@ const BadgeZarah: React.FC<{o: Badge; t: number; op: number}> = ({o, t, op}) => 
       }),
     [o],
   );
-  // 0 = zarah utama, 1-2 = jejak dron
-  const lag = [0, 0.05, 0.11];
-  const gain = [1, 0.45, 0.2];
+  // 0 = zarah utama, 1-2 = jejak halus semasa terbang ke badge
+  const lag = [0, 0.04, 0.09];
+  const gain = [1, 0.4, 0.16];
   lapis.forEach((g, L) => {
     const P = g.attributes.position.array as Float32Array;
     const C = g.attributes.color.array as Float32Array;
@@ -243,29 +381,34 @@ const BadgeZarah: React.FC<{o: Badge; t: number; op: number}> = ({o, t, op}) => 
     for (let i = 0; i < o.n; i++) {
       const j = i * 3;
       const st = posBadge(o, i, tt, P, j);
-      let r: number, gg: number, b: number;
-      if (st === 0) {
-        if (L > 0) {
-          r = gg = b = 0;
+      let r = 0, gg = 0, b = 0;
+      if (st === 0 && L === 0) {
+        const kel = 0.55 + 0.25 * Math.sin(t * 2 + o.ph[i]);
+        r = 0.75 * kel;
+        gg = 0.92 * kel;
+        b = kel;
+      } else if (st === 1 && L === 0) {
+        const m = cl((t - o.rel[i]) / 0.8);
+        const kel = 0.75 + 0.25 * Math.sin(t * 3 + o.ph[i] * 2);
+        r = THREE.MathUtils.lerp(0.6, 0.18, m) * kel;
+        gg = THREE.MathUtils.lerp(0.75, 0.66, m) * kel;
+        b = THREE.MathUtils.lerp(0.85, 0.85, m) * kel;
+      } else if (st === 2) {
+        const s = cl((tt - o.dep[i]) / TERBANG);
+        r = (0.1 + 0.25 * s) * gain[L];
+        gg = (0.45 + 0.5 * s) * gain[L];
+        b = (0.6 + 0.4 * s) * gain[L];
+      } else if (st === 3 && L === 0) {
+        const kil = 1 + 2.2 * Math.exp(-(t - o.arr[i]) * 8);
+        if (o.tepi[i]) {
+          r = 0.32 * kil;
+          gg = 0.92 * kil;
+          b = 1.0 * kil;
         } else {
-          const kel = 0.55 + 0.25 * Math.sin(t * 2 + o.ph[i]);
-          r = 0.75 * kel;
-          gg = 0.92 * kel;
-          b = 1.0 * kel;
+          r = 0.06 * kil;
+          gg = 0.26 * kil;
+          b = 0.34 * kil;
         }
-      } else if (st === 0.5) {
-        const lag2 = cl((tt - o.rel[i]) / 0.5);
-        r = 0.2 * gain[L] * lag2 + (L === 0 ? 0.6 * (1 - lag2) : 0);
-        gg = 0.85 * gain[L] * lag2 + (L === 0 ? 0.75 * (1 - lag2) : 0);
-        b = 1.0 * gain[L];
-      } else if (L > 0) {
-        r = gg = b = 0;
-      } else {
-        const k = cl((t - o.arr[i]) / 0.45);
-        const kil = 1 + 1.6 * Math.exp(-(t - o.arr[i]) * 7);
-        r = THREE.MathUtils.lerp(0.25, o.col[j], k) * kil;
-        gg = THREE.MathUtils.lerp(0.9, o.col[j + 1], k) * kil;
-        b = THREE.MathUtils.lerp(1.0, o.col[j + 2], k) * kil;
       }
       C[j] = r;
       C[j + 1] = gg;
@@ -278,9 +421,66 @@ const BadgeZarah: React.FC<{o: Badge; t: number; op: number}> = ({o, t, op}) => 
     <>
       {lapis.map((g, L) => (
         <points key={L} geometry={g} frustumCulled={false}>
-          <pointsMaterial size={L === 0 ? 0.045 : 0.034} map={spriteTex()} vertexColors transparent opacity={op} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} sizeAttenuation />
+          <pointsMaterial size={L === 0 ? 0.03 : 0.024} map={spriteTex()} vertexColors transparent opacity={op} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} sizeAttenuation />
         </points>
       ))}
+    </>
+  );
+};
+
+// Garis imbasan binaan (bawah -> atas) + grid pelan di belakang badge
+const gridTex = () => {
+  const c = document.createElement('canvas');
+  c.width = c.height = 1024;
+  const g = c.getContext('2d')!;
+  g.strokeStyle = CYAN;
+  for (let i = 0; i <= 32; i++) {
+    g.globalAlpha = i % 4 === 0 ? 0.5 : 0.18;
+    g.lineWidth = i % 4 === 0 ? 2 : 1;
+    const p = i * 32;
+    g.beginPath();
+    g.moveTo(p, 0);
+    g.lineTo(p, 1024);
+    g.moveTo(0, p);
+    g.lineTo(1024, p);
+    g.stroke();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+};
+const ImbasBina: React.FC<{t: number; aspek: number}> = ({t, aspek}) => {
+  const grid = useMemo(() => gridTex(), []);
+  const lebar = BH * aspek + 1.6;
+  const p = (t - IMBAS0) / IMBAS_DUR;
+  const y = BY - BH / 2 + BH * cl(p);
+  const nampak = interpolate(t, [IMBAS0 - 0.3, IMBAS0, IMBAS0 + IMBAS_DUR, IMBAS0 + IMBAS_DUR + 0.4], [0, 1, 1, 0], clamp);
+  const gOp = interpolate(t, [3.8, 4.6, 7.8, 9.0], [0, 0.16, 0.16, 0], clamp);
+  return (
+    <>
+      <mesh position={[0, BY, -1.2]}>
+        <planeGeometry args={[7.5, 7.5]} />
+        <meshBasicMaterial map={grid} transparent opacity={gOp} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+      </mesh>
+      {nampak > 0 && (
+        <>
+          <mesh position={[0, y, 0.03]}>
+            <planeGeometry args={[lebar, 0.022]} />
+            <meshBasicMaterial color="#e8feff" transparent opacity={nampak} blending={THREE.AdditiveBlending} toneMapped={false} />
+          </mesh>
+          <mesh position={[0, y - 0.35, 0.02]}>
+            <planeGeometry args={[lebar, 0.7]} />
+            <meshBasicMaterial color={CYAN} transparent opacity={nampak * 0.1} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} />
+          </mesh>
+          {/* tanda hujung garis imbasan */}
+          {[-1, 1].map((sx) => (
+            <mesh key={sx} position={[(sx * lebar) / 2, y, 0.03]}>
+              <planeGeometry args={[0.06, 0.32]} />
+              <meshBasicMaterial color={CYAN} transparent opacity={nampak} blending={THREE.AdditiveBlending} toneMapped={false} />
+            </mesh>
+          ))}
+        </>
+      )}
     </>
   );
 };
@@ -298,7 +498,7 @@ const sediaTeks = (d: Data): Teks => {
     o.src.set([d.badge.x[b] * BH, d.badge.y[b] * BH + BY, 0], i * 3);
     o.tg.set([tx.x[i] * sk, tx.y[i] * sk + TY, 0], i * 3);
     const xn = (tx.x[i] + tx.lebar / 2) / tx.lebar;
-    o.rel[i] = 5.55 + 0.85 * xn + 0.15 * random(`tr${i}`);
+    o.rel[i] = 8.0 + 0.85 * xn + 0.15 * random(`tr${i}`);
     o.arr[i] = o.rel[i] + 0.85 + 0.3 * random(`ta${i}`);
     o.ph[i] = random(`tp${i}`) * 6.28;
   }
@@ -416,15 +616,15 @@ const BadgeSebenar: React.FC<{t: number; aspek: number; tex: THREE.Texture}> = (
   const dailB = useMemo(() => dailTex('dB', 0.7), []);
   const atas = BY + BH / 2 + 0.15;
   const bawah = BY - BH / 2 - 0.15;
-  const sy = interpolate(t, [4.95, 5.75], [atas, bawah], {...clamp, easing: Easing.inOut(Easing.cubic)});
+  const sy = interpolate(t, [7.2, 8.4], [atas, bawah], {...clamp, easing: Easing.inOut(Easing.cubic)});
   // dedah dari atas ke bawah: potong satah & UV (tanpa clipping plane)
   const f = cl((atas - sy) / BH);
   tex.repeat.set(1, f);
   tex.offset.set(0, 1 - f);
-  const garis = interpolate(t, [4.9, 5.0, 5.7, 5.85], [0, 1, 1, 0], clamp);
-  const hud = interpolate(t, [4.7, 5.5], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
-  const hudOp = hud * interpolate(t, [7.5, 9], [0.6, 0.4], clamp);
-  const cahaya = interpolate(t, [5.0, 5.8], [0, 1], clamp);
+  const garis = interpolate(t, [7.1, 7.2, 8.4, 8.55], [0, 1, 1, 0], clamp);
+  const hud = interpolate(t, [6.8, 7.6], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+  const hudOp = hud * interpolate(t, [9.8, 11], [0.6, 0.4], clamp);
+  const cahaya = interpolate(t, [7.2, 8.0], [0, 1], clamp);
   return (
     <>
       <mesh position={[0, BY, -0.9]} rotation={[0, 0, t * 0.12]} scale={THREE.MathUtils.lerp(1.6, 1, hud)}>
@@ -460,7 +660,7 @@ const BadgeSebenar: React.FC<{t: number; aspek: number; tex: THREE.Texture}> = (
 // Dail condong di lantai (gaya HUD perspektif)
 const Lantai: React.FC<{t: number}> = ({t}) => {
   const tex = useMemo(() => dailTex('lt', 1.4), []);
-  const op = interpolate(t, [0.4, 2.0, 4.5, 6.0], [0, 0.35, 0.35, 0.12], clamp);
+  const op = interpolate(t, [0.4, 2.0, 6.0, 8.0], [0, 0.35, 0.35, 0.12], clamp);
   return (
     <mesh position={[0, -2.9, -1.5]} rotation={[-Math.PI / 2 + 0.18, 0, t * 0.05]}>
       <planeGeometry args={[16, 16]} />
@@ -472,19 +672,20 @@ const Lantai: React.FC<{t: number}> = ({t}) => {
 const Adegan: React.FC<{d: Data; t: number; tex: THREE.Texture}> = ({d, t, tex}) => {
   const badge = useMemo(() => sediaBadge(d), [d]);
   const teks = useMemo(() => sediaTeks(d), [d]);
-  const opZ = interpolate(t, [5.3, 6.6], [1, 0.07], clamp);
-  const putar = interpolate(t, [5.8, 9], [0, 0.12], {...clamp, easing: Easing.inOut(Easing.sin)});
+  const opZ = interpolate(t, [7.6, 8.8], [1, 0.06], clamp);
   return (
     <>
       <Kamera t={t} />
       <Bintang n={1300} spread={120} seed="ib" size={0.09} />
       <Lantai t={t} />
       <Dandelion t={t} />
-      <group rotation={[0, putar, 0]} position={[0, 0, 0]}>
+      <PanelHud t={t} />
+      <group>
         <BadgeSebenar t={t} aspek={d.badge.aspek} tex={tex} />
+        <ImbasBina t={t} aspek={d.badge.aspek} />
         <BadgeZarah o={badge} t={t} op={opZ} />
       </group>
-      {t > 5.4 && <TeksZarah o={teks} t={t} />}
+      {t > 7.9 && <TeksZarah o={teks} t={t} />}
     </>
   );
 };
@@ -505,9 +706,11 @@ export const IntroBadge: React.FC<{fd: number}> = ({fd}) => {
   const tex = useTekstur('montaj/badge_rasmi.png');
   const boot = interpolate(t, [0.1, 0.35, 1.45, 1.75], [0, 1, 1, 0], clamp);
   const muat = interpolate(t, [0.2, 1.4], [0, 100], clamp);
-  const sah = interpolate(t, [5.1, 5.35, 6.5, 6.9], [0, 1, 1, 0], clamp);
-  const sub = interpolate(t, [6.7, 7.6], [0, 1], clamp);
-  const garisSub = interpolate(t, [6.6, 7.4], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+  const sah = interpolate(t, [7.6, 7.85, 9.0, 9.4], [0, 1, 1, 0], clamp);
+  const sub = interpolate(t, [9.7, 10.5], [0, 1], clamp);
+  const garisSub = interpolate(t, [9.7, 10.4], [0, 1], {...clamp, easing: Easing.out(Easing.cubic)});
+  const lb = keSkrin(t, 1.95, BY + 1.75, 0);
+  const sb = keSkrin(t, 0, TY - 0.62, 0);
   const akhir = interpolate(frame, [fd - 6, fd], [1, 0], clamp);
   const angin = interpolate(t, [1.35, 1.6, 2.1], [0, 0.7, 0], clamp);
   return (
@@ -528,15 +731,15 @@ export const IntroBadge: React.FC<{fd: number}> = ({fd}) => {
         <div style={{marginTop: 10, fontSize: 16, opacity: 0.8}}>{String(Math.round(muat)).padStart(3, '0')}%</div>
       </div>
       {/* pengesahan identiti */}
-      <div style={{position: 'absolute', left: 1330, top: 290, opacity: sah, fontFamily: MONO, color: CYAN, fontSize: 18, letterSpacing: 4, textShadow: `0 0 8px ${CYAN}`}}>
+      <div style={{position: 'absolute', left: lb.x + 20, top: lb.y - 20, opacity: sah, fontFamily: MONO, color: CYAN, fontSize: 18, letterSpacing: 4, textShadow: `0 0 8px ${CYAN}`}}>
         <div style={{width: 160 * sah, height: 2, background: CYAN, marginBottom: 10}} />
         IDENTITI DISAHKAN ✓
-        <div style={{fontSize: 14, opacity: 0.75, marginTop: 6}}>{nyahkod('BADGE RASMI SKeSO', interpolate(t, [5.2, 5.9], [0, 1], clamp), 'b', frame)}</div>
+        <div style={{fontSize: 14, opacity: 0.75, marginTop: 6}}>{nyahkod('BADGE RASMI SKeSO', interpolate(t, [7.7, 8.4], [0, 1], clamp), 'b', frame)}</div>
       </div>
       {/* nama tempat */}
-      <div style={{position: 'absolute', left: 0, right: 0, top: 905, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 26, opacity: sub}}>
+      <div style={{position: 'absolute', left: 0, right: 0, top: sb.y - 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 26, opacity: sub}}>
         <div style={{width: 240 * garisSub, height: 2, background: `linear-gradient(90deg, transparent, ${CYAN})`}} />
-        <div style={{fontFamily: ORB, fontWeight: 600, fontSize: 30, letterSpacing: 14, color: '#dff9ff', textShadow: `0 0 14px ${CYAN}`}}>{nyahkod('DUNGUN · TERENGGANU', interpolate(t, [6.8, 7.7], [0, 1], clamp), 's', frame)}</div>
+        <div style={{fontFamily: ORB, fontWeight: 600, fontSize: 30, letterSpacing: 14, color: '#dff9ff', textShadow: `0 0 14px ${CYAN}`}}>{nyahkod('DUNGUN · TERENGGANU', interpolate(t, [9.8, 10.7], [0, 1], clamp), 's', frame)}</div>
         <div style={{width: 240 * garisSub, height: 2, background: `linear-gradient(270deg, transparent, ${CYAN})`}} />
       </div>
     </AbsoluteFill>
