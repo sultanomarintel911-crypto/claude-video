@@ -70,5 +70,16 @@ ffmpeg -y -loglevel error -i out/_mentah.mp4 -c:v copy -af "alimiter=limit=0.89:
 ```
 `remotion.config.ts` points at the preinstalled headless Chromium (`/opt/pw-browsers/...`); adjust the path if it differs (`ls /opt/pw-browsers`).
 
+### Options the user may ask for
+
+**Speaker in a round corner frame** ("masukkan penyampai dalam frame bulat"): find the real video band first (screen recordings have UI bars — check a full-res frame for the rows where the picture is), then
+`python3 -I <skill>/scripts/penyampai_bulat.py sumber.mp4 public/video/penyampai.mp4 START END --band Y0 Y1` → face-tracked, smoothed square clip. Render it with the `Speaker` component from `assets/contoh-kuliah/ui.tsx` (OffthreadVideo, borderRadius 50%, gold ring, "PENYAMPAI" pill; top-right, d≈300) and keep scene titles to its left (`SceneTitle`). Check stills that the face is inside the circle.
+
+**Clearer voice** ("suara upgrade"): `bash <skill>/scripts/suara_jelas.sh sumber.mp4 public/audio/suara.wav START END` (RNNoise + FFT denoise, de-mud, presence boost, compressor, loudnorm). Sanity-check by re-transcribing a slice of both versions with Whisper — the enhanced one must not score worse.
+
+**Hadith / ayat / Arabic quotes** ("hadis dan maksud jelas"): Whisper `--lang ms` skips Arabic recitation — re-run that time range with `--lang ar` (and Malay ranges separately, `condition_on_previous_text=False`) to get word times. Display Arabic **with harakat** in Amiri (`@fontsource/amiri`), word-by-word highlighted as recited (`ArabKaraoke`, RTL), then the Malay *maksud* in the same card under a "MAKSUDNYA" divider, revealed as the speaker translates; show the narrator chain as a small diagram and the source (e.g. Riwayat at-Tirmizi). Hide the bottom subtitles while the hadith card is up so viewers read one thing. Use the canonical Arabic text of the hadith, but follow what the speaker actually read for gradings/wording and tell the user if anything is uncertain. `assets/contoh-kuliah/` is a full worked example (calm emerald/gold theme, large Montserrat text, icon cards, checklists, conditions, rumusan).
+
+**"Mudah dibaca semua golongan"**: sentence-case Montserrat 800, subtitles ≥ 60px on a dark pill, body text ≥ 44px, high contrast cream-on-dark, calm motion (no shake/glitch), one idea per screen.
+
 ### 6. Deliver
 Copy the mp4 to the working directory, send it to the user (SendUserFile, display render), commit source (node_modules/public/out are gitignored) and push to the session branch. In the reply: segment chosen (timestamps + first/last sentence), scene list, spelling corrections, anything added that the speaker didn't say, and any limitation (e.g. original background music can't be removed).
