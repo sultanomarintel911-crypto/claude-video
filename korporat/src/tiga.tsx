@@ -33,23 +33,28 @@ const Env: React.FC = () => {
   return null;
 };
 
+// Muat tekstur; pulangkan null sehingga siap supaya ThreeCanvas hanya dipasang
+// selepas imej ada (elak bingkai pertama dilukis tanpa tekstur).
 export const useTekstur = (src: string) => {
   const [handle] = useState(() => delayRender('tekstur ' + src));
-  const tex = useMemo(() => {
-    const t = new THREE.TextureLoader().load(
+  const [tex, setTex] = useState<THREE.Texture | null>(null);
+  useEffect(() => {
+    new THREE.TextureLoader().load(
       staticFile(src),
       (loaded) => {
+        loaded.colorSpace = THREE.SRGBColorSpace;
+        loaded.anisotropy = 8;
         loaded.needsUpdate = true;
-        // beri masa three.js melukis dengan tekstur sebelum bingkai ditangkap
-        requestAnimationFrame(() => requestAnimationFrame(() => continueRender(handle)));
+        setTex(loaded);
       },
       undefined,
       (e) => cancelRender(e),
     );
-    t.colorSpace = THREE.SRGBColorSpace;
-    t.anisotropy = 8;
-    return t;
-  }, [src, handle]);
+  }, [src]);
+  // lepaskan selepas komit yang memasang ThreeCanvas (ia ada delayRender sendiri)
+  useEffect(() => {
+    if (tex) continueRender(handle);
+  }, [tex, handle]);
   return tex;
 };
 
@@ -123,7 +128,7 @@ export const Emblem3D: React.FC<{fd: number}> = ({fd}) => {
   const kilat = interpolate(frame, [fd - 8, fd - 3, fd], [0, 1, 1], clamp);
   return (
     <AbsoluteFill style={{background: 'radial-gradient(ellipse at center, #0b2142 0%, #02050d 75%)'}}>
-      <ThreeCanvas width={W} height={H} camera={{fov: 40, position: [0, 0, 16]}} gl={{antialias: true}}>
+      {tex && <ThreeCanvas width={W} height={H} camera={{fov: 40, position: [0, 0, 16]}} gl={{antialias: true}}>
         <Env />
         <ambientLight intensity={0.35} />
         <directionalLight position={[6, 8, 10]} intensity={2.2} />
@@ -131,7 +136,7 @@ export const Emblem3D: React.FC<{fd: number}> = ({fd}) => {
         <pointLight position={[sapu * 14 - 7, 4, 6]} intensity={140} color="#ffe2a0" />
         <Bintang n={1800} spread={140} seed="em" />
         <Syiling tex={tex} />
-      </ThreeCanvas>
+      </ThreeCanvas>}
       <div style={{position: 'absolute', left: 0, right: 0, bottom: 70, textAlign: 'center', opacity: teks}}>
         <div style={{fontFamily: MONO, fontSize: 24, letterSpacing: 10, color: CYAN, textShadow: `0 0 10px ${CYAN}`}}>SK SULTAN OMAR · DUNGUN</div>
         <div style={{fontFamily: ORB, fontWeight: 900, fontSize: 46, letterSpacing: 12, color: '#fff', marginTop: 8, textShadow: '0 0 18px rgba(56,232,255,.8)'}}>MEMULAKAN MISI DIGITAL</div>

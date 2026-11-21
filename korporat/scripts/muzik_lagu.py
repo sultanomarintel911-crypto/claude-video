@@ -59,9 +59,8 @@ offA2 = 44.35 - T('lima_guru')
 # langkau 12 rentak (3 bar) pada potongan koko -> pukulan 96.4 jatuh pada terowong;
 # grid rentak tetap 123 BPM berpaksikan dentuman 44.35 s (96.53 tepat pada grid)
 offA3 = offA2 + 12 * BEAT_A
-# ulang beberapa rentak penuh (di bawah suara latar) -> 146.10 jatuh pada emas
-k4 = round((offA3 - (146.10 - T('emas'))) / BEAT_A)
-offA4 = offA3 - k4 * BEAT_A
+# lompatan di bawah suara latar (muzik direndahkan) -> 146.10 jatuh tepat pada emas
+offA4 = 146.10 - T('emas')
 print('terowong ->', round(96.53 - offA3, 3), 'video', round(T('terowong'), 3))
 print('emas     ->', round(146.10 - offA4, 3), 'video', round(T('emas'), 3))
 

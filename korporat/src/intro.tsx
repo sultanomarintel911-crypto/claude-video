@@ -715,7 +715,7 @@ export const IntroBadge: React.FC<{fd: number}> = ({fd}) => {
   const angin = interpolate(t, [1.35, 1.6, 2.1], [0, 0.7, 0], clamp);
   return (
     <AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 45%, #071a2e 0%, #02050c 70%)', opacity: akhir}}>
-      {d && (
+      {d && tex && (
         <ThreeCanvas width={W} height={H} camera={{fov: 40, position: [0, 0, 14], near: 0.1, far: 300}} gl={{antialias: true}}>
           <Adegan d={d} t={t} tex={tex} />
         </ThreeCanvas>
