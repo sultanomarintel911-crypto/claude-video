@@ -209,17 +209,6 @@
       "label": "INOVASI · SKeSO APP"
     },
     {
-      "id": "dots",
-      "src": "video/walk.mp4",
-      "from": 131.2,
-      "to": 140.5,
-      "rate": 1,
-      "energi": 1,
-      "vo": "w",
-      "voFrom": 131.95,
-      "voTo": 135.8
-    },
-    {
       "id": "statistik",
       "kind": "statistik",
       "src": "video/hologram.mp4",

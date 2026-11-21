@@ -111,7 +111,7 @@ dentum(T('graf3d'), 0.4)
 
 # rendahkan muzik semasa suara latar
 v0 = T('elearning')
-v1 = T('dots') + (mula['dots'][2]['voTo'] - mula['dots'][2]['from'])
+v1 = max(T(k) + (mula[k][2]['voTo'] - mula[k][2]['from']) / mula[k][2].get('rate', 1) for k in mula if mula[k][2].get('vo'))
 tt = np.arange(n) / SR
 duk = 1 - 0.68 * np.clip(np.minimum((tt - v0) / 0.6, (v1 + 0.9 - tt) / 0.9), 0, 1)
 out *= duk[:, None]
