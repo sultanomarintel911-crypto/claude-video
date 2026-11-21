@@ -83,6 +83,8 @@ ffmpeg -y -loglevel error -i out/_mentah.mp4 -c:v copy -af "alimiter=limit=0.89:
 
 **Remove stumbles / repeats** ("sunting yang tersangkut"): Whisper hides stumbles inside one over-long word (e.g. "makan" lasting 1.2 s). Find suspects by word duration and gaps, look at a 40 ms energy envelope, then confirm each cut by splicing the candidate ranges and re-transcribing the spliced audio. Apply cuts to both the voice and the speaker clip (12 ms audio crossfade), and list them in `CUTS` in `data.ts`; `at()` maps through `ed()` so every scene/subtitle time stays in original-video seconds (see `assets/contoh-kuliah/data.ts`). Re-transcribe the final video around each cut.
 
+**Different / nicer background** ("tukar background"): stock-photo sites may be unreachable; draw an original one instead. `scripts/latar_bukit.py <project>/public/latar`-style generator makes layered landscape PNGs (overcast sky, drifting clouds, far ridge, grass hill, textured forest, blurred foreground grass); `LatarBukit` in `assets/contoh-kuliah/latar.tsx` animates them with parallax (each layer pans/zooms at its own speed = 3D camera dolly), drifting clouds, swaying grass, mist, plus a dark reading overlay so content stays legible. Other ready variants there: `senja` (mosque at dusk), `pelita` (lanterns + bokeh), `gerbang` (mihrab arches). Pick with `--props='{"latar":"bukit"}'`. Show the user a contact sheet of options before a full render. Give text that sits directly on the background a soft dark text-shadow.
+
 **Background music**: mix the user's track at about -22 to -26 dB under the voice with sidechain ducking (`sidechaincompress`) and fade in/out; prefer instrumental/no vocals so it doesn't fight the speech.
 
 ### 6. Deliver

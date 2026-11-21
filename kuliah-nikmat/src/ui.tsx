@@ -245,7 +245,7 @@ export const SceneTitle: React.FC<{t: number; kicker: string; title: React.React
 
 export {TOTAL};
 
-import {LatarGerbang, LatarPelita, LatarSenja} from './latar';
+import {LatarBukit, LatarGerbang, LatarPelita, LatarSenja} from './latar';
 import {LATAR} from './data';
 export const Background: React.FC = () =>
-  LATAR === 'pelita' ? <LatarPelita /> : LATAR === 'gerbang' ? <LatarGerbang /> : LATAR === 'asal' ? <BackgroundAsal /> : <LatarSenja />;
+  LATAR === 'bukit' ? <LatarBukit /> : LATAR === 'pelita' ? <LatarPelita /> : LATAR === 'gerbang' ? <LatarGerbang /> : LATAR === 'asal' ? <BackgroundAsal /> : <LatarSenja />;

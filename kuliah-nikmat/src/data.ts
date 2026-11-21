@@ -6,8 +6,8 @@ export const PENYAMPAI = 'Ustaz Mohd Yusof Bin Ismail';
 export const HEADER_TITLE = 'KULIAH HADIS';
 export const HEADER_TAG = 'NIKMAT & SYUKUR';
 
-// Latar: 'asal' | 'senja' | 'pelita' | 'gerbang'
-export const LATAR: string = ((getInputProps() as {latar?: string}).latar) ?? 'senja';
+// Latar: 'bukit' | 'asal' | 'senja' | 'pelita' | 'gerbang'
+export const LATAR: string = ((getInputProps() as {latar?: string}).latar) ?? 'bukit';
 
 export const FPS = 30;
 export const W = 1080;

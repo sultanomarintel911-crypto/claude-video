@@ -111,7 +111,7 @@ export const Intro: React.FC = () => {
   const P = useP();
   const t0 = CLIP_START_ABS;
   return (
-    <Win a={t0} b={12.1} fin={0.01} fout={0.4}>
+    <Win a={t0} b={12.1} fin={0.01} fout={0.4} style={{textShadow: '0 4px 22px rgba(0,0,0,0.85), 0 1px 3px rgba(0,0,0,0.6)'}}>
       <AbsoluteFill style={{...center, paddingBottom: 120}}>
         <div style={{...rise(ci(fr, 4, 22))}}>
           <Ornament />
@@ -143,7 +143,7 @@ const CLIP_START_ABS = 8.3;
 export const Bismillah: React.FC = () => {
   const P = useP();
   return (
-    <Win a={12.0} b={14.3} fin={0.3} fout={0.3}>
+    <Win a={12.0} b={14.3} fin={0.3} fout={0.3} style={{textShadow: '0 4px 22px rgba(0,0,0,0.85), 0 1px 3px rgba(0,0,0,0.6)'}}>
       <AbsoluteFill style={{...center, paddingTop: 200}}>
         <div style={{fontFamily: ARAB, fontSize: 120, color: GOLD, lineHeight: 1.6, textShadow: '0 0 40px rgba(230,195,106,0.4)', ...pop(P(12.14, 0.8), 1.15)}}>
           بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
@@ -510,7 +510,7 @@ export const Penutup: React.FC = () => {
   const sum = P(CLIP_END + 1.0, 0.8, easeInOut);
   const end = ci(fr, at(CLIP_END + 4.3), at(CLIP_END + 5.0), 1, 0);
   return (
-    <Win a={84.88} b={CLIP_END + 5.1} fin={0.35} fout={0.01}>
+    <Win a={84.88} b={CLIP_END + 5.1} fin={0.35} fout={0.01} style={{textShadow: '0 4px 22px rgba(0,0,0,0.85), 0 1px 3px rgba(0,0,0,0.6)'}}>
       <AbsoluteFill style={{...center, opacity: (1 - sum) * 1, paddingTop: 120}}>
         <div style={{fontFamily: ARAB, fontSize: 120, color: GOLD, lineHeight: 1.6, ...pop(P(85.08, 0.7), 1.15)}}>وَاللَّهُ أَعْلَمُ</div>
         <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 44, color: CREAM, ...rise(P(85.48))}}>Dan Allah lebih mengetahui</div>

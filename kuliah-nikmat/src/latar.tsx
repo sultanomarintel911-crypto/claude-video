@@ -122,3 +122,46 @@ export const LatarGerbang: React.FC = () => {
     </AbsoluteFill>
   );
 };
+
+// ------------------------------------------------------------ D. Bukit hijau (parallax 3D, gaya filem)
+import {Img, staticFile} from 'remotion';
+import {TOTAL} from './data';
+const LAPIS: {f: string; pan: number; zoom: number; rise: number}[] = [
+  {f: 'jauh', pan: 40, zoom: 0.02, rise: 0},
+  {f: 'bukit', pan: 90, zoom: 0.04, rise: 6},
+  {f: 'hutan', pan: 170, zoom: 0.07, rise: 14},
+  {f: 'depan', pan: 300, zoom: 0.12, rise: 30},
+];
+export const LatarBukit: React.FC = () => {
+  const fr = useCurrentFrame();
+  const t = fr / FPS;
+  const p = fr / TOTAL; // 0..1 sepanjang video
+  const e = p * p * (3 - 2 * p); // pergerakan kamera lembut
+  const layer = (src: string, x: number, s: number, y: number, extra?: React.CSSProperties) => (
+    <Img
+      src={staticFile(`latar/${src}.png`)}
+      style={{position: 'absolute', left: -210 + x, top: y, width: 1500, height: 1920, transform: `scale(${s})`, transformOrigin: '50% 75%', ...extra}}
+    />
+  );
+  return (
+    <AbsoluteFill style={{background: '#5c6876', overflow: 'hidden'}}>
+      {layer('langit', 0, 1.02 + 0.01 * e, 0)}
+      {/* awan hanyut (dua salinan bersambung) */}
+      {[0, 1].map((k) => (
+        <Img
+          key={k}
+          src={staticFile('latar/awan.png')}
+          style={{position: 'absolute', top: 90 - 20 * e, left: ((-t * 9 + k * 2400) % 4800) - 600, width: 2400, height: 1000, opacity: 0.9}}
+        />
+      ))}
+      {LAPIS.map((L) =>
+        layer(L.f, 105 - L.pan * (e - 0.5) * 2 * 0.5, 1 + L.zoom * e, -L.rise * e, L.f === 'depan' ? {transform: `scale(${1 + L.zoom * e}) skewX(${Math.sin(t * 1.3) * 0.6}deg)`} : undefined)
+      )}
+      {/* kabus tipis di kaki bukit */}
+      <div style={{position: 'absolute', left: 0, right: 0, top: 980, height: 260, background: 'linear-gradient(180deg, rgba(200,208,206,0) 0%, rgba(200,208,206,0.22) 50%, rgba(200,208,206,0) 100%)', transform: `translateX(${Math.sin(t * 0.15) * 30}px)`}} />
+      {/* gred warna filem + lapisan bacaan (isi kuliah kekal jelas) */}
+      <AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(6,14,12,0.62) 0%, rgba(6,14,12,0.38) 22%, rgba(6,14,12,0.42) 55%, rgba(6,14,12,0.62) 80%, rgba(4,10,8,0.8) 100%)'}} />
+      <AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.55) 100%)'}} />
+    </AbsoluteFill>
+  );
+};

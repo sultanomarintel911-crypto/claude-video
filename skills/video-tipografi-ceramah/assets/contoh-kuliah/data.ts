@@ -1,9 +1,13 @@
+import {getInputProps} from 'remotion';
 // Masa dalam SAAT mengikut rakaman asal (abs), dalam garis masa `ffmpeg -ss` (= pemain video).
 // Nota: strim audio sumber bermula 0.29 s lewat; transkrip Whisper fail penuh adalah ~0.58 s lebih awal
 // daripada garis masa ini, jadi masa dari transkrip penuh telah dianjak +0.58 s. at() menukar kepada bingkai video ini.
 export const PENYAMPAI = 'Ustaz Mohd Yusof Bin Ismail';
 export const HEADER_TITLE = 'KULIAH HADIS';
 export const HEADER_TAG = 'NIKMAT & SYUKUR';
+
+// Latar: 'bukit' | 'asal' | 'senja' | 'pelita' | 'gerbang'
+export const LATAR: string = ((getInputProps() as {latar?: string}).latar) ?? 'bukit';
 
 export const FPS = 30;
 export const W = 1080;

@@ -48,7 +48,7 @@ const STAR = (() => {
   return `url("data:image/svg+xml;utf8,${svg}")`;
 })();
 
-export const Background: React.FC = () => {
+export const BackgroundAsal: React.FC = () => {
   const fr = useCurrentFrame();
   const t = fr / FPS;
   return (
@@ -244,3 +244,8 @@ export const SceneTitle: React.FC<{t: number; kicker: string; title: React.React
 };
 
 export {TOTAL};
+
+import {LatarBukit, LatarGerbang, LatarPelita, LatarSenja} from './latar';
+import {LATAR} from './data';
+export const Background: React.FC = () =>
+  LATAR === 'bukit' ? <LatarBukit /> : LATAR === 'pelita' ? <LatarPelita /> : LATAR === 'gerbang' ? <LatarGerbang /> : LATAR === 'asal' ? <BackgroundAsal /> : <LatarSenja />;
