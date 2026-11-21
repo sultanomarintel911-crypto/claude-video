@@ -116,7 +116,7 @@ export const Intro: React.FC = () => {
         <div style={{...rise(ci(fr, 4, 22))}}>
           <Ornament />
         </div>
-        <div style={{fontFamily: SANS, fontWeight: 800, fontSize: 40, color: GOLD, letterSpacing: 10, marginTop: 30, ...rise(ci(fr, 8, 26))}}>KULIAH HADIS</div>
+        <div style={{fontFamily: SANS, fontWeight: 800, fontSize: 40, color: GOLD, letterSpacing: 8, marginTop: 30, ...rise(ci(fr, 8, 26))}}>PERKONGSIAN HADIS</div>
         <div style={{fontFamily: SANS, fontWeight: 900, fontSize: 112, color: CREAM, lineHeight: 1.05, textAlign: 'center', marginTop: 24, ...pop(ci(fr, 14, 34))}}>
           Nampakkan
           <br />
@@ -179,7 +179,7 @@ export const Sanad: React.FC = () => {
             const p = P(c.t, 0.45, backOut);
             const top = i === CHAIN.length - 1;
             return (
-              <div key={c.n} style={{display: 'flex', flexDirection: 'column-reverse', alignItems: 'center'}}>
+              <div key={c.n} style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                 <div
                   style={{
                     width: 660,
@@ -507,13 +507,13 @@ export const Syarat: React.FC = () => {
 export const Penutup: React.FC = () => {
   const fr = useCurrentFrame();
   const P = useP();
-  const sum = P(CLIP_END + 1.0, 0.8, easeInOut);
-  const end = ci(fr, at(CLIP_END + 4.3), at(CLIP_END + 5.0), 1, 0);
+  const sum = P(CLIP_END + 2.4, 0.8, easeInOut);
+  const end = ci(fr, at(CLIP_END + 5.3), at(CLIP_END + 6.0), 1, 0);
   return (
-    <Win a={84.88} b={CLIP_END + 5.1} fin={0.35} fout={0.01} style={{textShadow: '0 4px 22px rgba(0,0,0,0.85), 0 1px 3px rgba(0,0,0,0.6)'}}>
+    <Win a={84.45} b={CLIP_END + 6.1} fin={0.35} fout={0.01} style={{textShadow: '0 4px 22px rgba(0,0,0,0.85), 0 1px 3px rgba(0,0,0,0.6)'}}>
       <AbsoluteFill style={{...center, opacity: (1 - sum) * 1, paddingTop: 120}}>
-        <div style={{fontFamily: ARAB, fontSize: 120, color: GOLD, lineHeight: 1.6, ...pop(P(85.08, 0.7), 1.15)}}>وَاللَّهُ أَعْلَمُ</div>
-        <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 44, color: CREAM, ...rise(P(85.48))}}>Dan Allah lebih mengetahui</div>
+        <div style={{fontFamily: ARAB, fontSize: 120, color: GOLD, lineHeight: 1.6, ...pop(P(84.6, 0.7), 1.15)}}>وَاللَّهُ أَعْلَمُ</div>
+        <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 44, color: CREAM, ...rise(P(85.0))}}>Dan Allah lebih mengetahui</div>
       </AbsoluteFill>
       <AbsoluteFill style={{...center, opacity: sum * end}}>
         <Ornament />

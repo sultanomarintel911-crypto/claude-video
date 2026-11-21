@@ -3,7 +3,7 @@ import {getInputProps} from 'remotion';
 // Nota: strim audio sumber bermula 0.29 s lewat; transkrip Whisper fail penuh adalah ~0.58 s lebih awal
 // daripada garis masa ini, jadi masa dari transkrip penuh telah dianjak +0.58 s. at() menukar kepada bingkai video ini.
 export const PENYAMPAI = 'Ustaz Mohd Yusof Bin Ismail';
-export const HEADER_TITLE = 'KULIAH HADIS';
+export const HEADER_TITLE = 'PERKONGSIAN HADIS';
 export const HEADER_TAG = 'NIKMAT & SYUKUR';
 
 // Latar: 'bukit' | 'asal' | 'senja' | 'pelita' | 'gerbang'
@@ -14,9 +14,9 @@ export const W = 1080;
 export const H = 1920;
 
 export const CLIP_START = 10.8; // mesti sama dengan potongan audio/video penyampai
-export const CLIP_END = 86.17; // selepas "Wallahu a'lam" (selawat yang terpotong dibuang)
+export const CLIP_END = 84.9; // tamat selepas "...hukum syarak" (1:15 dalam video); rakaman selepasnya tidak lengkap
 export const LEAD = 2.5;
-export const OUTRO = 5.0;
+export const OUTRO = 6.0;
 // Bahagian ustaz tersangkut/jeda panjang yang dipotong dari audio & video penyampai (masa abs)
 export const CUTS: [number, number][] = [
   [74.06, 74.99], // "makan… makanan…" diulang
@@ -49,7 +49,6 @@ const RAW: [string, number][] = [
   ['|Asalkan', 77.5], ['semua', 78.42], ['perkara', 79.96], ['tersebut', 80.56],
   ['|dinikmati', 81.02], ['dengan', 81.56], ['cara', 81.86], ['halal', 82.08],
   ['|serta', 82.54], ['tidak', 82.90], ['menyalahi', 83.22], ['hukum', 83.76], ['syarak.', 84.08],
-  ['|Wallahu', 85.08], ["a'lam.", 85.78],
 ];
 
 export type Word = {w: string; s: number; e: number};
