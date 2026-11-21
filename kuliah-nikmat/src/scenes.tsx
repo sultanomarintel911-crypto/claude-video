@@ -125,7 +125,7 @@ export const Intro: React.FC = () => {
         <div style={{fontFamily: SANS, fontWeight: 800, fontSize: 62, color: GOLD, marginTop: 24, textAlign: 'center', ...rise(ci(fr, 26, 44))}}>
           sebagai Tanda Bersyukur
         </div>
-        <div style={{fontFamily: SANS, fontWeight: 600, fontSize: 36, color: DIM, marginTop: 40, ...rise(ci(fr, 34, 52))}}>bersama</div>
+        <div style={{fontFamily: SANS, fontWeight: 600, fontSize: 36, color: DIM, marginTop: 40, ...rise(ci(fr, 34, 52))}}>Perkongsian oleh</div>
         <div style={{fontFamily: SANS, fontWeight: 900, fontSize: 52, color: CREAM, marginTop: 4, ...rise(ci(fr, 38, 56))}}>{PENYAMPAI}</div>
         <div style={{marginTop: 36, ...rise(ci(fr, 30, 48))}}>
           <Ornament />
@@ -377,35 +377,35 @@ export const Contoh: React.FC = () => {
 export const Pengajaran: React.FC = () => {
   const fr = useCurrentFrame();
   const P = useP();
-  const harus = fr >= at(66.64);
+  const harus = fr >= at(67.22);
   return (
-    <Win a={56.6} b={67.95} fin={0.35} fout={0.35}>
-      <SceneTitle t={56.7} kicker="PENGAJARAN HADIS" title={<>Setiap Muslim Hendaklah…</>} />
+    <Win a={57.18} b={68.53} fin={0.35} fout={0.35}>
+      <SceneTitle t={57.28} kicker="PENGAJARAN HADIS" title={<>Setiap Muslim Hendaklah…</>} />
       <AbsoluteFill style={{...center, justifyContent: 'flex-start', paddingTop: 610}}>
-        <div style={{width: 960, borderRadius: 30, background: CARD, border: `3px solid ${GOLD}`, padding: '34px 40px', display: 'flex', alignItems: 'center', gap: 34, ...rise(P(60.36))}}>
-          <div style={{...pop(P(61.54, 0.5, backOut), 1.6)}}>{I.hadiah}</div>
+        <div style={{width: 960, borderRadius: 30, background: CARD, border: `3px solid ${GOLD}`, padding: '34px 40px', display: 'flex', alignItems: 'center', gap: 34, ...rise(P(60.94))}}>
+          <div style={{...pop(P(62.12, 0.5, backOut), 1.6)}}>{I.hadiah}</div>
           <div>
             <div style={{fontFamily: SANS, fontWeight: 900, fontSize: 76, color: GOLD, lineHeight: 1}}>SYUKURI</div>
-            <div style={{fontFamily: SANS, fontWeight: 800, fontSize: 50, color: CREAM, lineHeight: 1.2, marginTop: 8, ...rise(P(61.18))}}>segala nikmat</div>
-            <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, color: DIM, ...rise(P(62.56))}}>daripada Allah SWT</div>
+            <div style={{fontFamily: SANS, fontWeight: 800, fontSize: 50, color: CREAM, lineHeight: 1.2, marginTop: 8, ...rise(P(61.76))}}>segala nikmat</div>
+            <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, color: DIM, ...rise(P(63.14))}}>daripada Allah SWT</div>
           </div>
         </div>
-        <div style={{...center, margin: '20px 0', opacity: P(63.76)}}>
+        <div style={{...center, margin: '20px 0', opacity: P(64.34)}}>
           <svg width={60} height={70}>
             <path d="M30 4 L30 60 M12 42 L30 62 L48 42" stroke={GOLD} strokeWidth={7} fill="none" strokeLinecap="round" />
           </svg>
           <div style={{fontFamily: SANS, fontWeight: 800, fontSize: 34, color: GOLD, letterSpacing: 6}}>CARANYA</div>
         </div>
-        <div style={{width: 960, borderRadius: 30, background: CARD, border: `3px solid ${harus ? GREEN : 'rgba(230,195,106,0.4)'}`, padding: '34px 40px', display: 'flex', alignItems: 'center', gap: 34, ...rise(P(64.44))}}>
+        <div style={{width: 960, borderRadius: 30, background: CARD, border: `3px solid ${harus ? GREEN : 'rgba(230,195,106,0.4)'}`, padding: '34px 40px', display: 'flex', alignItems: 'center', gap: 34, ...rise(P(65.02))}}>
           <div>{I.dompet}</div>
           <div style={{flex: 1}}>
             <div style={{fontFamily: SANS, fontWeight: 900, fontSize: 60, color: CREAM, lineHeight: 1.05}}>Belanjakan</div>
-            <div style={{fontFamily: SANS, fontWeight: 800, fontSize: 44, color: CREAM, lineHeight: 1.25, marginTop: 6, ...rise(P(65.76))}}>
+            <div style={{fontFamily: SANS, fontWeight: 800, fontSize: 44, color: CREAM, lineHeight: 1.25, marginTop: 6, ...rise(P(66.34))}}>
               pada perkara yang{' '}
               <span style={{background: harus ? GREEN : 'transparent', color: harus ? BG : CREAM, borderRadius: 10, padding: '0 10px'}}>diharuskan</span> syarak
             </div>
           </div>
-          <Check p={P(67.0, 0.5)} />
+          <Check p={P(67.58, 0.5)} />
         </div>
       </AbsoluteFill>
     </Win>
@@ -414,15 +414,15 @@ export const Pengajaran: React.FC = () => {
 
 // ======================================================= 6. Tidak melarang
 const HARUS = [
-  {n: 'Memakai pakaian yang indah', t: 69.44, icon: I.baju},
-  {n: 'Berumah besar lagi cantik', t: 71.84, icon: I.rumah},
-  {n: 'Makan makanan yang lazat', t: 74.99, icon: I.makan},
+  {n: 'Memakai pakaian yang indah', t: 70.02, icon: I.baju},
+  {n: 'Berumah besar lagi cantik', t: 72.42, icon: I.rumah},
+  {n: 'Makan makanan yang lazat', t: 75.07, icon: I.makan},
 ];
 export const TidakLarang: React.FC = () => {
   const P = useP();
   return (
-    <Win a={67.9} b={76.95} fin={0.35} fout={0.35}>
-      <SceneTitle t={68.0} kicker="ISLAM" title={<>Tidak Melarang Umatnya</>} />
+    <Win a={68.48} b={77.53} fin={0.35} fout={0.35}>
+      <SceneTitle t={68.58} kicker="ISLAM" title={<>Tidak Melarang Umatnya</>} />
       <AbsoluteFill style={{...center, justifyContent: 'flex-start', paddingTop: 620, gap: 30}}>
         {HARUS.map((h) => {
           const p = P(h.t, 0.5, backOut);
@@ -449,7 +449,7 @@ export const TidakLarang: React.FC = () => {
             </div>
           );
         })}
-        <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, color: DIM, ...rise(P(76.0))}}>…dan lain-lain</div>
+        <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, color: DIM, ...rise(P(76.43))}}>…dan lain-lain</div>
       </AbsoluteFill>
     </Win>
   );
@@ -457,17 +457,17 @@ export const TidakLarang: React.FC = () => {
 
 // =========================================================== 7. Syarat
 const SYARAT = [
-  {no: '1', a: 'Dinikmati dengan cara', b: 'HALAL', t: 80.44},
-  {no: '2', a: 'Tidak menyalahi', b: 'HUKUM SYARAK', t: 81.96},
+  {no: '1', a: 'Dinikmati dengan cara', b: 'HALAL', t: 81.02},
+  {no: '2', a: 'Tidak menyalahi', b: 'HUKUM SYARAK', t: 82.54},
 ];
 export const Syarat: React.FC = () => {
   const fr = useCurrentFrame();
   const P = useP();
   return (
-    <Win a={76.9} b={83.8} fin={0.35} fout={0.3}>
-      <SceneTitle t={77.0} kicker="ASALKAN…" title={<>Dua Syarat Penting</>} />
+    <Win a={77.48} b={84.38} fin={0.35} fout={0.3}>
+      <SceneTitle t={77.58} kicker="ASALKAN…" title={<>Dua Syarat Penting</>} />
       <AbsoluteFill style={{...center, justifyContent: 'flex-start', paddingTop: 600}}>
-        <div style={{...pop(P(77.14, 0.6), 1.2)}}>{I.perisai}</div>
+        <div style={{...pop(P(77.5, 0.6), 1.2)}}>{I.perisai}</div>
         {SYARAT.map((s) => {
           const p = P(s.t, 0.5, backOut);
           const on = fr >= at(s.t);
@@ -507,13 +507,13 @@ export const Syarat: React.FC = () => {
 export const Penutup: React.FC = () => {
   const fr = useCurrentFrame();
   const P = useP();
-  const sum = P(CLIP_END + 0.2, 0.8, easeInOut);
-  const end = ci(fr, at(CLIP_END + 3.8), at(CLIP_END + 4.5), 1, 0);
+  const sum = P(CLIP_END + 1.0, 0.8, easeInOut);
+  const end = ci(fr, at(CLIP_END + 4.3), at(CLIP_END + 5.0), 1, 0);
   return (
-    <Win a={83.75} b={CLIP_END + 4.6} fin={0.35} fout={0.01}>
+    <Win a={84.88} b={CLIP_END + 5.1} fin={0.35} fout={0.01}>
       <AbsoluteFill style={{...center, opacity: (1 - sum) * 1, paddingTop: 120}}>
-        <div style={{fontFamily: ARAB, fontSize: 120, color: GOLD, lineHeight: 1.6, ...pop(P(83.86, 0.7), 1.15)}}>وَاللَّهُ أَعْلَمُ</div>
-        <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 44, color: CREAM, ...rise(P(84.5))}}>Dan Allah lebih mengetahui</div>
+        <div style={{fontFamily: ARAB, fontSize: 120, color: GOLD, lineHeight: 1.6, ...pop(P(85.08, 0.7), 1.15)}}>وَاللَّهُ أَعْلَمُ</div>
+        <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 44, color: CREAM, ...rise(P(85.48))}}>Dan Allah lebih mengetahui</div>
       </AbsoluteFill>
       <AbsoluteFill style={{...center, opacity: sum * end}}>
         <Ornament />
@@ -529,7 +529,7 @@ export const Penutup: React.FC = () => {
           إِنَّ اللَّهَ يُحِبُّ أَنْ يُرَى أَثَرُ نِعْمَتِهِ عَلَى عَبْدِهِ
         </div>
         <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 32, color: DIM, marginTop: 6}}>Riwayat at-Tirmizi</div>
-        <div style={{fontFamily: SANS, fontWeight: 600, fontSize: 32, color: DIM, marginTop: 44}}>Kuliah oleh</div>
+        <div style={{fontFamily: SANS, fontWeight: 600, fontSize: 32, color: DIM, marginTop: 44}}>Perkongsian oleh</div>
         <div style={{fontFamily: SANS, fontWeight: 900, fontSize: 52, color: GOLD, marginTop: 4}}>{PENYAMPAI}</div>
         <div style={{marginTop: 36}}>
           <Ornament />

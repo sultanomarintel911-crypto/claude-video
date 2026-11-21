@@ -1,5 +1,7 @@
-// Masa dalam SAAT mengikut rakaman asal (abs). at() menukar kepada bingkai video ini.
-export const PENYAMPAI = 'Ustaz Mohd Yusof bin Ismail';
+// Masa dalam SAAT mengikut rakaman asal (abs), dalam garis masa `ffmpeg -ss` (= pemain video).
+// Nota: strim audio sumber bermula 0.29 s lewat; transkrip Whisper fail penuh adalah ~0.58 s lebih awal
+// daripada garis masa ini, jadi masa dari transkrip penuh telah dianjak +0.58 s. at() menukar kepada bingkai video ini.
+export const PENYAMPAI = 'Ustaz Mohd Yusof Bin Ismail';
 export const HEADER_TITLE = 'KULIAH HADIS';
 export const HEADER_TAG = 'NIKMAT & SYUKUR';
 
@@ -8,9 +10,9 @@ export const W = 1080;
 export const H = 1920;
 
 export const CLIP_START = 10.8; // mesti sama dengan potongan audio/video penyampai
-export const CLIP_END = 86.3;
+export const CLIP_END = 86.17; // selepas "Wallahu a'lam" (selawat yang terpotong dibuang)
 export const LEAD = 2.5;
-export const OUTRO = 4.5;
+export const OUTRO = 5.0;
 // Bahagian ustaz tersangkut/jeda panjang yang dipotong dari audio & video penyampai (masa abs)
 export const CUTS: [number, number][] = [
   [74.06, 74.99], // "makan… makanan…" diulang
@@ -30,20 +32,20 @@ const RAW: [string, number][] = [
   ['|membuat', 48.06], ['perkara', 48.42], ['yang', 48.86], ['baik', 49.06], ['dan', 49.34], ['berpakaian', 49.74], ['cantik,', 50.32],
   ['|makan', 52.1], ['makanan', 52.2], ['yang', 52.68], ['halal', 52.88],
   ['|dan', 53.22], ['rumah', 53.4], ['tangga', 53.68], ['yang', 53.98], ['bahagia', 54.18], ['dan', 54.52], ['lain-lain.', 54.7],
-  ['|Jadi,', 56.96], ['pengajaran', 57.68], ['hadisnya,', 58.4],
-  ['|setiap', 59.14], ['umat', 59.46], ['Islam', 59.66], ['hendaklah', 60.0],
-  ['|mensyukuri', 60.36], ['segala', 61.18], ['nikmat', 61.54],
-  ['|yang', 61.98], ['diterima', 62.1], ['daripada', 62.56], ['Allah', 62.88], ['SWT', 63.14],
-  ['|dengan', 63.76], ['membelanjakan', 64.44],
-  ['|pada', 65.76], ['perkara', 66.18], ['yang', 66.5], ['diharuskan', 66.64], ['oleh', 67.14], ['syarak.', 67.34],
-  ['|Islam', 68.16], ['tidak', 68.38], ['melarang', 68.64], ['umatnya', 68.94],
-  ['|memakai', 69.44], ['pakaian', 69.92], ['yang', 70.44], ['indah,', 70.7],
-  ['|berumah', 71.84], ['besar', 72.14], ['lagi', 72.5], ['cantik', 72.8],
-  ['|dan', 73.86], ['makan', 74.99], ['makanan', 75.3], ['yang', 75.6], ['lazat', 75.75], ['dan', 76.0], ['lain-lain.', 76.2],
-  ['|Asalkan', 77.5], ['semua', 77.84], ['perkara', 79.38], ['tersebut', 79.98],
-  ['|dinikmati', 80.44], ['dengan', 80.98], ['cara', 81.28], ['halal', 81.5],
-  ['|serta', 81.96], ['tidak', 82.32], ['menyalahi', 82.64], ['hukum', 83.18], ['syarak.', 83.5],
-  ['|Wallahu', 83.9], ["a'lam.", 84.8],
+  ['|Jadi,', 57.54], ['pengajaran', 58.26], ['hadisnya,', 58.98],
+  ['|setiap', 59.72], ['umat', 60.04], ['Islam', 60.24], ['hendaklah', 60.58],
+  ['|mensyukuri', 60.94], ['segala', 61.76], ['nikmat', 62.12],
+  ['|yang', 62.56], ['diterima', 62.68], ['daripada', 63.14], ['Allah', 63.46], ['SWT', 63.72],
+  ['|dengan', 64.34], ['membelanjakan', 65.02],
+  ['|pada', 66.34], ['perkara', 66.76], ['yang', 67.08], ['diharuskan', 67.22], ['oleh', 67.72], ['syarak.', 67.92],
+  ['|Islam', 68.74], ['tidak', 68.96], ['melarang', 69.22], ['umatnya', 69.52],
+  ['|memakai', 70.02], ['pakaian', 70.50], ['yang', 71.02], ['indah,', 71.28],
+  ['|berumah', 72.42], ['besar', 72.72], ['lagi', 73.08], ['cantik', 73.38],
+  ['|dan', 73.88], ['makan', 75.07], ['makanan', 75.41], ['yang', 75.91], ['lazat', 76.09], ['dan', 76.43], ['lain-lain.', 76.65],
+  ['|Asalkan', 77.5], ['semua', 78.42], ['perkara', 79.96], ['tersebut', 80.56],
+  ['|dinikmati', 81.02], ['dengan', 81.56], ['cara', 81.86], ['halal', 82.08],
+  ['|serta', 82.54], ['tidak', 82.90], ['menyalahi', 83.22], ['hukum', 83.76], ['syarak.', 84.08],
+  ['|Wallahu', 85.08], ["a'lam.", 85.78],
 ];
 
 export type Word = {w: string; s: number; e: number};
@@ -98,8 +100,8 @@ export const CHAPTERS: [string, number][] = [
   ['HADIS', 12.1],
   ['MAKSUD', 30.5],
   ['CONTOH', 46.2],
-  ['PENGAJARAN', 56.96],
-  ['SYARAT', 77.14],
+  ['PENGAJARAN', 57.54],
+  ['SYARAT', 77.5],
 ];
 
 // Video kuliah bertenang: tiada gegaran skrin
@@ -113,7 +115,7 @@ export const SFX: [string, number, number][] = [
   ['whoosh_pendek.wav', 30.2, 0.12],
   ['swish_teks.wav', 37.1, 0.12],
   ['whoosh_pendek.wav', 45.9, 0.12],
-  ['whoosh_pendek.wav', 56.6, 0.12], ['swish_teks.wav', 60.36, 0.14], ['swish_teks.wav', 64.44, 0.14],
-  ['whoosh_pendek.wav', 67.9, 0.12],
-  ['whoosh_pendek.wav', 76.9, 0.12],
+  ['whoosh_pendek.wav', 57.18, 0.12], ['swish_teks.wav', 60.94, 0.14], ['swish_teks.wav', 65.02, 0.14],
+  ['whoosh_pendek.wav', 68.48, 0.12],
+  ['whoosh_pendek.wav', 77.48, 0.12],
 ];

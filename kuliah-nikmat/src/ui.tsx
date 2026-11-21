@@ -160,7 +160,7 @@ export const Speaker: React.FC = () => {
       >
         <div style={{fontWeight: 800, fontSize: 18, letterSpacing: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8}}>
           <span style={{width: 10, height: 10, borderRadius: 5, background: '#d6303b', opacity: Math.floor(fr / 15) % 2 ? 1 : 0.35}} />
-          PENYAMPAI
+          PERKONGSIAN OLEH
         </div>
         <div style={{fontWeight: 900, fontSize: 25, lineHeight: 1.15}}>{PENYAMPAI}</div>
       </div>

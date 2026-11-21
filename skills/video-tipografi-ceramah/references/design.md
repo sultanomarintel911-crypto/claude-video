@@ -23,3 +23,10 @@
 ## Audio
 - Voice: loudnorm I=-15. SFX 0.15–0.45 volume. Final limiter at 0.89.
 - Source clips from TikTok/Threads often have background music baked in; it cannot be cleanly removed — mention it.
+
+## Timebase trap (screen recordings)
+Screen-recorded MP4s can have an audio stream `start_time` > 0 (check `ffprobe -show_entries stream=start_time`).
+Then a WAV decoded from the whole file (Whisper on the full file) and a clip cut with `ffmpeg -ss X -i` disagree
+(seen: 0.58 s). Keep ONE timebase: measure the offset by cross-correlating loudness envelopes of the cut voice
+file against the full decode, and shift full-file Whisper times before using them. Symptom: captions early and
+cut points (e.g. ending) clipping words.
