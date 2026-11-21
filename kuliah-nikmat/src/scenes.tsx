@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, interpolate, useCurrentFrame} from 'remotion';
-import {at, CLIP_END, MAKSUD, MATAN_AR, QALA_AR, RIWAYAT_AR, RIWAYAT_T, SANAD_AR, SANAD_MS} from './data';
+import {at, CLIP_END, MAKSUD, PENYAMPAI, MATAN_AR, QALA_AR, RIWAYAT_AR, RIWAYAT_T, SANAD_AR, SANAD_MS} from './data';
 import {ARAB, backOut, BG, CARD, center, ci, CREAM, DIM, easeInOut, GOLD, GREEN, pop, rise, SANS, SceneTitle, useP, Win} from './ui';
 
 // ---------------------------------------------------------------- utiliti
@@ -96,14 +96,11 @@ const I = {
       <circle cx={76} cy={60} r={6} fill={GOLD} />
     </svg>
   ),
-  neraca: (
-    <svg width={220} height={150} viewBox="0 0 220 150">
-      <rect x={106} y={20} width={8} height={110} fill={GOLD} />
-      <rect x={70} y={128} width={80} height={12} rx={4} fill={GOLD} />
-      <rect x={30} y={30} width={160} height={7} rx={3} fill={GOLD} />
-      <circle cx={110} cy={20} r={10} fill={GOLD} />
-      <path d="M40 37 L18 90 L62 90 Z M180 37 L158 90 L202 90 Z" fill="none" stroke={GOLD} strokeWidth={3} />
-      <path d="M12 90 Q40 116 68 90 Z M152 90 Q180 116 208 90 Z" fill={GOLD} />
+  perisai: (
+    <svg width={170} height={190} viewBox="0 0 170 190">
+      <path d="M85 8 L156 34 L156 92 C 156 140, 122 168, 85 182 C 48 168, 14 140, 14 92 L14 34 Z" fill={GOLD} />
+      <path d="M85 26 L140 46 L140 92 C 140 130, 113 153, 85 164 C 57 153, 30 130, 30 92 L30 46 Z" fill="none" stroke={BG} strokeWidth={5} />
+      <path d="M52 96 L76 120 L120 72" fill="none" stroke={BG} strokeWidth={14} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
 };
@@ -128,7 +125,9 @@ export const Intro: React.FC = () => {
         <div style={{fontFamily: SANS, fontWeight: 800, fontSize: 62, color: GOLD, marginTop: 24, textAlign: 'center', ...rise(ci(fr, 26, 44))}}>
           sebagai Tanda Bersyukur
         </div>
-        <div style={{marginTop: 40, ...rise(ci(fr, 30, 48))}}>
+        <div style={{fontFamily: SANS, fontWeight: 600, fontSize: 36, color: DIM, marginTop: 40, ...rise(ci(fr, 34, 52))}}>bersama</div>
+        <div style={{fontFamily: SANS, fontWeight: 900, fontSize: 52, color: CREAM, marginTop: 4, ...rise(ci(fr, 38, 56))}}>{PENYAMPAI}</div>
+        <div style={{marginTop: 36, ...rise(ci(fr, 30, 48))}}>
           <Ornament />
         </div>
       </AbsoluteFill>
@@ -464,12 +463,11 @@ const SYARAT = [
 export const Syarat: React.FC = () => {
   const fr = useCurrentFrame();
   const P = useP();
-  const tilt = Math.sin(fr / 14) * 4 * (1 - P(81.96, 1));
   return (
     <Win a={76.9} b={83.8} fin={0.35} fout={0.3}>
       <SceneTitle t={77.0} kicker="ASALKAN…" title={<>Dua Syarat Penting</>} />
       <AbsoluteFill style={{...center, justifyContent: 'flex-start', paddingTop: 600}}>
-        <div style={{transform: `rotate(${tilt}deg)`, ...pop(P(77.14, 0.6), 1.2)}}>{I.neraca}</div>
+        <div style={{...pop(P(77.14, 0.6), 1.2)}}>{I.perisai}</div>
         {SYARAT.map((s) => {
           const p = P(s.t, 0.5, backOut);
           const on = fr >= at(s.t);
@@ -531,7 +529,9 @@ export const Penutup: React.FC = () => {
           إِنَّ اللَّهَ يُحِبُّ أَنْ يُرَى أَثَرُ نِعْمَتِهِ عَلَى عَبْدِهِ
         </div>
         <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 32, color: DIM, marginTop: 6}}>Riwayat at-Tirmizi</div>
-        <div style={{marginTop: 40}}>
+        <div style={{fontFamily: SANS, fontWeight: 600, fontSize: 32, color: DIM, marginTop: 44}}>Kuliah oleh</div>
+        <div style={{fontFamily: SANS, fontWeight: 900, fontSize: 52, color: GOLD, marginTop: 4}}>{PENYAMPAI}</div>
+        <div style={{marginTop: 36}}>
           <Ornament />
         </div>
       </AbsoluteFill>

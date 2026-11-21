@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, Easing, interpolate, OffthreadVideo, random, Sequence, staticFile, useCurrentFrame} from 'remotion';
-import {at, CHAPTERS, CLIP_END, CLIP_START, FPS, HEADER_TAG, HEADER_TITLE, IMPACTS, LINES, TOTAL} from './data';
+import {at, CHAPTERS, CLIP_END, CLIP_START, FPS, HEADER_TAG, HEADER_TITLE, IMPACTS, LINES, PENYAMPAI, TOTAL} from './data';
 
 // Tema kuliah: hijau zamrud + emas + krim. Kontras tinggi, mudah dibaca semua peringkat umur.
 export const BG = '#04201a';
@@ -122,7 +122,7 @@ export const Header: React.FC = () => {
 };
 
 // ------------------------------------------- penyampai dalam bingkai bulat
-export const SPK = {cx: 870, cy: 365, d: 300};
+export const SPK = {cx: 870, cy: 345, d: 300};
 export const Speaker: React.FC = () => {
   const fr = useCurrentFrame();
   const a = at(CLIP_START);
@@ -146,24 +146,23 @@ export const Speaker: React.FC = () => {
         style={{
           position: 'absolute',
           left: '50%',
-          bottom: -26,
+          top: d - 14,
           transform: 'translateX(-50%)',
           background: GOLD,
           color: BG,
           fontFamily: SANS,
-          fontWeight: 800,
-          fontSize: 24,
-          letterSpacing: 2,
-          padding: '6px 18px',
-          borderRadius: 30,
+          padding: '6px 20px 8px',
+          borderRadius: 18,
           whiteSpace: 'nowrap',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
+          textAlign: 'center',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.45)',
         }}
       >
-        <span style={{width: 12, height: 12, borderRadius: 6, background: '#d6303b', opacity: Math.floor(fr / 15) % 2 ? 1 : 0.35}} />
-        PENYAMPAI
+        <div style={{fontWeight: 800, fontSize: 18, letterSpacing: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8}}>
+          <span style={{width: 10, height: 10, borderRadius: 5, background: '#d6303b', opacity: Math.floor(fr / 15) % 2 ? 1 : 0.35}} />
+          PENYAMPAI
+        </div>
+        <div style={{fontWeight: 900, fontSize: 25, lineHeight: 1.15}}>{PENYAMPAI}</div>
       </div>
     </div>
   );

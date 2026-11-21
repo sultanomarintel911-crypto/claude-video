@@ -1,4 +1,5 @@
 // Masa dalam SAAT mengikut rakaman asal (abs). at() menukar kepada bingkai video ini.
+export const PENYAMPAI = 'Ustaz Mohd Yusof bin Ismail';
 export const HEADER_TITLE = 'KULIAH HADIS';
 export const HEADER_TAG = 'NIKMAT & SYUKUR';
 
@@ -97,17 +98,13 @@ export const IMPACTS: [number, number][] = [];
 
 export const SFX: [string, number, number][] = [
   ['dengung.wav', 8.4, 0.12],
-  ['swish_teks.wav', 8.9, 0.18], ['kilauan.wav', 9.6, 0.15],
+  ['swish_teks.wav', 8.9, 0.18],
   ['swish_teks.wav', 12.0, 0.15],
   ['swish_teks.wav', 14.3, 0.12],
-  ['kilauan.wav', 21.2, 0.16],
-  ['pop_bintang.wav', 27.1, 0.18],
   ['whoosh_pendek.wav', 30.2, 0.12],
-  ['swish_teks.wav', 37.1, 0.12], ['kilauan.wav', 41.5, 0.14],
+  ['swish_teks.wav', 37.1, 0.12],
   ['whoosh_pendek.wav', 45.9, 0.12],
-  ['pop_bintang.wav', 48.06, 0.16], ['pop_bintang.wav', 49.74, 0.16], ['pop_bintang.wav', 52.1, 0.16], ['pop_bintang.wav', 53.4, 0.16],
   ['whoosh_pendek.wav', 56.6, 0.12], ['swish_teks.wav', 60.36, 0.14], ['swish_teks.wav', 64.44, 0.14],
-  ['whoosh_pendek.wav', 67.9, 0.12], ['blip.wav', 69.44, 0.25], ['blip.wav', 71.84, 0.25], ['blip.wav', 73.68, 0.25],
-  ['whoosh_pendek.wav', 76.9, 0.12], ['pop_bintang.wav', 80.44, 0.16], ['pop_bintang.wav', 81.96, 0.16],
-  ['koir.wav', 84.0, 0.1], ['kilauan.wav', 86.6, 0.14],
+  ['whoosh_pendek.wav', 67.9, 0.12],
+  ['whoosh_pendek.wav', 76.9, 0.12],
 ];
