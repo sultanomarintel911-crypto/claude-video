@@ -81,5 +81,9 @@ ffmpeg -y -loglevel error -i out/_mentah.mp4 -c:v copy -af "alimiter=limit=0.89:
 
 **"Mudah dibaca semua golongan"**: sentence-case Montserrat 800, subtitles ≥ 60px on a dark pill, body text ≥ 44px, high contrast cream-on-dark, calm motion (no shake/glitch), one idea per screen.
 
+**Remove stumbles / repeats** ("sunting yang tersangkut"): Whisper hides stumbles inside one over-long word (e.g. "makan" lasting 1.2 s). Find suspects by word duration and gaps, look at a 40 ms energy envelope, then confirm each cut by splicing the candidate ranges and re-transcribing the spliced audio. Apply cuts to both the voice and the speaker clip (12 ms audio crossfade), and list them in `CUTS` in `data.ts`; `at()` maps through `ed()` so every scene/subtitle time stays in original-video seconds (see `assets/contoh-kuliah/data.ts`). Re-transcribe the final video around each cut.
+
+**Background music**: mix the user's track at about -22 to -26 dB under the voice with sidechain ducking (`sidechaincompress`) and fade in/out; prefer instrumental/no vocals so it doesn't fight the speech.
+
 ### 6. Deliver
 Copy the mp4 to the working directory, send it to the user (SendUserFile, display render), commit source (node_modules/public/out are gitignored) and push to the session branch. In the reply: segment chosen (timestamps + first/last sentence), scene list, spelling corrections, anything added that the speaker didn't say, and any limitation (e.g. original background music can't be removed).

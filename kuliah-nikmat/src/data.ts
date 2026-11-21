@@ -11,9 +11,18 @@ export const CLIP_START = 10.8; // mesti sama dengan potongan audio/video penyam
 export const CLIP_END = 86.3;
 export const LEAD = 2.5;
 export const OUTRO = 4.5;
-export const TOTAL = Math.round((CLIP_END - CLIP_START + LEAD + OUTRO) * FPS);
+// Bahagian ustaz tersangkut/jeda panjang yang dipotong dari audio & video penyampai (masa abs)
+export const CUTS: [number, number][] = [
+  [74.06, 74.99], // "makan… makanan…" diulang
+  [77.02, 77.47], // bunyi sebelum "asalkan"
+  [78.95, 79.3], // jeda panjang
+];
+/** masa abs -> masa selepas suntingan */
+export const ed = (t: number) => CUTS.reduce((acc, [a, b]) => acc - Math.min(Math.max(t - a, 0), b - a), t);
 
-export const at = (abs: number) => Math.round((abs - CLIP_START + LEAD) * FPS);
+export const TOTAL = Math.round((ed(CLIP_END) - CLIP_START + LEAD + OUTRO) * FPS);
+
+export const at = (abs: number) => Math.round((ed(abs) - CLIP_START + LEAD) * FPS);
 
 // Kapsyen (bahagian huraian Bahasa Melayu sahaja; bahagian hadis dipaparkan dalam kad hadis).
 const RAW: [string, number][] = [
@@ -30,11 +39,11 @@ const RAW: [string, number][] = [
   ['|Islam', 68.16], ['tidak', 68.38], ['melarang', 68.64], ['umatnya', 68.94],
   ['|memakai', 69.44], ['pakaian', 69.92], ['yang', 70.44], ['indah,', 70.7],
   ['|berumah', 71.84], ['besar', 72.14], ['lagi', 72.5], ['cantik', 72.8],
-  ['|dan', 73.4], ['makan', 73.68], ['makanan', 74.86], ['yang', 75.3], ['lazat', 75.5], ['dan', 75.86], ['lain-lain.', 76.08],
-  ['|Asalkan', 77.14], ['semua', 77.84], ['perkara', 79.38], ['tersebut', 79.98],
+  ['|dan', 73.86], ['makan', 74.99], ['makanan', 75.3], ['yang', 75.6], ['lazat', 75.75], ['dan', 76.0], ['lain-lain.', 76.2],
+  ['|Asalkan', 77.5], ['semua', 77.84], ['perkara', 79.38], ['tersebut', 79.98],
   ['|dinikmati', 80.44], ['dengan', 80.98], ['cara', 81.28], ['halal', 81.5],
   ['|serta', 81.96], ['tidak', 82.32], ['menyalahi', 82.64], ['hukum', 83.18], ['syarak.', 83.5],
-  ['|Wallahu', 83.86], ["Ta'ala", 84.72], ["a'lam.", 85.22],
+  ['|Wallahu', 83.9], ["a'lam.", 84.8],
 ];
 
 export type Word = {w: string; s: number; e: number};

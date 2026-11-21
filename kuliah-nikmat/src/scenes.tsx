@@ -416,7 +416,7 @@ export const Pengajaran: React.FC = () => {
 const HARUS = [
   {n: 'Memakai pakaian yang indah', t: 69.44, icon: I.baju},
   {n: 'Berumah besar lagi cantik', t: 71.84, icon: I.rumah},
-  {n: 'Makan makanan yang lazat', t: 73.68, icon: I.makan},
+  {n: 'Makan makanan yang lazat', t: 74.99, icon: I.makan},
 ];
 export const TidakLarang: React.FC = () => {
   const P = useP();
@@ -449,7 +449,7 @@ export const TidakLarang: React.FC = () => {
             </div>
           );
         })}
-        <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, color: DIM, ...rise(P(75.86))}}>…dan lain-lain</div>
+        <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, color: DIM, ...rise(P(76.0))}}>…dan lain-lain</div>
       </AbsoluteFill>
     </Win>
   );
@@ -512,8 +512,8 @@ export const Penutup: React.FC = () => {
   return (
     <Win a={83.75} b={CLIP_END + 4.6} fin={0.35} fout={0.01}>
       <AbsoluteFill style={{...center, opacity: (1 - sum) * 1, paddingTop: 120}}>
-        <div style={{fontFamily: ARAB, fontSize: 120, color: GOLD, lineHeight: 1.6, ...pop(P(83.86, 0.7), 1.15)}}>وَاللَّهُ تَعَالَى أَعْلَمُ</div>
-        <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 44, color: CREAM, ...rise(P(84.5))}}>Dan Allah Taala lebih mengetahui</div>
+        <div style={{fontFamily: ARAB, fontSize: 120, color: GOLD, lineHeight: 1.6, ...pop(P(83.86, 0.7), 1.15)}}>وَاللَّهُ أَعْلَمُ</div>
+        <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 44, color: CREAM, ...rise(P(84.5))}}>Dan Allah lebih mengetahui</div>
       </AbsoluteFill>
       <AbsoluteFill style={{...center, opacity: sum * end}}>
         <Ornament />
