@@ -2,11 +2,11 @@
   "_nota": "Senarai suntingan. Masa sumber dalam saat. dur = (to-from)/rate untuk video; 'dur' terus untuk babak grafik. bab = tag bab digital; energi = tenaga muzik (0-3); vo = stem suara latar (k=korporat mula 110 s, w=walk mula 10 s) dan julat [voFrom, voTo] masa sumber.",
   "segs": [
     {
-      "id": "emblem3d",
-      "kind": "emblem3d",
-      "dur": 5.5,
+      "id": "intro",
+      "kind": "intro",
+      "dur": 9.0,
       "energi": 1,
-      "hit": 2.4
+      "hit": 5.0
     },
     {
       "id": "biometrik",

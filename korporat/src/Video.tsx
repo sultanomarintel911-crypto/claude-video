@@ -9,6 +9,7 @@ import {AbsoluteFill, Audio, interpolate, random, Sequence, staticFile, useCurre
 import {FPS, Seg, SEGS, VO_FILE} from './data';
 import {BabTag, glitchAmt, GlitchOverlay, Grade, Hud, Label} from './fx';
 import {Emblem3D, Graf3D, Terowong3D} from './tiga';
+import {IntroBadge} from './intro';
 import {MaklumatGlob} from './maklumat3d';
 import {Bio, Emas, KadAsal, KadPentadbir, Kertas, Klip, PanelHem, Statistik, Tutup} from './scenes';
 
@@ -24,6 +25,8 @@ const SegView: React.FC<{s: Seg}> = ({s}) => {
       return <Emas s={s} />;
     case 'tutup':
       return <Tutup />;
+    case 'intro':
+      return <IntroBadge fd={s.fd} />;
     case 'emblem3d':
       return <Emblem3D fd={s.fd} />;
     case 'terowong':

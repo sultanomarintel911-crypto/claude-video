@@ -33,7 +33,7 @@ const Env: React.FC = () => {
   return null;
 };
 
-const useTekstur = (src: string) => {
+export const useTekstur = (src: string) => {
   const [handle] = useState(() => delayRender('tekstur ' + src));
   const tex = useMemo(() => {
     const t = new THREE.TextureLoader().load(
@@ -53,7 +53,7 @@ const useTekstur = (src: string) => {
   return tex;
 };
 
-const Bintang: React.FC<{n?: number; spread?: number; seed?: string; size?: number}> = ({n = 1500, spread = 120, seed = 'b', size = 0.12}) => {
+export const Bintang: React.FC<{n?: number; spread?: number; seed?: string; size?: number}> = ({n = 1500, spread = 120, seed = 'b', size = 0.12}) => {
   const geo = useMemo(() => {
     const g = new THREE.BufferGeometry();
     const p = new Float32Array(n * 3);
