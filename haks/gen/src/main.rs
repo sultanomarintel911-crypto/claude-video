@@ -392,7 +392,7 @@ fn lerp3(a: [f64; 3], b: [f64; 3], t: f64) -> [f64; 3] {
 }
 
 fn planet_texture(rng: &mut Rng, path: &str) {
-    let (w, h) = (2048usize, 512usize);
+    let (w, h) = (4096usize, 1024usize);
     let land = Noise::new(rng);
     let cloud = Noise::new(rng);
     let lights = Noise::new(rng);
@@ -457,7 +457,7 @@ fn worley(px: &[(f64, f64)], cells: usize, x: f64, y: f64) -> (f64, f64) {
 }
 
 fn meteor_textures(rng: &mut Rng, rock_path: &str, crack_path: &str) {
-    let n = 1024usize;
+    let n = 2048usize;
     let nz = Noise::new(rng);
     let nz2 = Noise::new(rng);
     // kawah
@@ -507,7 +507,8 @@ fn meteor_textures(rng: &mut Rng, rock_path: &str, crack_path: &str) {
             let i = y * n + x;
             let hx = hgt[y * n + (x + 1) % n] - hgt[y * n + (x + n - 1) % n];
             let hy = hgt[((y + 1) % n) * n + x] - hgt[((y + n - 1) % n) * n + x];
-            let (nx, ny, nzv) = (-hx * 9.0, -hy * 9.0, 1.0);
+            let bump = 9.0 * n as f64 / 1024.0; // kekal sama walaupun resolusi berubah
+            let (nx, ny, nzv) = (-hx * bump, -hy * bump, 1.0);
             let m = (nx * nx + ny * ny + nzv * nzv).sqrt();
             let lam = ((nx * l.0 + ny * l.1 + nzv * l.2) / m).max(0.0);
             let (u, v) = (x as f64 / n as f64, y as f64 / n as f64);
