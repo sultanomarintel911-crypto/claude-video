@@ -2,15 +2,15 @@ import React from 'react';
 import {AbsoluteFill, Easing, interpolate, useCurrentFrame} from 'remotion';
 import {at, CHAPTERS, CLIP_END, FPS, LINES} from './data';
 
-// Gaya "studio pic + tanah liat oren 3D"
-export const PEACH = '#f8e6d8';
-export const PAPER = '#fffaf5';
-export const ORANGE = '#ff5a1f';
-export const ORANGE_D = '#d8400e';
+// Gaya "studio lembut + tanah liat turquoise 3D" (ORANGE kini bermaksud warna utama: turquoise)
+export const PEACH = '#e3f4f1';
+export const PAPER = '#fbfffe';
+export const ORANGE = '#2bb3a6';
+export const ORANGE_D = '#1c8c82';
 export const YELLOW = '#f7b733';
-export const INK = '#3b2418';
-export const MUTED = '#9b7663';
-export const GREEN = '#2fa36b';
+export const INK = '#173b3a';
+export const MUTED = '#5d8783';
+export const GREEN = '#34a853';
 export const RED = '#e0362c';
 
 export const POP = "'Poppins', sans-serif";
@@ -38,9 +38,9 @@ export const Clay: React.FC<{size: number; color?: 'o' | 'y' | 'p'; style?: Reac
     color === 'y'
       ? 'radial-gradient(circle at 34% 28%, #fff1c9 0%, #ffd36b 22%, #f7b733 52%, #c98412 100%)'
       : color === 'p'
-        ? 'radial-gradient(circle at 34% 28%, #ffffff 0%, #ffe9dc 30%, #f6cdb6 70%, #d9a183 100%)'
-        : 'radial-gradient(circle at 34% 28%, #ffd9c4 0%, #ff8d55 22%, #ff5a1f 55%, #b93508 100%)';
-  return <div style={{width: size, height: size, borderRadius: '50%', background: g, boxShadow: `0 ${size * 0.18}px ${size * 0.35}px rgba(160,70,30,0.25)`, ...style}} />;
+        ? 'radial-gradient(circle at 34% 28%, #ffffff 0%, #e5f7f4 30%, #c9ebe5 70%, #8fcfc5 100%)'
+        : 'radial-gradient(circle at 34% 28%, #d4f5f0 0%, #5fd0c4 22%, #2bb3a6 55%, #137068 100%)';
+  return <div style={{width: size, height: size, borderRadius: '50%', background: g, boxShadow: `0 ${size * 0.18}px ${size * 0.35}px rgba(20,90,85,0.25)`, ...style}} />;
 };
 
 /** Awan tanah liat (gabungan sfera) */
@@ -64,12 +64,12 @@ const FLOATS: {x: number; y: number; s: number; c: 'o' | 'y' | 'p'; z: number; p
 export const Background: React.FC = () => {
   const fr = useCurrentFrame();
   const t = fr / FPS;
-  const dots = 'radial-gradient(circle, rgba(255,90,31,0.22) 2px, transparent 2.6px)';
+  const dots = 'radial-gradient(circle, rgba(43,179,166,0.22) 2px, transparent 2.6px)';
   return (
     <AbsoluteFill style={{background: PEACH, overflow: 'hidden'}}>
       {/* dinding & lantai studio */}
-      <AbsoluteFill style={{background: 'linear-gradient(180deg, #fbeadf 0%, #f6dccb 62%, #f0cdb6 63%, #f8e3d4 100%)'}} />
-      <div style={{position: 'absolute', left: -200, right: -200, top: 1170, height: 140, background: 'radial-gradient(ellipse at 50% 0%, rgba(150,80,40,0.18) 0%, rgba(0,0,0,0) 70%)'}} />
+      <AbsoluteFill style={{background: 'linear-gradient(180deg, #eef9f7 0%, #dcf0ec 62%, #cfe8e3 63%, #e6f5f2 100%)'}} />
+      <div style={{position: 'absolute', left: -200, right: -200, top: 1170, height: 140, background: 'radial-gradient(ellipse at 50% 0%, rgba(20,90,85,0.18) 0%, rgba(0,0,0,0) 70%)'}} />
       {/* cahaya tingkap */}
       <div style={{position: 'absolute', left: 540 + Math.sin(t * 0.1) * 40, top: -300, width: 900, height: 1700, transform: 'rotate(18deg)', background: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 40%, rgba(255,255,255,0) 100%)'}} />
       {/* titik halftone di penjuru */}
@@ -86,7 +86,7 @@ export const Background: React.FC = () => {
             {f.kind === 'cloud' ? (
               <ClayCloud w={f.s} />
             ) : f.kind === 'card' ? (
-              <div style={{width: f.s, height: f.s * 1.25, borderRadius: 12, background: 'linear-gradient(145deg,#ff8a52,#ff5a1f)', boxShadow: '0 18px 30px rgba(160,70,30,0.3)'}} />
+              <div style={{width: f.s, height: f.s * 1.25, borderRadius: 12, background: 'linear-gradient(145deg,#5ccdc1,#2bb3a6)', boxShadow: '0 18px 30px rgba(20,90,85,0.3)'}} />
             ) : (
               <Clay size={f.s} color={f.c} />
             )}
@@ -120,11 +120,11 @@ export const Tilt: React.FC<{p: number; children: React.ReactNode; amp?: number;
 export const Card: React.FC<{children: React.ReactNode; style?: React.CSSProperties; tone?: 'paper' | 'orange'}> = ({children, style, tone = 'paper'}) => (
   <div
     style={{
-      background: tone === 'orange' ? 'linear-gradient(150deg, #ff8248 0%, #ff5a1f 60%, #e2460f 100%)' : PAPER,
+      background: tone === 'orange' ? 'linear-gradient(150deg, #57cabe 0%, #2bb3a6 60%, #1f9a8f 100%)' : PAPER,
       color: tone === 'orange' ? '#fff' : INK,
       borderRadius: 40,
       padding: '36px 44px',
-      boxShadow: '0 40px 70px rgba(150,70,30,0.22), 0 8px 18px rgba(150,70,30,0.12), inset 0 2px 0 rgba(255,255,255,0.7)',
+      boxShadow: '0 40px 70px rgba(20,90,85,0.22), 0 8px 18px rgba(20,90,85,0.12), inset 0 2px 0 rgba(255,255,255,0.7)',
       ...style,
     }}
   >
@@ -133,7 +133,7 @@ export const Card: React.FC<{children: React.ReactNode; style?: React.CSSPropert
 );
 /** Butang pil 3D tersemperit (gaya "Learn") */
 export const Pill3D: React.FC<{children: React.ReactNode; size?: number; tone?: 'o' | 'g' | 'r'; style?: React.CSSProperties}> = ({children, size = 60, tone = 'o', style}) => {
-  const c = tone === 'g' ? ['#56c98e', '#2fa36b', '#1d7a4d'] : tone === 'r' ? ['#ff7a6b', '#e0362c', '#a8211a'] : ['#ff8d55', '#ff5a1f', '#c13d0e'];
+  const c = tone === 'g' ? ['#5cc46f', '#34a853', '#237a37'] : tone === 'r' ? ['#ff7a6b', '#e0362c', '#a8211a'] : ['#5fd0c4', '#2bb3a6', '#178077'];
   return (
     <div
       style={{
@@ -145,7 +145,7 @@ export const Pill3D: React.FC<{children: React.ReactNode; size?: number; tone?: 
         padding: `${size * 0.22}px ${size * 0.6}px`,
         borderRadius: size,
         background: `linear-gradient(180deg, ${c[0]} 0%, ${c[1]} 60%)`,
-        boxShadow: `0 ${size * 0.16}px 0 ${c[2]}, 0 ${size * 0.45}px ${size * 0.6}px rgba(150,60,20,0.3), inset 0 3px 0 rgba(255,255,255,0.45)`,
+        boxShadow: `0 ${size * 0.16}px 0 ${c[2]}, 0 ${size * 0.45}px ${size * 0.6}px rgba(20,90,85,0.3), inset 0 3px 0 rgba(255,255,255,0.45)`,
         textShadow: `0 2px 0 ${c[2]}`,
         whiteSpace: 'nowrap',
         ...style,
@@ -169,7 +169,7 @@ export const Header: React.FC = () => {
       <div style={{fontFamily: POP, fontWeight: 800, fontSize: 24, color: '#fff', background: ORANGE, borderRadius: 30, padding: '8px 20px', letterSpacing: 2, boxShadow: `0 5px 0 ${ORANGE_D}`}}>TAZKIRAH</div>
       <div style={{flex: 1}}>
         <div style={{fontFamily: POP, fontWeight: 700, fontSize: 24, color: MUTED, letterSpacing: 3}}>{cur >= 0 ? CHAPTERS[cur][0] : ''}</div>
-        <div style={{height: 8, borderRadius: 4, background: 'rgba(155,118,99,0.2)', marginTop: 8, overflow: 'hidden'}}>
+        <div style={{height: 8, borderRadius: 4, background: 'rgba(93,135,131,0.2)', marginTop: 8, overflow: 'hidden'}}>
           <div style={{width: `${prog * 100}%`, height: '100%', borderRadius: 4, background: `linear-gradient(90deg, ${YELLOW}, ${ORANGE})`}} />
         </div>
       </div>
@@ -177,24 +177,18 @@ export const Header: React.FC = () => {
   );
 };
 
+// Kapsyen bawah = terjemahan Bahasa Inggeris (infografik di atas sudah memaparkan teks Melayu)
 export const Subtitles: React.FC = () => {
   const fr = useCurrentFrame();
   const L = LINES.find((l) => fr >= at(l.s) - 3 && fr < at(l.e));
-  if (!L) return null;
-  const pin = ci(fr, at(L.s) - 3, at(L.s) + 4);
-  const pout = ci(fr, at(L.e) - 4, at(L.e));
+  if (!L || !L.en) return null;
+  const pin = ci(fr, at(L.s) - 3, at(L.s) + 5);
+  const pout = ci(fr, at(L.e) - 5, at(L.e));
   return (
-    <div style={{position: 'absolute', left: 50, right: 50, top: 1590, display: 'flex', justifyContent: 'center', opacity: pin * (1 - pout), transform: `translateY(${(1 - pin) * 16}px)`}}>
-      <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '4px 12px', background: 'rgba(255,250,245,0.94)', borderRadius: 30, padding: '18px 28px', boxShadow: '0 20px 40px rgba(150,70,30,0.18)'}}>
-        {L.words.map((w, i) => {
-          const said = fr >= at(w.s);
-          const now = said && fr < at(w.e);
-          return (
-            <span key={i} style={{fontFamily: POP, fontWeight: 800, fontSize: 58, lineHeight: 1.22, padding: '0 10px', borderRadius: 14, color: now ? '#fff' : said ? INK : 'rgba(59,36,24,0.3)', background: now ? ORANGE : 'transparent'}}>
-              {w.w}
-            </span>
-          );
-        })}
+    <div style={{position: 'absolute', left: 60, right: 60, top: 1520, display: 'flex', justifyContent: 'center', opacity: pin * (1 - pout), transform: `translateY(${(1 - pin) * 14}px)`}}>
+      <div style={{display: 'flex', alignItems: 'center', gap: 18, background: 'rgba(251,255,254,0.94)', borderRadius: 28, padding: '16px 28px', boxShadow: '0 18px 36px rgba(20,90,85,0.16)'}}>
+        <span style={{fontFamily: POP, fontWeight: 800, fontSize: 22, color: '#fff', background: ORANGE, borderRadius: 10, padding: '4px 10px', letterSpacing: 2, flexShrink: 0}}>EN</span>
+        <span style={{fontFamily: POP, fontWeight: 600, fontSize: 44, lineHeight: 1.25, color: INK, textAlign: 'center'}}>{L.en}</span>
       </div>
     </div>
   );

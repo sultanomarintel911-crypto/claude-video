@@ -3,12 +3,29 @@ export const FPS = 30;
 export const W = 1080;
 export const H = 1920;
 
+import WARP from './warp.json';
+
+// Semua masa dalam fail ini & scenes.tsx ditulis mengikut audio VERSI 1.
+// Audio versi 2 (dikemas kini) dibaca dengan rentak berbeza: warp() memetakan masa v1 -> v2
+// melalui 176 perkataan yang dipadankan (interpolasi linear).
+const WA = (WARP as number[][]).map((p) => p[0]);
+const WB = (WARP as number[][]).map((p) => p[1]);
+export const warp = (t: number) => {
+  if (t <= WA[0]) return t + (WB[0] - WA[0]);
+  if (t >= WA[WA.length - 1]) return t + (WB[WB.length - 1] - WA[WA.length - 1]);
+  let i = 1;
+  while (WA[i] < t) i++;
+  const k = (t - WA[i - 1]) / (WA[i] - WA[i - 1]);
+  return WB[i - 1] + k * (WB[i] - WB[i - 1]);
+};
+
+export const AUDIO_LEN = 101.52; // panjang audio v2
 export const CLIP_START = 0;
-export const CLIP_END = 101.72;
+export const CLIP_END = AUDIO_LEN - (WB[WB.length - 1] - WA[WA.length - 1]); // dalam masa v1
 export const LEAD = 1.4; // tajuk sebelum suara
 export const OUTRO = 4.0;
-export const TOTAL = Math.round((CLIP_END - CLIP_START + LEAD + OUTRO) * FPS);
-export const at = (t: number) => Math.round((t - CLIP_START + LEAD) * FPS);
+export const at = (t: number) => Math.round((warp(t) - CLIP_START + LEAD) * FPS);
+export const TOTAL = Math.round((AUDIO_LEN + LEAD + OUTRO) * FPS);
 
 export const TITLE = 'Racun Yang Halus';
 
@@ -60,7 +77,53 @@ const RAW: [string, number][] = [
 ];
 
 export type Word = {w: string; s: number; e: number};
-export type Line = {words: Word[]; s: number; e: number};
+export type Line = {words: Word[]; s: number; e: number; en?: string};
+
+// Terjemahan Bahasa Inggeris (satu bagi setiap baris kapsyen, ikut urutan RAW)
+export const EN: string[] = ['Assalamu’alaikum. Ever heard people say,',
+  '“What matters is a good heart,” or',
+  '“I don’t cover my aurah,',
+  'but I do pray”?',
+  'It sounds harmless, but this is where',
+  'a very subtle poison begins.',
+  'Today, many claim to be ‘spiritual’',
+  'but don’t want religion.',
+  'Some are comfortable calling themselves',
+  'non-practising Muslims.',
+  'Islam remains only in name,',
+  'but no longer in their lives.',
+  'Over time, the line between halal and haram',
+  'becomes blurred.',
+  'The forbidden becomes a joke.',
+  'The sacred becomes entertainment.',
+  'Scholars call this way of thinking',
+  'Murji’ah.',
+  'It holds that faith in the heart is enough',
+  'and deeds don’t matter.',
+  'Supposedly, sins don’t affect faith.',
+  'Yet Allah says in Surah al-‘Asr:',
+  'all of mankind is in loss,',
+  'except those who',
+  'believe and do righteous deeds.',
+  'Faith and deeds cannot be separated.',
+  'Allah also commands us',
+  'to enter into Islam',
+  'completely.',
+  'Not picking what we like',
+  'and leaving what we don’t.',
+  'None of us is perfect.',
+  'Some are still learning to cover their aurah.',
+  'Some are still taking small steps with prayer.',
+  'That is okay.',
+  'What is dangerous',
+  'is when we stop trying',
+  'and start to think',
+  'that sin is normal.',
+  'So keep praying,',
+  'and keep improving the rest.',
+  'May Allah keep our hearts',
+  'firm upon His religion.',
+  'And Allah knows best.'];
 export const LINES: Line[] = (() => {
   const lines: Line[] = [];
   RAW.forEach(([w, s], i) => {
@@ -74,6 +137,7 @@ export const LINES: Line[] = (() => {
   lines.forEach((L, i) => {
     const nx = lines[i + 1]?.s ?? L.e + 1.4;
     L.e = Math.min(nx, L.e + 1.5);
+    L.en = EN[i];
   });
   return lines;
 })();

@@ -6,7 +6,7 @@ import '@fontsource/poppins/800.css';
 import '@fontsource/poppins/900.css';
 import '@fontsource/amiri/400.css';
 import '@fontsource/amiri/700.css';
-import {at, CLIP_END, CLIP_START, SFX, TOTAL} from './data';
+import {at, AUDIO_LEN, FPS, LEAD, SFX, TOTAL} from './data';
 import {Background, ci, Header, Subtitles} from './ui';
 import {Asr, Bahaya, Dakwaan, Gandingan, Intro, Kabur, Kaffah, Murjiah, PadaNama, Penutup, Racun, Spiritual, TakSempurna, Teruskan} from './scenes';
 
@@ -47,7 +47,7 @@ export const VideoTipografi: React.FC = () => {
         <Header />
         <Subtitles />
       </AbsoluteFill>
-      <Sequence from={at(CLIP_START)} durationInFrames={at(CLIP_END) - at(CLIP_START) + 10}>
+      <Sequence from={Math.round(LEAD * FPS)} durationInFrames={Math.round(AUDIO_LEN * FPS) + 10}>
         <Audio src={staticFile('audio/suara.wav')} />
       </Sequence>
       {SFX.map(([f, t, v], i) => (

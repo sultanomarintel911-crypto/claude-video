@@ -82,18 +82,18 @@ const Botol: React.FC<{fr: number}> = ({fr}) => (
   <svg width={360} height={460} viewBox="0 0 360 460">
     <defs>
       <radialGradient id="kaca" cx="35%" cy="35%" r="75%">
-        <stop offset="0%" stopColor="#ffd9c4" />
-        <stop offset="35%" stopColor="#ff8d55" />
-        <stop offset="75%" stopColor="#ff5a1f" />
-        <stop offset="100%" stopColor="#b93508" />
+        <stop offset="0%" stopColor="#d4f5f0" />
+        <stop offset="35%" stopColor="#5fd0c4" />
+        <stop offset="75%" stopColor="#2bb3a6" />
+        <stop offset="100%" stopColor="#137068" />
       </radialGradient>
     </defs>
-    <ellipse cx={180} cy={440} rx={120} ry={16} fill="rgba(150,70,30,0.22)" />
-    <rect x={140} y={40} width={80} height={90} rx={16} fill="#f3c9ad" />
-    <rect x={128} y={20} width={104} height={40} rx={14} fill="#7a3e22" />
+    <ellipse cx={180} cy={440} rx={120} ry={16} fill="rgba(20,90,85,0.22)" />
+    <rect x={140} y={40} width={80} height={90} rx={16} fill="#cfe9e4" />
+    <rect x={128} y={20} width={104} height={40} rx={14} fill="#1d4f4b" />
     <path d="M140 120 Q60 170 60 280 Q60 430 180 430 Q300 430 300 280 Q300 170 220 120 Z" fill="url(#kaca)" />
     <path d="M100 200 Q90 260 104 320" stroke="#fff" strokeOpacity={0.6} strokeWidth={14} fill="none" strokeLinecap="round" />
-    <rect x={110} y={240} width={140} height={110} rx={18} fill="#fffaf5" />
+    <rect x={110} y={240} width={140} height={110} rx={18} fill="#fbfffe" />
     <circle cx={180} cy={278} r={20} fill={INK} />
     <rect x={168} y={290} width={24} height={14} rx={4} fill={INK} />
     <text x={180} y={336} textAnchor="middle" fontFamily="Poppins" fontWeight={900} fontSize={26} fill={ORANGE}>
@@ -101,7 +101,7 @@ const Botol: React.FC<{fr: number}> = ({fr}) => (
     </text>
     {[0, 1, 2].map((k) => {
       const ph = ((fr / 30 + k * 0.6) % 1.8) / 1.8;
-      return <circle key={k} cx={180 + (k - 1) * 40} cy={150 - ph * 140} r={10 * (1 - ph) + 3} fill="#ffb28a" opacity={1 - ph} />;
+      return <circle key={k} cx={180 + (k - 1) * 40} cy={150 - ph * 140} r={10 * (1 - ph) + 3} fill="#9fe3da" opacity={1 - ph} />;
     })}
   </svg>
 );
@@ -131,8 +131,8 @@ export const Racun: React.FC = () => {
 const Toggle: React.FC<{on: number; label: string}> = ({on, label}) => (
   <Card style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: 860, padding: '40px 50px'}}>
     <div style={{fontFamily: POP, fontWeight: 900, fontSize: 76}}>{label}</div>
-    <div style={{width: 200, height: 104, borderRadius: 52, background: on > 0.5 ? GREEN : '#d8c3b6', position: 'relative', boxShadow: 'inset 0 6px 10px rgba(0,0,0,0.15)'}}>
-      <div style={{position: 'absolute', top: 8, left: 8 + on * 96, width: 88, height: 88, borderRadius: 44, background: 'radial-gradient(circle at 35% 30%, #fff, #f1e4da)', boxShadow: '0 6px 12px rgba(0,0,0,0.25)'}} />
+    <div style={{width: 200, height: 104, borderRadius: 52, background: on > 0.5 ? GREEN : '#b9d3cf', position: 'relative', boxShadow: 'inset 0 6px 10px rgba(0,0,0,0.15)'}}>
+      <div style={{position: 'absolute', top: 8, left: 8 + on * 96, width: 88, height: 88, borderRadius: 44, background: 'radial-gradient(circle at 35% 30%, #fff, #e4f1ee)', boxShadow: '0 6px 12px rgba(0,0,0,0.25)'}} />
     </div>
   </Card>
 );
@@ -167,17 +167,17 @@ export const PadaNama: React.FC = () => {
           <Card style={{width: 880, position: 'relative', padding: 0, overflow: 'hidden'}}>
             <div style={{background: ORANGE, color: '#fff', fontFamily: POP, fontWeight: 800, fontSize: 30, letterSpacing: 4, padding: '18px 40px'}}>KAD PENGENALAN DIRI</div>
             <div style={{display: 'flex', gap: 36, padding: '36px 40px'}}>
-              <div style={{width: 170, height: 210, borderRadius: 20, background: '#f4dfd0', ...center}}>
+              <div style={{width: 170, height: 210, borderRadius: 20, background: '#d8efeb', ...center}}>
                 <svg width={120} height={140} viewBox="0 0 96 110">
-                  <circle cx={48} cy={38} r={22} fill="#e7bfa7" />
-                  <path d="M8 108 Q48 56 88 108 Z" fill="#e7bfa7" />
+                  <circle cx={48} cy={38} r={22} fill="#a9d9d1" />
+                  <path d="M8 108 Q48 56 88 108 Z" fill="#a9d9d1" />
                 </svg>
               </div>
               <div style={{flex: 1, fontFamily: POP}}>
                 <div style={{fontSize: 26, fontWeight: 700, color: MUTED, letterSpacing: 2}}>GELARAN</div>
                 <div style={{fontSize: 64, fontWeight: 900, lineHeight: 1.1, ...rise(P(24.48))}}>Muslim</div>
                 <div style={{fontSize: 26, fontWeight: 700, color: MUTED, letterSpacing: 2, marginTop: 14}}>AMALAN</div>
-                <div style={{fontSize: 44, fontWeight: 800, color: '#c9b2a4', ...rise(P(25.14))}}>— kosong —</div>
+                <div style={{fontSize: 44, fontWeight: 800, color: '#a9c4c0', ...rise(P(25.14))}}>— kosong —</div>
               </div>
             </div>
             <div
@@ -208,7 +208,7 @@ export const PadaNama: React.FC = () => {
             <Tilt key={c.k} p={P(c.t, 0.6, backOut)}>
               <Card style={{width: 420, ...center, gap: 12}} tone={c.ok ? 'paper' : 'paper'}>
                 <div style={{fontFamily: POP, fontWeight: 700, fontSize: 28, color: MUTED, letterSpacing: 3}}>{c.k}</div>
-                <div style={{fontFamily: POP, fontWeight: 900, fontSize: 66, color: c.ok ? INK : '#c9b2a4'}}>{c.v}</div>
+                <div style={{fontFamily: POP, fontWeight: 900, fontSize: 66, color: c.ok ? INK : '#a9c4c0'}}>{c.v}</div>
                 {c.ok ? <V p={P(c.t + 0.3)} /> : <X p={P(c.t + 0.6)} />}
               </Card>
             </Tilt>
@@ -228,8 +228,8 @@ export const Kabur: React.FC = () => {
       <AbsoluteFill style={{...center, justifyContent: 'flex-start', paddingTop: 280}}>
         <Kicker p={P(31.56)}>Lama-kelamaan…</Kicker>
         <Tilt p={P(32.6, 0.7, backOut)} style={{marginTop: 34}}>
-          <div style={{display: 'flex', width: 900, height: 330, borderRadius: 40, overflow: 'hidden', boxShadow: '0 40px 70px rgba(150,70,30,0.22)', position: 'relative'}}>
-            <div style={{flex: 1, background: `linear-gradient(150deg, #5fd197, ${GREEN})`, ...center, filter: `blur(${blur * 6}px)`}}>
+          <div style={{display: 'flex', width: 900, height: 330, borderRadius: 40, overflow: 'hidden', boxShadow: '0 40px 70px rgba(20,90,85,0.22)', position: 'relative'}}>
+            <div style={{flex: 1, background: `linear-gradient(150deg, #6ccf7d, ${GREEN})`, ...center, filter: `blur(${blur * 6}px)`}}>
               <div style={{fontFamily: POP, fontWeight: 900, fontSize: 84, color: '#fff'}}>HALAL</div>
             </div>
             <div style={{flex: 1, background: `linear-gradient(150deg, #ff7a6b, ${RED})`, ...center, filter: `blur(${blur * 6}px)`}}>
@@ -280,7 +280,7 @@ export const Murjiah: React.FC = () => {
       <AbsoluteFill style={{...center, justifyContent: 'flex-start', paddingTop: 280}}>
         <Kicker p={P(41.24)} style={{opacity: 1 - up}}>Ulama menamakan pemikiran ini</Kicker>
       </AbsoluteFill>
-      <div style={{position: 'absolute', left: 0, right: 0, top: 330, textAlign: 'center', fontFamily: POP, fontWeight: 900, fontSize: 170, letterSpacing: -6, color: ORANGE, textShadow: `0 10px 0 ${ORANGE_D}, 0 30px 50px rgba(150,60,20,0.3)`, opacity: up, transform: `scale(${0.9 + 0.1 * up})`}}>
+      <div style={{position: 'absolute', left: 0, right: 0, top: 330, textAlign: 'center', fontFamily: POP, fontWeight: 900, fontSize: 170, letterSpacing: -6, color: ORANGE, textShadow: `0 10px 0 ${ORANGE_D}, 0 30px 50px rgba(20,90,85,0.3)`, opacity: up, transform: `scale(${0.9 + 0.1 * up})`}}>
         MURJI’AH
       </div>
       {/* tipografi gergasi (dipotong di tepi) */}
@@ -296,7 +296,7 @@ export const Murjiah: React.FC = () => {
           letterSpacing: -12,
           color: ORANGE,
           whiteSpace: 'nowrap',
-          textShadow: `0 14px 0 ${ORANGE_D}, 0 40px 60px rgba(150,60,20,0.3)`,
+          textShadow: `0 14px 0 ${ORANGE_D}, 0 40px 60px rgba(20,90,85,0.3)`,
           opacity: Math.min(1, big * 2) * (1 - up),
           transform: `scale(${interpolate(big, [0, 1], [1.4, 1])})`,
           transformOrigin: '0% 50%',
@@ -326,7 +326,7 @@ export const Murjiah: React.FC = () => {
 
 // ============================================================ 7. Surah al-'Asr
 const Mushaf: React.FC<{children: React.ReactNode; surah: string}> = ({children, surah}) => (
-  <Card style={{width: 940, padding: '30px 40px 36px', border: `4px solid ${YELLOW}`, background: 'linear-gradient(180deg,#fffdf8,#fff4e6)'}}>
+  <Card style={{width: 940, padding: '30px 40px 36px', border: `4px solid ${YELLOW}`, background: 'linear-gradient(180deg,#fcfffe,#eefaf7)'}}>
     <div style={{display: 'flex', justifyContent: 'center', marginBottom: 6}}>
       <div style={{fontFamily: POP, fontWeight: 800, fontSize: 28, color: '#fff', background: YELLOW, borderRadius: 30, padding: '6px 22px', letterSpacing: 2, boxShadow: '0 4px 0 #c98412'}}>{surah}</div>
     </div>
@@ -376,8 +376,8 @@ export const Gandingan: React.FC = () => {
           width: 380,
           height: 380,
           borderRadius: 60,
-          background: c === 'o' ? 'linear-gradient(150deg,#ff9460,#ff5a1f 60%,#d8400e)' : 'linear-gradient(150deg,#ffd77a,#f7b733 60%,#c98412)',
-          boxShadow: `0 26px 0 ${c === 'o' ? '#b93508' : '#a96c0a'}, 0 60px 80px rgba(150,60,20,0.3), inset 0 4px 0 rgba(255,255,255,0.5)`,
+          background: c === 'o' ? 'linear-gradient(150deg,#6ed6ca,#2bb3a6 60%,#1c8c82)' : 'linear-gradient(150deg,#ffd77a,#f7b733 60%,#c98412)',
+          boxShadow: `0 26px 0 ${c === 'o' ? '#137068' : '#a96c0a'}, 0 60px 80px rgba(20,90,85,0.3), inset 0 4px 0 rgba(255,255,255,0.5)`,
           ...center,
         }}
       >
@@ -444,12 +444,12 @@ export const Kaffah: React.FC = () => {
                     height: 120,
                     borderRadius: 26,
                     background: it.keep ? PAPER : PAPER,
-                    boxShadow: `0 ${it.keep ? 24 : 10}px ${it.keep ? 40 : 20}px rgba(150,70,30,${it.keep ? 0.25 : 0.12})`,
+                    boxShadow: `0 ${it.keep ? 24 : 10}px ${it.keep ? 40 : 20}px rgba(20,90,85,${it.keep ? 0.25 : 0.12})`,
                     ...center,
                     fontFamily: POP,
                     fontWeight: 900,
                     fontSize: 46,
-                    color: it.keep ? ORANGE : '#c9b2a4',
+                    color: it.keep ? ORANGE : '#a9c4c0',
                     transform: `translateY(${(it.keep ? -14 : 0) * picked + drop * 60}px) rotate(${drop * (i % 2 ? 12 : -12)}deg)`,
                     opacity: Math.min(1, picked * 2) * (1 - drop * 0.65),
                     position: 'relative',
@@ -480,7 +480,7 @@ const Prog: React.FC<{t: number; label: string; to: number; icon: React.ReactNod
         <div style={{transform: `translateY(${step * -4}px)`}}>{icon}</div>
         <div style={{flex: 1}}>
           <div style={{fontFamily: POP, fontWeight: 800, fontSize: 44, lineHeight: 1.15}}>{label}</div>
-          <div style={{height: 26, borderRadius: 13, background: '#f1dccd', marginTop: 16, overflow: 'hidden', boxShadow: 'inset 0 3px 6px rgba(0,0,0,0.08)'}}>
+          <div style={{height: 26, borderRadius: 13, background: '#d6ece8', marginTop: 16, overflow: 'hidden', boxShadow: 'inset 0 3px 6px rgba(0,0,0,0.08)'}}>
             <div style={{width: `${f * 100}%`, height: '100%', borderRadius: 13, background: `linear-gradient(90deg, ${YELLOW}, ${ORANGE})`}} />
           </div>
         </div>
@@ -504,7 +504,7 @@ export const TakSempurna: React.FC = () => {
           icon={
             <svg width={100} height={100} viewBox="0 0 100 100">
               <path d="M50 8 C24 8 14 34 18 60 L22 92 L78 92 L82 60 C86 34 76 8 50 8 Z" fill={ORANGE} />
-              <ellipse cx={50} cy={46} rx={18} ry={22} fill="#ffd9c4" />
+              <ellipse cx={50} cy={46} rx={18} ry={22} fill="#d4f5f0" />
             </svg>
           }
         />
@@ -538,7 +538,7 @@ export const Bahaya: React.FC = () => {
         <div style={{...pop(P(84.54, 0.6, backOut), 0.4), transform: `${pop(P(84.54, 0.6, backOut), 0.4).transform} rotate(${Math.sin(fr / 8) * 3}deg)`}}>
           <svg width={240} height={215} viewBox="0 0 240 215">
             <path d="M120 14 L228 200 L12 200 Z" fill={ORANGE} stroke={ORANGE} strokeWidth={22} strokeLinejoin="round" />
-            <path d="M120 14 L228 200 L12 200 Z" fill="none" stroke="#c13d0e" strokeWidth={4} strokeLinejoin="round" transform="translate(0 10)" opacity={0.6} />
+            <path d="M120 14 L228 200 L12 200 Z" fill="none" stroke="#178077" strokeWidth={4} strokeLinejoin="round" transform="translate(0 10)" opacity={0.6} />
             <rect x={108} y={70} width={24} height={80} rx={12} fill="#fff" />
             <circle cx={120} cy={174} r={14} fill="#fff" />
           </svg>
@@ -605,8 +605,8 @@ export const Teruskan: React.FC = () => {
                   style={{
                     borderRadius: 30,
                     padding: '34px 40px',
-                    background: i ? 'linear-gradient(150deg,#ff9460,#ff5a1f)' : 'linear-gradient(150deg,#ffd77a,#f7b733)',
-                    boxShadow: `0 30px 0 ${i ? '#b93508' : '#a96c0a'}, 0 60px 70px rgba(150,60,20,0.3)`,
+                    background: i ? 'linear-gradient(150deg,#6ed6ca,#2bb3a6)' : 'linear-gradient(150deg,#ffd77a,#f7b733)',
+                    boxShadow: `0 30px 0 ${i ? '#137068' : '#a96c0a'}, 0 60px 70px rgba(20,90,85,0.3)`,
                     fontFamily: POP,
                     fontWeight: 900,
                     fontSize: 54,
@@ -650,7 +650,7 @@ export const Penutup: React.FC = () => {
       <AbsoluteFill style={{...center, gap: 30, opacity: end, paddingBottom: 100}}>
         <div style={{fontFamily: ARAB, fontSize: 110, color: ORANGE, ...pop(P(100.76, 0.6, backOut), 0.6)}}>وَاللَّهُ أَعْلَمُ</div>
         <div style={{display: 'flex', ...pop(P(101.6, 0.6, backOut), 0.6)}}>
-          <div style={{width: 300, height: 150, borderRadius: 36, background: 'linear-gradient(150deg,#ff9460,#ff5a1f)', boxShadow: '0 18px 0 #b93508', ...center, fontFamily: POP, fontWeight: 900, fontSize: 68, color: '#fff'}}>IMAN</div>
+          <div style={{width: 300, height: 150, borderRadius: 36, background: 'linear-gradient(150deg,#6ed6ca,#2bb3a6)', boxShadow: '0 18px 0 #137068', ...center, fontFamily: POP, fontWeight: 900, fontSize: 68, color: '#fff'}}>IMAN</div>
           <div style={{width: 300, height: 150, borderRadius: 36, background: 'linear-gradient(150deg,#ffd77a,#f7b733)', boxShadow: '0 18px 0 #a96c0a', ...center, fontFamily: POP, fontWeight: 900, fontSize: 68, color: '#fff'}}>AMAL</div>
         </div>
         <H1 size={70} style={rise(P(102.0))}>
