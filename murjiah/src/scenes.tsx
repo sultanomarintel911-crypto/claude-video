@@ -270,13 +270,19 @@ export const Murjiah: React.FC = () => {
   const big = P(43.1, 0.6, backOut);
   const slide = Math.min(260, Math.max(0, fr - at(43.1)) * 1.6);
   const up = P(44.7, 0.7, easeInOut);
+  // cop 3D "FAHAMAN YANG SALAH" terbang dari kamera & menghentak
+  const ST = 52.3;
+  const st = P(ST, 0.42, backOut);
+  const hit = fr - at(ST + 0.36);
+  const shake = hit >= 0 && hit < 14 ? Math.sin(hit * 2.3) * 16 * Math.exp(-hit / 4) : 0;
+  const flash = hit >= 0 ? Math.max(0, 1 - hit / 12) : 0;
   const pts = [
     {t: 45.84, a: 'Iman cukup di hati'},
     {t: 47.94, a: 'Amal tidak penting'},
     {t: 50.78, a: 'Dosa tidak menjejaskan iman'},
   ];
   return (
-    <Win a={40.8} b={53.65}>
+    <Win a={40.8} b={54.35}>
       <AbsoluteFill style={{...center, justifyContent: 'flex-start', paddingTop: 280}}>
         <Kicker p={P(41.24)} style={{opacity: 1 - up}}>Ulama menamakan pemikiran ini</Kicker>
       </AbsoluteFill>
@@ -308,18 +314,51 @@ export const Murjiah: React.FC = () => {
       </div>
       <AbsoluteFill style={{...center, justifyContent: 'flex-start', paddingTop: 680, opacity: up}}>
         <div style={{fontFamily: POP, fontWeight: 800, fontSize: 44, color: MUTED, marginBottom: 26}}>Fahamannya menganggap:</div>
-        <div style={{display: 'flex', flexDirection: 'column', gap: 26, width: 900}}>
-          {pts.map((p) => (
-            <Tilt key={p.t} p={P(p.t, 0.55, backOut)}>
-              <Card style={{display: 'flex', alignItems: 'center', gap: 28, padding: '28px 36px'}}>
-                <X p={P(p.t + 0.4)} size={70} />
-                <div style={{fontFamily: POP, fontWeight: 800, fontSize: 52, lineHeight: 1.1}}>{p.a}</div>
-              </Card>
-            </Tilt>
-          ))}
-        </div>
-        <div style={{marginTop: 30, ...pop(P(52.4, 0.5, backOut), 0.5)}}>
-          <Pill3D size={44} tone="r">FAHAMAN YANG SALAH</Pill3D>
+        <div style={{display: 'flex', flexDirection: 'column', gap: 26, width: 900, transform: `translate(${shake}px, ${shake * 0.4}px)`, position: 'relative'}}>
+          {pts.map((p) => {
+            const strike = P(p.t + 0.55, 0.35, easeInOut);
+            return (
+              <Tilt key={p.t} p={P(p.t, 0.55, backOut)}>
+                <Card style={{display: 'flex', alignItems: 'center', gap: 28, padding: '28px 36px', position: 'relative', background: `rgba(255,${Math.round(255 - 20 * strike)},${Math.round(254 - 24 * strike)},1)`}}>
+                  <X p={P(p.t + 0.4)} size={70} />
+                  <div style={{position: 'relative'}}>
+                    <div style={{fontFamily: POP, fontWeight: 800, fontSize: 52, lineHeight: 1.1, opacity: 1 - 0.35 * strike}}>{p.a}</div>
+                    <div style={{position: 'absolute', left: -6, top: '52%', height: 8, borderRadius: 4, width: `${strike * 104}%`, background: RED, boxShadow: '0 2px 6px rgba(224,54,44,0.4)'}} />
+                  </div>
+                </Card>
+              </Tilt>
+            );
+          })}
+          {/* kilat merah lembut ketika cop menghentak */}
+          <div style={{position: 'absolute', inset: -80, borderRadius: 60, background: 'radial-gradient(ellipse, rgba(224,54,44,0.35) 0%, rgba(224,54,44,0) 70%)', opacity: flash, pointerEvents: 'none'}} />
+          {/* COP 3D */}
+          <div style={{position: 'absolute', left: 0, right: 0, top: 30, display: 'flex', justifyContent: 'center', perspective: 1200, pointerEvents: 'none'}}>
+            <div
+              style={{
+                transform: `translateZ(${(1 - st) * 800}px) rotateX(${(1 - st) * 55}deg) rotateY(${(1 - st) * -40}deg) rotateZ(${-9 - (1 - st) * 30}deg)`,
+                opacity: Math.min(1, st * 3),
+                fontFamily: POP,
+                fontWeight: 900,
+                fontSize: 104,
+                lineHeight: 0.98,
+                textAlign: 'center',
+                color: RED,
+                letterSpacing: -2,
+                padding: '26px 46px 30px',
+                border: `12px solid ${RED}`,
+                outline: `4px solid ${RED}`,
+                outlineOffset: 10,
+                borderRadius: 28,
+                background: 'rgba(255,251,250,0.93)',
+                textShadow: '0 4px 0 #a8211a, 0 8px 0 #8a1a14, 0 18px 24px rgba(120,20,15,0.35)',
+                boxShadow: `0 ${30 + (1 - st) * 60}px ${70 + (1 - st) * 80}px rgba(120,20,15,${0.35 - 0.2 * (1 - st)})`,
+              }}
+            >
+              FAHAMAN
+              <br />
+              YANG SALAH
+            </div>
+          </div>
         </div>
       </AbsoluteFill>
     </Win>
@@ -340,7 +379,7 @@ export const Asr: React.FC = () => {
   const P = useP();
   const hi = (t: number) => (fr >= at(t) ? ORANGE : INK);
   return (
-    <Win a={53.65} b={62.85}>
+    <Win a={54.15} b={62.85}>
       <AbsoluteFill style={{...center, justifyContent: 'flex-start', paddingTop: 270}}>
         <Kicker p={P(53.86)}>Sedangkan Allah berfirman…</Kicker>
         <Tilt p={P(54.6, 0.8, backOut)} amp={0.6} style={{marginTop: 30}}>
