@@ -59,7 +59,7 @@ const FLOATS: {x: number; y: number; s: number; c: 'o' | 'y' | 'p'; z: number; p
   {x: 880, y: 1380, s: 260, c: 'o', z: 0.3, ph: 2.1, kind: 'cloud'},
   {x: -40, y: 1500, s: 110, c: 'p', z: 0.8, ph: 0.6},
   {x: 70, y: 980, s: 60, c: 'y', z: 1, ph: 2.8},
-  {x: 990, y: 820, s: 70, c: 'o', z: 1, ph: 1.7, kind: 'card'},
+  {x: 990, y: 1060, s: 70, c: 'o', z: 1, ph: 1.7, kind: 'card'},
 ];
 export const Background: React.FC = () => {
   const fr = useCurrentFrame();

@@ -283,23 +283,25 @@ export const Murjiah: React.FC = () => {
       <div style={{position: 'absolute', left: 0, right: 0, top: 330, textAlign: 'center', fontFamily: POP, fontWeight: 900, fontSize: 170, letterSpacing: -6, color: ORANGE, textShadow: `0 10px 0 ${ORANGE_D}, 0 30px 50px rgba(20,90,85,0.3)`, opacity: up, transform: `scale(${0.9 + 0.1 * up})`}}>
         MURJI’AH
       </div>
-      {/* tipografi gergasi (dipotong di tepi) */}
+      {/* tipografi besar — muat sepenuhnya dalam skrin */}
       <div
         style={{
           position: 'absolute',
-          top: 640,
-          left: 60 - slide,
+          top: 700 - slide * 0.1,
+          left: 0,
+          right: 0,
+          textAlign: 'center',
           fontFamily: POP,
           fontWeight: 900,
-          fontSize: 400,
+          fontSize: 190,
           lineHeight: 1,
-          letterSpacing: -12,
+          letterSpacing: -6,
           color: ORANGE,
           whiteSpace: 'nowrap',
           textShadow: `0 14px 0 ${ORANGE_D}, 0 40px 60px rgba(20,90,85,0.3)`,
           opacity: Math.min(1, big * 2) * (1 - up),
-          transform: `scale(${interpolate(big, [0, 1], [1.4, 1])})`,
-          transformOrigin: '0% 50%',
+          transform: `scale(${interpolate(big, [0, 1], [1.5, 1])})`,
+          transformOrigin: '50% 50%',
         }}
       >
         MURJI’AH
