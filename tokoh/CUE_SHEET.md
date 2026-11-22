@@ -94,5 +94,9 @@ npm run preview
 Untuk render akhir (1920×1080). **Jalankan hanya selepas pratonton diluluskan.**
 
 ```bash
-npm run final
+npm run final        # 1920×1080
+npm run final:4k     # 3840×2160 — untuk TV 4K (lebih tajam, render ~4× lebih lama)
+npm run trailer1     # TrailerBahagian1 (juga trailer2, trailer3; tambah :4k untuk versi 4K)
 ```
+
+> Nota TV: fail `pratonton.mp4` hanya 960×540 — jangan tayang di TV. Guna fail `final_*` atau `*_4K`.
