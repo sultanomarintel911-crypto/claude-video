@@ -247,7 +247,7 @@ export function makeFilm(C, model) {
     ctx.fillText('NAMA', x, y + 124);
     if (t >= TL.name[0] && t < TL.deny) {
       ctx.font = `300 76px ${U.FONT.ui}`; ctx.letterSpacing = '6px'; ctx.fillStyle = T.hi(a * nA);
-      ctx.fillText(U.rollText('XXXXXXXXXXXX', 0, frame, 71), x, y + 200); ctx.letterSpacing = '0px';
+      ctx.fillText(U.rollText('XXXXXXXXXXXX', 0.1, frame, 71), x, y + 200); ctx.letterSpacing = '0px';
     } else if (t >= TL.deny) {
       ctx.fillStyle = T.hi(0.92 * a); for (let k = 0; k < 7; k++) ctx.fillRect(x + k * 124, y + 142, 108, 54);
       const d = seg(t, TL.deny, TL.deny + 0.25);
