@@ -322,8 +322,7 @@ export const Murjiah: React.FC = () => {
                 <Card style={{display: 'flex', alignItems: 'center', gap: 28, padding: '28px 36px', position: 'relative', background: `rgba(255,${Math.round(255 - 20 * strike)},${Math.round(254 - 24 * strike)},1)`}}>
                   <X p={P(p.t + 0.4)} size={70} />
                   <div style={{position: 'relative'}}>
-                    <div style={{fontFamily: POP, fontWeight: 800, fontSize: 52, lineHeight: 1.1, opacity: 1 - 0.35 * strike}}>{p.a}</div>
-                    <div style={{position: 'absolute', left: -6, top: '52%', height: 8, borderRadius: 4, width: `${strike * 104}%`, background: RED, boxShadow: '0 2px 6px rgba(224,54,44,0.4)'}} />
+                    <div style={{fontFamily: POP, fontWeight: 800, fontSize: 52, lineHeight: 1.1}}>{p.a}</div>
                   </div>
                 </Card>
               </Tilt>
