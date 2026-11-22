@@ -1,0 +1,11 @@
+{
+  "title": "TOKOH MURID 2026",
+  "model": "models/piala.json",
+  "hue": 250, "accent": 42,
+  "callouts": [
+    { "part": "tapak", "label": "Penyertaan 2026", "chip": "Penyertaan", "value": "18", "unit": "KALI", "detail": "ZON · DAERAH · NEGERI" },
+    { "part": "batang", "label": "Peringkat Kebangsaan", "chip": "Kebangsaan", "value": "06", "unit": "KALI", "detail": "SELURUH MALAYSIA" },
+    { "part": "pemegang", "label": "Jawatan Disandang", "chip": "Jawatan", "value": "05", "unit": "", "detail": "PEMIMPIN SEKOLAH" },
+    { "part": "mahkota", "label": "Peringkat Antarabangsa", "chip": "Antarabangsa", "value": "04", "unit": "NEGARA", "detail": "MISI LUAR NEGARA" }
+  ]
+}

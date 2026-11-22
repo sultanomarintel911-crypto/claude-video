@@ -1,0 +1,5 @@
+out/
+fonts/*.ttf
+models/piala.json
+events.json
+*.mp4

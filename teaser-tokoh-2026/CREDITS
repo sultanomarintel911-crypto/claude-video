@@ -1,0 +1,11 @@
+Tokoh Murid 2026 · Teaser "Fail Sulit" (SK Sultan Omar, Dungun)
+
+Gaya: Sci-fi Hologram HUD daripada pustaka Lemo-Opuscar (github.com/lemomo-ai/lemo-opuscar), MIT (kod) / CC BY-NC 4.0 (kandungan gaya).
+Enjin: engine/holo.js, engine/hud.js, models/mkmodel.mjs disalin daripada demo gaya hologram-hud (MIT).
+
+Fon (SIL Open Font License 1.1, fail lesen dalam fonts/):
+  Rajdhani, Indian Type Foundry: github.com/google/fonts/tree/main/ofl/rajdhani
+  Share Tech Mono, Carrois Apostrophe: github.com/google/fonts/tree/main/ofl/sharetechmono
+
+Muzik dan bunyi: skor asal dan semua kesan bunyi disintesis dengan numpy dalam mix.py (tiada sampel pihak ketiga).
+Model piala: dijana dengan kod (models/gen_piala.mjs). Tiada gambar, nama atau suara pelajar digunakan.
