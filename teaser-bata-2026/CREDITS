@@ -1,0 +1,11 @@
+Tokoh Murid 2026 · Teaser "Kepingan Terakhir" (gaya Mainan Bata) · SK Sultan Omar, Dungun
+
+Gaya: Brick Toy daripada pustaka Lemo-Opuscar (github.com/lemomo-ai/lemo-opuscar), MIT (kod) / CC BY-NC 4.0 (kandungan gaya).
+Kod: bricks.js disalin daripada demo brick-toy (MIT); post.js ialah salinan core/three/post.js (MIT) dengan sampel DOF dan
+     resolusi AO dikurangkan untuk render 4K tanpa GPU. three.js (MIT).
+Aset 3D (Poly Haven, CC0): HDRI photo_studio_loft_hall, tekstur american_walnut_veneer, tea_set_01 (cawan dan piring).
+Bata, piala, papan tanda dan jubin "?" dibina secara prosedur dalam kod. Bentuk bata generik sahaja;
+     tiada logo LEGO, reka bentuk minifigur atau model set.
+Fon: Fredoka (core/fonts), Google Fonts, SIL Open Font License 1.1.
+Muzik dan bunyi: skor asal dan semua kesan bunyi disintesis dengan numpy (mix.py, core/audio/sfx.py). Tiada sampel.
+Tiada gambar, nama atau suara pelajar digunakan.
