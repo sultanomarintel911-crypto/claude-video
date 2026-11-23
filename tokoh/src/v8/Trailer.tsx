@@ -10,6 +10,7 @@ import '@fontsource/jetbrains-mono/400.css';
 import {ci, easeOut, FilmLook, Gold, Gold3D, GOLD_GRAD, SANS, SERIF, Vignette} from '../components';
 import {BANDAR, City, Globe, lerpRot} from './Globe';
 import {pulseAt} from './beat';
+import TANGAN from './tangan.json';
 
 const FPS = 30;
 const f = (s: number) => Math.round(s * FPS);
@@ -18,14 +19,15 @@ const f = (s: number) => Math.round(s * FPS);
 const PRO = 0; // prolog
 const PANG = 45.0; // pangkalan (muzik Midnight Breach bermula)
 // [mula, nama klip, mula dalam klip, tempoh, kelantangan audio asal (0 = senyap)]
-type Shot = [number, string, number, number, number];
+type Shot = [number, string, number, number, number, number?]; // [..., kadar main balik]
 const SHOTS: Shot[] = [
   [45.0, 'drones_rise_roof', 0, 7.85, 0.9],
   [52.85, 'drones_taking_off', 0, 7.65, 0.8],
   [60.5, 'drone_wall_opening', 0, 7.85, 0.8],
-  [68.35, 'to_the_basement', 0, 7.85, 0], // suara Inggeris dibuang -> GB_01
-  [76.2, 'lift_opens_basement', 0, 7.85, 0.7],
-  [84.05, 'man_walking_office', 0, 7.85, 0], // suara Inggeris dibuang -> GB_02
+  [68.35, 'drone_into_lift', 0, 6.08, 0], // drone terbang masuk ke dalam lif bercahaya
+  [74.43, 'to_the_basement', 0, 7.85, 0], // suara Inggeris dibuang -> GB_01
+  // (syot GB bercakap ke peranti dibuang) lif dibuka dimainkan perlahan; arahan GB sebagai suara luar layar
+  [82.28, 'lift_opens_basement', 0, 9.62, 0.7, 0.816],
   // 91.9 - 97.0 kad tajuk
   [97.0, 'woman_reading_hologram', 0, 5.97, 0.7], // teks Inggeris ditutup dengan hologram Melayu
   [102.97, 'woman_touching_earpiece', 0, 5.97, 2.4], // "Baik tuan, saya uruskan."
@@ -64,10 +66,10 @@ const VO: Array<[number, string, string]> = [
 const VO_LEN: Record<string, number> = {P1: 3.82, P2: 4.0, P3: 3.09, P4: 4.2, P5: 8.47, P6: 2.95, P7: 4.14};
 // dialog: [mula, fail, teks]
 const DIALOG: Array<[number, string, string]> = [
-  [68.95, 'GB_01', 'Bawa saya ke pangkalan utama.'],
-  // dipecah dua frasa: diselaraskan dengan gerak mulut GB dalam klip (wajah muncul ~2.3 s, frasa kedua ~4.0 s)
-  [86.35, 'GB_02a', 'Adakan mesyuarat segera.'],
-  [88.05, 'GB_02b', 'Cari Tokoh Murid tahun ini.'],
+  [75.03, 'GB_01', 'Bawa saya ke pangkalan utama.'],
+  // suara luar layar semasa GB berjalan masuk ke pangkalan (belakang badan, tiada gerak mulut)
+  [86.9, 'GB_02a', 'Adakan mesyuarat segera.'],
+  [88.8, 'GB_02b', 'Cari Tokoh Murid tahun ini.'],
 ];
 const DIALOG_LEN: Record<string, number> = {GB_01: 3.0, GB_02a: 1.7, GB_02b: 2.76};
 const SUB_ASAL: Array<[number, number, string]> = [[106.47, 108.6, 'Baik, tuan. Saya uruskan.']];
@@ -149,6 +151,131 @@ const HologramMelayu: React.FC = () => {
           tahun ini, segera.
         </div>
       </div>
+    </AbsoluteFill>
+  );
+};
+
+
+// ------------------------------------------------------------------ HOLOGRAM SWIPE (bilik gerakan)
+// Panel data hologram yang mengikut tangan sebenar (dijejak per bingkai: scripts/jejak_tangan.py -> tangan.json).
+// Setiap sapuan jari menyeret karusel fail calon; kad paling dekat dengan hujung jari dipilih & dianalisis.
+const TG = TANGAN as unknown as Record<string, number[][]>;
+const HC = '#8ff6ff';
+const KAD_CALON = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+const HoloSwipe: React.FC<{klip: string; from: number}> = ({klip, from}) => {
+  const fr = useCurrentFrame();
+  const d = TG[klip];
+  const i0 = Math.round(from * FPS);
+  const at = (i: number) => d[Math.max(0, Math.min(d.length - 1, i0 + i))];
+  const udara = klip === 'teachers_invisible_b';
+  // kehadiran tangan (dilicinkan) -> hologram 'hidup'
+  let pres = 0;
+  for (let k = -5; k <= 5; k++) pres += at(fr + k)[4];
+  pres = Math.min(1, pres / 8);
+  let mula = -1;
+  for (let k = 0; k <= fr; k++) if (at(k)[4]) { mula = k; break; }
+  if (mula < 0) return null;
+  const boot = ci(fr, mula - 2, mula + 10, 0, 1, easeOut);
+  // seretan: jumlah gerakan hujung jari (hanya bila tangan kelihatan)
+  let drag = 0;
+  for (let k = mula + 1; k <= fr; k++) if (at(k)[4] && at(k - 1)[4]) drag += at(k)[2] - at(k - 1)[2];
+  const [, , hx, hy] = at(fr);
+  const vx = at(fr)[2] - at(fr - 3)[2];
+  const laju = Math.min(1, Math.abs(vx) / 60);
+  const SP = udara ? 300 : 340;
+  const baseY = udara ? Math.min(420, hy - 230) : 150;
+  const n = KAD_CALON.length;
+  const kad = KAD_CALON.map((nm, k) => {
+    const span = n * SP;
+    const rel = (k - 3) * SP + drag * 1.15;
+    const w = ((((rel + span / 2) % span) + span) % span) - span / 2; // balut karusel
+    return {nm, k, x: 960 + w};
+  });
+  const pilih = kad.reduce((a, b) => (Math.abs(b.x - hx) < Math.abs(a.x - hx) ? b : a));
+  const tapis = Math.max(6, Math.round(1204 - Math.abs(drag) * 1.6));
+  const W_ = udara ? 230 : 260;
+  const H_ = udara ? 300 : 320;
+  return (
+    <AbsoluteFill style={{opacity: boot, pointerEvents: 'none'}}>
+      {/* pengepala */}
+      <div style={{position: 'absolute', left: 70, top: 60, fontFamily: "'JetBrains Mono', monospace", color: HC, textShadow: `0 0 10px ${HC}`, background: 'rgba(0,22,32,0.8)', padding: '10px 18px', border: `1px solid ${HC}66`}}>
+        <div style={{fontSize: 20, letterSpacing: 5}}>BILIK GERAKAN · PANGKALAN DATA MURID</div>
+        <div style={{fontSize: 30, fontWeight: 700, letterSpacing: 3, marginTop: 4, color: '#fff'}}>
+          MENAPIS: {tapis.toLocaleString('en-US')} <span style={{color: HC}}>CALON</span>
+        </div>
+      </div>
+      {/* karusel fail calon, diseret oleh jari */}
+      <div style={{position: 'absolute', inset: 0, perspective: 1400}}>
+        {kad.map(({nm, k, x}) => {
+          const dipilih = pilih.k === k && pres > 0.5;
+          const jauh = Math.min(1, Math.abs(x - 960) / 1100);
+          const ry = (x - 960) / 1920 * (udara ? -40 : -25);
+          const sc = (dipilih ? 1.12 : 1) * (1 - 0.15 * jauh);
+          const pct = Math.round(40 + 50 * Math.abs(Math.sin(k * 1.7 + drag / 300)));
+          return (
+            <div
+              key={k}
+              style={{
+                position: 'absolute',
+                left: x - W_ / 2,
+                top: baseY + 40 * jauh * (udara ? 1 : 0.5),
+                width: W_,
+                height: H_,
+                transform: `rotateY(${ry}deg) scale(${sc})`,
+                background: `linear-gradient(180deg, rgba(10,60,80,${dipilih ? 0.82 : 0.62}), rgba(0,24,36,${dipilih ? 0.85 : 0.6}))`,
+                border: `2px solid ${dipilih ? '#ffd36b' : HC}`,
+                boxShadow: `0 0 ${dipilih ? 36 : 18}px ${dipilih ? 'rgba(255,200,90,0.7)' : 'rgba(120,240,255,0.55)'}, inset 0 0 24px rgba(120,240,255,0.25)`,
+                opacity: (1 - 0.6 * jauh) * (0.55 + 0.45 * pres),
+                fontFamily: "'JetBrains Mono', monospace",
+                color: HC,
+                padding: 16,
+                boxSizing: 'border-box',
+                overflow: 'hidden',
+              }}
+            >
+              <div style={{fontSize: udara ? 13 : 16, letterSpacing: udara ? 2 : 3, whiteSpace: 'nowrap'}}>FAIL CALON {nm}-{String(k + 11).padStart(3, '0')}</div>
+              {/* siluet neutral (tiada jantina) */}
+              <svg width={W_ - 32} height={H_ * 0.42} viewBox="0 0 100 70" style={{marginTop: 8}}>
+                <rect x={0} y={0} width={100} height={70} fill="rgba(143,246,255,0.08)" stroke={`${HC}55`} />
+                <circle cx={50} cy={27} r={13} fill={`${HC}55`} />
+                <rect x={26} y={44} width={48} height={26} rx={12} fill={`${HC}44`} />
+                <text x={50} y={33} textAnchor="middle" fontSize={14} fill="#fff" fontFamily="monospace">?</text>
+              </svg>
+              {['AKADEMIK', 'SUKAN', 'KEPIMPINAN'].map((lbl, j) => {
+                const w = 0.3 + 0.7 * Math.abs(Math.sin(k * 2.3 + j * 1.9 + fr / 40));
+                return (
+                  <div key={j} style={{marginTop: 7}}>
+                    <div style={{fontSize: 12, letterSpacing: 2, opacity: 0.85}}>{lbl}</div>
+                    <div style={{height: 6, background: 'rgba(143,246,255,0.15)', marginTop: 3}}>
+                      <div style={{height: 6, width: `${w * 100}%`, background: dipilih ? '#ffd36b' : HC, boxShadow: `0 0 8px ${dipilih ? '#ffd36b' : HC}`}} />
+                    </div>
+                  </div>
+                );
+              })}
+              <div style={{fontSize: 20, fontWeight: 700, marginTop: 10, color: dipilih ? '#ffd36b' : '#fff'}}>{dipilih ? 'MENGANALISIS…' : `PADANAN ${pct}%`}</div>
+              {dipilih ? <div style={{position: 'absolute', left: 0, right: 0, top: `${(fr * 4) % 100}%`, height: 3, background: '#ffd36b', boxShadow: '0 0 12px #ffd36b'}} /> : null}
+            </div>
+          );
+        })}
+      </div>
+      {/* pautan cahaya dari hujung jari ke kad dipilih + riak sentuhan */}
+      <svg width={1920} height={1080} style={{position: 'absolute', left: 0, top: 0, opacity: pres}}>
+        <defs>
+          <filter id="g"><feGaussianBlur stdDeviation={4} /></filter>
+        </defs>
+        <line x1={hx} y1={hy} x2={pilih.x} y2={baseY + H_} stroke="#ffd36b" strokeWidth={3} strokeDasharray="10 8" strokeDashoffset={-fr * 3} opacity={0.85} />
+        {[0, 1, 2].map((r) => {
+          const ph = ((fr + r * 7) % 21) / 21;
+          return <ellipse key={r} cx={hx} cy={hy} rx={20 + 110 * ph} ry={(20 + 110 * ph) * (udara ? 1 : 0.3)} fill="none" stroke={HC} strokeWidth={3} opacity={(1 - ph) * (0.4 + 0.6 * laju)} />;
+        })}
+        <circle cx={hx} cy={hy} r={14} fill={HC} filter="url(#g)" opacity={0.9} />
+        <circle cx={hx} cy={hy} r={5} fill="#fff" />
+        {/* jejak sapuan */}
+        {Array.from({length: 10}, (_, k) => {
+          const a = at(fr - k * 2);
+          return a[4] ? <circle key={'j' + k} cx={a[2]} cy={a[3]} r={10 - k * 0.8} fill={HC} opacity={(0.5 - k * 0.05) * laju} filter="url(#g)" /> : null;
+        })}
+      </svg>
     </AbsoluteFill>
   );
 };
@@ -267,7 +394,9 @@ const SFX: Sfx[] = [
   [TAJUK - 1.6, 'sfx/sedutan', 0.5],
   [SOAL, 'sfx/taiko', 0.8],
   [SOAL, 'sfx/sub_drop', 0.6],
-  [68.35, 'sfx/hum', 0.35],
+  [74.43, 'sfx/hum', 0.35],
+  [68.35, 'sfx/warp', 0.35],
+  [72.6, 'sfx/whoosh_panjang', 0.4],
   [29.68 + 0, 'sfx/impact_lembut', 0.5],
   [38.78, 'sfx/taiko', 0.55],
   [39.44, 'sfx/taiko', 0.55],
@@ -292,10 +421,11 @@ export const TrailerBahagian1: React.FC = () => {
       <Sequence from={f(PRO)} durationInFrames={f(PANG)}>
         <Prolog />
       </Sequence>
-      {SHOTS.map(([t, name, from, len], i) => (
+      {SHOTS.map(([t, name, from, len, , rate], i) => (
         <Sequence key={i} from={f(t)} durationInFrames={f(len)}>
-          <Klip name={`v8/flow/${name}.mp4`} from={from} len={len} music={cwAt(t)} />
+          <Klip name={`v8/flow/${name}.mp4`} from={from} len={len} rate={rate ?? 1} music={cwAt(t)} />
           {name === 'woman_reading_hologram' ? <HologramMelayu /> : null}
+          {name === 'teachers_invisible_a' || name === 'teachers_invisible_b' ? <HoloSwipe klip={name} from={from} /> : null}
           <Vignette strength={0.45} />
         </Sequence>
       ))}

@@ -50,12 +50,31 @@ const PETA = MORPH + 17.7;
 const CW_PETA = 21.0; // Clockwork untuk peta misi // 76.9
 const PETA_LEN = 21.5; // peta misi (dipendekkan; cop MISI SELESAI jatuh pada hentakan kuat Clockwork)
 const KLIMAKS = PETA + PETA_LEN;
-const DROP = KLIMAKS + 34.5; // pendedahan (The Last Strike 1:00)
-const AKHIR = DROP + 13.5;
 const SV_GAH = 96.68; // saat dalam Beneath the Sovereign Sky bila muzik meletup selepas senyap (pendedahan)
-const LS_PRE = 7.0; // lagu pendedahan bermula 7 s sebelum DROP
-const CC_SENYAP = 99.0; // saat The Clockwork Collapse menjadi senyap (sebelum hentakannya pada 104.5)
-const CC0 = CC_SENYAP - (DROP - LS_PRE + 0.2 - KLIMAKS); // masa dalam lagu Clockwork pada KLIMAKS
+// ROBOT: urutan gaya trailer filem dari pentas hingga topi keledar dibuka; dipotong ikut rentak Sovereign
+const ROBOT = KLIMAKS + 27.0;
+const SV_ROBOT = 75.14; // masa lagu Sovereign pada ROBOT
+const DROP = ROBOT + (SV_GAH - SV_ROBOT); // pendedahan: wajah sebenar
+const DEDAH_LEN = 7.3; // klip topi keledar terbuka (wajah)
+const AKHIR = DROP + 13.5;
+const LS_PRE = DROP - ROBOT; // Sovereign bermula pada ROBOT
+const CC0 = 71.3; // masa dalam lagu Clockwork pada KLIMAKS (senyap sendiri ~99.0 = ROBOT + 0.7)
+// syot robot: [masa lagu Sovereign mula, klip | kad, mula dalam klip, kadar]
+type RShot = [number, string, number, number];
+const SV = (t: number) => ROBOT + (t - SV_ROBOT);
+const RSHOT: RShot[] = [
+  [75.14, 'robot_pentas', 0.0, 1],
+  [77.15, 'kad:SATU PENTAS.', 0, 1],
+  [78.25, 'robot_masuk', 1.7, 1],
+  [80.99, 'kad:SATU NAMA.', 0, 1],
+  [82.08, 'robot_jalan', 3.6, 1],
+  [86.25, 'robot_pentas', 6.9, 1],
+  [87.39, 'robot_pentas', 8.0, 1],
+  [89.48, 'img:v8/img/K1.jpg', 0, 1],
+  [93.32, 'helmet', 0.0, 1],
+  [94.45, 'helmet', 4.5, 1],
+  [96.2, 'hitam', 0, 1],
+];
 
 // ------------------------------------------------------------------ komponen
 const KadBab: React.FC<{a: string; b: string; len: number}> = ({a, b, len}) => {
@@ -73,7 +92,7 @@ const KadBab: React.FC<{a: string; b: string; len: number}> = ({a, b, len}) => {
 
 // syot sinematik penuh skrin: gambar rata (tiada kesan 3D), Ken Burns perlahan + hentakan zum ikut rentak
 // gambar yang menunjukkan jantina/identiti -> versi CLASSIFIED (bar hitam / zum bukti), dibuka selepas pendedahan
-export const SULIT = new Set(['b03', 'b06', 'b07', 'b08', 'b09', 'b10', 'b11', 'b12', 'b13', 'c01', 'c02', 'c03', 'c04', 'c05', 'c06', 'd01', 'd02', 'd03', 'e01']);
+export const SULIT = new Set(['b01', 'b02', 'b03', 'b04', 'b05', 'b06', 'b07', 'b08', 'b09', 'b10', 'b11', 'b12', 'b13', 'c01', 'c02', 'c03', 'c04', 'c05', 'c06', 'd01', 'd02', 'd03', 'e01']);
 const Foto: React.FC<{src: string; bar?: string; len: number; i: number; music: number}> = ({src, bar, len, i, music}) => {
   const fr = useCurrentFrame();
   const p = usePulse('last_strike', music, 0.28, 0.6);
@@ -430,6 +449,55 @@ const Kelipan: React.FC<{len: number; music: number}> = ({len, music}) => {
 };
 
 
+// ---------------- gaya trailer filem: klip video, kad tajuk, bar sinema
+const Vid: React.FC<{src: string; from: number; len: number; rate?: number; z?: [number, number]}> = ({src, from, len, rate = 1, z = [1.0, 1.05]}) => {
+  const fr = useCurrentFrame();
+  const s = interpolate(fr, [0, f(len)], z);
+  return (
+    <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
+      <AbsoluteFill style={{transform: `scale(${s})`}}>
+        <OffthreadVideo src={staticFile(src)} muted trimBefore={Math.round(from * FPS)} playbackRate={rate} style={{width: 1920, height: 1080}} />
+      </AbsoluteFill>
+      <AbsoluteFill style={{background: '#fff', opacity: 0.18 * Math.exp(-fr / 2)}} />
+      <Vignette strength={0.5} />
+    </AbsoluteFill>
+  );
+};
+
+const KadTrailer: React.FC<{text: string; len: number}> = ({text, len}) => {
+  const fr = useCurrentFrame();
+  const L = f(len);
+  const a = ci(fr, 0, 4, 0, 1, easeOut) * (1 - ci(fr, L - 3, L));
+  const shine = ci(fr, 2, L);
+  return (
+    <AbsoluteFill style={{background: '#000', justifyContent: 'center', alignItems: 'center'}}>
+      <div style={{opacity: a, transform: `scale(${1.06 - 0.06 * ci(fr, 0, L)})`, filter: `blur(${(1 - a) * 4}px)`}}>
+        <Gold size={118} spacing={22} shine={shine}>{text}</Gold>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// bar sinema 2.39:1: masuk bila robot muncul, terbuka perlahan bila wajah didedahkan
+const BarSinema: React.FC<{len: number; buka: number}> = ({len, buka}) => {
+  const fr = useCurrentFrame();
+  const h = 138 * ci(fr, 0, 10, 0, 1, easeOut) * (1 - ci(fr, f(buka), f(buka) + 60, 0, 1, easeInOut)) * (1 - ci(fr, f(len) - 4, f(len)));
+  return (
+    <AbsoluteFill style={{pointerEvents: 'none'}}>
+      <div style={{position: 'absolute', left: 0, right: 0, top: 0, height: h, background: '#000'}} />
+      <div style={{position: 'absolute', left: 0, right: 0, bottom: 0, height: h, background: '#000'}} />
+    </AbsoluteFill>
+  );
+};
+
+const RobotShot: React.FC<{s: RShot; len: number}> = ({s, len}) => {
+  const [, k, from, rate] = s;
+  if (k === 'hitam') return <AbsoluteFill style={{background: '#000'}} />;
+  if (k.startsWith('kad:')) return <KadTrailer text={k.slice(4)} len={len} />;
+  if (k.startsWith('img:')) return <KImg src={k.slice(4)} len={len} z={[1.0, 1.14]} />;
+  return <Vid src={`v8/robot/${k}.mp4`} from={from} len={len} rate={rate} z={k === 'robot_jalan' ? [1.0, 1.08] : [1.02, 1.07]} />;
+};
+
 const GbPentas: React.FC<{len: number}> = ({len}) => {
   const fr = useCurrentFrame();
   const L = f(len);
@@ -499,15 +567,20 @@ SFX.push([KLIMAKS + 12.5, 'sfx/stinger', 0.4], [KLIMAKS + 18.5, 'sfx/riser', 0.6
 {
   let tb = KLIMAKS + 23.5;
   let gap = 0.9;
-  while (tb < DROP - 1.9) {
-    SFX.push([tb, 'sfx/degupan', tb > KLIMAKS + 29.5 ? 0.45 : 0.7]);
+  while (tb < ROBOT - 0.6) {
+    SFX.push([tb, 'sfx/degupan', 0.6]);
     tb += gap;
     gap = Math.max(0.45, gap * 0.88);
   }
 }
-[0, 1, 2].forEach((k) => SFX.push([KLIMAKS + 27 + k, 'sfx/taiko', 0.7], [KLIMAKS + 27 + k, 'sfx/detik', 0.7]));
+// robot (gaya trailer)
+SFX.push([ROBOT, 'sfx/braam', 0.7], [ROBOT, 'sfx/impact_besar', 0.5], [ROBOT + 0.2, 'sfx/hum', 0.35]);
+[77.15, 80.99].forEach((t) => SFX.push([SV(t), 'sfx/taiko', 0.75], [SV(t), 'sfx/impact_lembut', 0.6]));
+[78.25, 78.8, 79.34, 79.89, 80.39].forEach((t) => SFX.push([SV(t), 'sfx/kepingan', 0.35], [SV(t), 'sfx/impact_lembut', 0.3]));
+SFX.push([SV(82.08), 'sfx/whoosh_panjang', 0.4], [SV(86.25), 'sfx/kilauan', 0.4], [SV(87.39), 'sfx/whoosh_pendek', 0.4]);
+SFX.push([SV(89.48), 'sfx/riser', 0.5], [SV(93.32), 'sfx/hud_boot', 0.5], [SV(94.45), 'sfx/warp', 0.5], [SV(96.2) - 2.5, 'sfx/cymbal_terbalik', 0.6]);
 // pendedahan
-SFX.push([DROP - 1.5 - 1.55, 'sfx/sedutan', 0.7]);
+SFX.push([DROP - 1.7, 'sfx/sedutan', 0.7]);
 SFX.push(
   [DROP, 'sfx/impact_besar', 0.9],
   [DROP, 'sfx/sub_drop', 0.8],
@@ -552,16 +625,16 @@ export const TrailerBahagian2: React.FC = () => {
       </Sequence>
       {/* D. klimaks */}
       <Sequence from={f(kStart)} durationInFrames={f(5.5)}>
-        <KImg src="v8/img/K1.jpg" len={5.5} z={[1.0, 1.12]} music={CC0 + kStart - KLIMAKS} />
+        <Vid src="v8/robot/umum.mp4" from={0} len={5.5} rate={0.75} z={[1.0, 1.06]} />
       </Sequence>
       <Sequence from={f(kStart + 1.0)} durationInFrames={f(4.2)}>
         <Sub text="Saya dah tahu... siapa dia." len={4.2} />
       </Sequence>
       <Sequence from={f(kStart + 5.5)} durationInFrames={f(3.5)}>
-        <KImg src="v8/img/K2.jpg" len={3.5} z={[1.08, 1.0]} music={CC0 + kStart + 5.5 - KLIMAKS} />
+        <KImg src="v8/img/K3.jpg" len={3.5} z={[1.08, 1.0]} music={CC0 + kStart + 5.5 - KLIMAKS} />
       </Sequence>
       <Sequence from={f(kStart + 9.0)} durationInFrames={f(3.5)}>
-        <KImg src="v8/img/K3.jpg" len={3.5} z={[1.0, 1.15]} music={CC0 + kStart + 9.0 - KLIMAKS} />
+        <KImg src="v8/img/K4.jpg" len={3.5} z={[1.0, 1.15]} music={CC0 + kStart + 9.0 - KLIMAKS} />
       </Sequence>
       <Sequence from={f(kStart + 12.5)} durationInFrames={f(4.6)}>
         <CalonLaju music={CC0 + 12.5} />
@@ -573,18 +646,30 @@ export const TrailerBahagian2: React.FC = () => {
         <Kelipan len={5.0} music={CC0 + 18.5} />
       </Sequence>
       <Sequence from={f(kStart + 23.5)} durationInFrames={f(3.5)}>
-        <KImg src="v8/img/K4.jpg" len={3.5} z={[1.0, 1.1]} music={CC0 + kStart + 23.5 - KLIMAKS} />
+        <KImg src="v8/img/K2.jpg" len={3.5} z={[1.0, 1.1]} music={CC0 + kStart + 23.5 - KLIMAKS} />
       </Sequence>
-      <Sequence from={f(kStart + 27.0)} durationInFrames={f(3.0)}>
-        <SceneKira />
-      </Sequence>
-      {/* GB di pentas memegang kad bercahaya: "Tokoh Murid 2026 ialah..." */}
-      <Sequence from={f(kStart + 30.0)} durationInFrames={f(DROP - kStart - 30.0 - 1.5)}>
-        <GbPentas len={DROP - kStart - 31.5} />
+      {/* ROBOT: pentas -> langkah -> pentas bulat -> pengumuman -> butang topi keledar */}
+      {RSHOT.map((r, i) => {
+        const t0 = SV(r[0]);
+        const t1 = i + 1 < RSHOT.length ? SV(RSHOT[i + 1][0]) : DROP;
+        return (
+          <Sequence key={'r' + i} from={f(t0)} durationInFrames={f(t1) - f(t0)}>
+            <RobotShot s={r} len={t1 - t0} />
+          </Sequence>
+        );
+      })}
+      <Sequence from={f(SV(89.48))} durationInFrames={f(SV(93.32) - SV(89.48))}>
+        <Teks text="TOKOH MURID 2026 IALAH..." len={SV(93.32) - SV(89.48)} size={54} y={760} />
       </Sequence>
       {/* E. PENDEDAHAN */}
-      <Sequence from={f(DROP)} durationInFrames={f(AKHIR - DROP)}>
+      <Sequence from={f(DROP)} durationInFrames={f(DEDAH_LEN)}>
+        <Vid src="v8/robot/dedah.mp4" from={0} len={DEDAH_LEN} rate={1.3} z={[1.0, 1.04]} />
+      </Sequence>
+      <Sequence from={f(DROP + DEDAH_LEN)} durationInFrames={f(AKHIR - DROP - DEDAH_LEN)}>
         <SceneReveal />
+      </Sequence>
+      <Sequence from={f(ROBOT)} durationInFrames={f(DROP + DEDAH_LEN - ROBOT)}>
+        <BarSinema len={DROP + DEDAH_LEN - ROBOT} buka={DROP - ROBOT + 1.0} />
       </Sequence>
       <FilmLook />
 
@@ -598,19 +683,19 @@ export const TrailerBahagian2: React.FC = () => {
         <Audio src={staticFile('v8/muzik/clockwork_collapse.mp3')} trimBefore={f(CW_PETA)} volume={vol([0, 1.2, KLIMAKS - PETA - 1.5, KLIMAKS - PETA + 0.3], [0, 0.8, 0.8, 0])} />
       </Sequence>
       {/* The Clockwork Collapse untuk klimaks: berakhir pada senyapnya sendiri (0:99) tepat bila The Last Strike masuk */}
-      <Sequence from={f(KLIMAKS)} durationInFrames={f(DROP - KLIMAKS)}>
-        <Audio src={staticFile('v8/muzik/clockwork_collapse.mp3')} trimBefore={f(CC0)} volume={vol([0, 1.0, DROP - KLIMAKS - LS_PRE - 0.3, DROP - KLIMAKS - LS_PRE + 0.6], [0, 0.85, 0.85, 0])} />
+      <Sequence from={f(KLIMAKS)} durationInFrames={f(ROBOT - KLIMAKS + 1.2)}>
+        <Audio src={staticFile('v8/muzik/clockwork_collapse.mp3')} trimBefore={f(CC0)} volume={vol([0, 1.0, ROBOT - KLIMAKS + 0.2, ROBOT - KLIMAKS + 1.1], [0, 0.85, 0.85, 0])} />
       </Sequence>
       {/* The Last Strike: masuk pada 0:53 (binaan perlahan dari 0:54) -> 1:00 bunyi gah tepat pada PENDEDAHAN */}
       <Sequence from={f(DROP - LS_PRE)} durationInFrames={f(AKHIR - DROP + LS_PRE)}>
-        <Audio src={staticFile('v8/muzik/sovereign.mp3')} trimBefore={f(SV_GAH - LS_PRE)} volume={vol([0, 1.0, LS_PRE + AKHIR - DROP - 2.5, LS_PRE + AKHIR - DROP], [0, 1.0, 1.0, 0])} />
+        <Audio src={staticFile('v8/muzik/sovereign.mp3')} trimBefore={f(SV_GAH - LS_PRE)} volume={vol([0, 0.8, LS_PRE + AKHIR - DROP - 2.5, LS_PRE + AKHIR - DROP], [0, 0.9, 1.0, 0])} />
       </Sequence>
       <Sequence from={f(kStart + 1.0)}>
         <Audio src={staticFile('v8/vo/GB_03.wav')} volume={1} />
       </Sequence>
       {SFX.map(([t, file, v], i) => (
         <Sequence key={'x' + i} from={Math.max(0, f(t))}>
-          <Audio src={staticFile(`${file}.wav`)} volume={(fr) => (f(t) + fr >= f(DROP - 1.5) && f(t) < f(DROP - 1.5) ? 0 : v)} />
+          <Audio src={staticFile(`${file}.wav`)} volume={(fr) => (f(t) + fr >= f(DROP - 0.52) && f(t) < f(DROP - 0.52) ? 0 : v)} />
         </Sequence>
       ))}
     </AbsoluteFill>

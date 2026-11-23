@@ -2,7 +2,7 @@
 // FILE DECRYPTED -> rekod sekolah (panel hologram 3D) -> dulu & kini -> sukan (warp) -> lari berpagar (paralaks)
 // -> skuasy kebangsaan -> misi antarabangsa (glob + uplink satelit) -> rumusan -> keluarga (VO) -> penutup
 import React, {useEffect, useState} from 'react';
-import {AbsoluteFill, Audio, continueRender, delayRender, Easing, Img, interpolate, random, Sequence, staticFile, useCurrentFrame} from 'remotion';
+import {AbsoluteFill, Audio, continueRender, delayRender, Easing, Img, interpolate, OffthreadVideo, random, Sequence, staticFile, useCurrentFrame} from 'remotion';
 import '@fontsource/cinzel/700.css';
 import '@fontsource/cinzel/900.css';
 import '@fontsource/montserrat/500.css';
@@ -29,11 +29,12 @@ const AKSES = 0;
 // REDACTION REMOVED: gambar yang dikaburkan sebelum pendedahan dibuka semula, setiap satu masuk tepat pada rentak
 const BUKA = 5.0;
 const BUKA_FOTO: Array<[string, string, number]> = [
-  ['b03', 'BAB I · LANGKAH PERTAMA', 3], ['b06', 'BAB I · LANGKAH PERTAMA', 2], ['b07', 'BAB I · LANGKAH PERTAMA', 1],
+  ['b01', 'BAB I · LANGKAH PERTAMA', 2], ['b02', 'BAB I · LANGKAH PERTAMA', 1], ['b03', 'BAB I · LANGKAH PERTAMA', 1],
+  ['b04', 'BAB I · LANGKAH PERTAMA', 1], ['b05', 'BAB I · LANGKAH PERTAMA', 1], ['b06', 'BAB I · LANGKAH PERTAMA', 1], ['b07', 'BAB I · LANGKAH PERTAMA', 1],
   ['b08', 'BAB I · LANGKAH PERTAMA', 1], ['b09', 'BAB I · LANGKAH PERTAMA', 1], ['b10', 'BAB I · LANGKAH PERTAMA', 1],
-  ['b11', 'BAB I · LANGKAH PERTAMA', 1], ['b12', 'BAB I · LANGKAH PERTAMA', 1], ['b13', 'BAB I · LANGKAH PERTAMA', 2],
-  ['c01', 'BAB II · ALAM PERSEKOLAHAN', 2], ['c02', 'BAB II · ALAM PERSEKOLAHAN', 2], ['c03', 'BAB II · ALAM PERSEKOLAHAN', 2],
-  ['c04', 'BAB II · ALAM PERSEKOLAHAN', 2], ['c05', 'BAB II · ALAM PERSEKOLAHAN', 2], ['c06', 'BAB II · ALAM PERSEKOLAHAN', 2],
+  ['b11', 'BAB I · LANGKAH PERTAMA', 1], ['b12', 'BAB I · LANGKAH PERTAMA', 1], ['b13', 'BAB I · LANGKAH PERTAMA', 1],
+  ['c01', 'BAB II · ALAM PERSEKOLAHAN', 2], ['c02', 'BAB II · ALAM PERSEKOLAHAN', 1], ['c03', 'BAB II · ALAM PERSEKOLAHAN', 2],
+  ['c04', 'BAB II · ALAM PERSEKOLAHAN', 1], ['c05', 'BAB II · ALAM PERSEKOLAHAN', 2], ['c06', 'BAB II · ALAM PERSEKOLAHAN', 2],
   ['d01', 'BAB III · MULA DIKENALI', 2], ['d02', 'BAB III · MULA DIKENALI', 2], ['d03', 'BAB III · MULA DIKENALI', 2],
   ['e01', 'BAB IV · HARI ANUGERAH', 6],
 ];
@@ -316,7 +317,10 @@ const DuluKini: React.FC<{len: number}> = ({len}) => {
   const w_ = (CUT_GRAD.w / CUT_GRAD.h) * H_;
   return (
     <AbsoluteFill style={{background: '#000', overflow: 'hidden'}}>
-      <Img src={img('s00')} style={{position: 'absolute', width: 1920, height: 1080, objectFit: 'cover', transform: `translateX(${-560 * wipe}px) scale(${1.04 + 0.04 * (fr / L)})`, filter: `saturate(${1 - 0.6 * wipe}) brightness(${1 - 0.35 * wipe})`}} />
+      {/* dulu: klip kanak-kanak berpakaian bomba (selepas pendedahan sahaja) */}
+      <AbsoluteFill style={{transform: `translateX(${-560 * wipe}px) scale(${1.04 + 0.04 * (fr / L)})`, filter: `saturate(${1 - 0.5 * wipe}) brightness(${1 - 0.3 * wipe})`}}>
+        <OffthreadVideo src={staticFile('v8/robot/bomba.mp4')} muted playbackRate={Math.min(1, 4.0 / len)} style={{width: 1920, height: 1080}} />
+      </AbsoluteFill>
       {/* kini: menyapu dari kanan */}
       <AbsoluteFill style={{clipPath: `inset(0 0 0 ${100 - wipe * 50}%)`, background: 'radial-gradient(ellipse at 75% 45%, #3a2a10 0%, #0a0703 70%)'}}>
         <Rays cx={1440} cy={430} opacity={0.5} />
@@ -325,7 +329,7 @@ const DuluKini: React.FC<{len: number}> = ({len}) => {
       {wipe > 0 && wipe < 1 ? <div style={{position: 'absolute', top: 0, bottom: 0, left: 1920 - wipe * 960 - 2, width: 4, background: CYAN, boxShadow: `0 0 24px 8px ${CYAN}`}} /> : null}
       <div style={{position: 'absolute', left: 80, bottom: 90, opacity: ci(fr, 6, 16)}}>
         <div style={{fontFamily: MONO, fontSize: 26, letterSpacing: 8, color: '#d8d2c4'}}>THEN</div>
-        <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, color: '#fff', marginTop: 6, textShadow: '0 4px 16px #000'}}>HARI ANUGERAH KECEMERLANGAN</div>
+        <div style={{fontFamily: SANS, fontWeight: 700, fontSize: 40, color: '#fff', marginTop: 6, textShadow: '0 4px 16px #000'}}>SEJAK KECIL · BERANI BERMIMPI</div>
       </div>
       <div style={{position: 'absolute', right: 80, bottom: 90, textAlign: 'right', opacity: ci(fr, 60, 72)}}>
         <div style={{fontFamily: MONO, fontSize: 26, letterSpacing: 8, color: GOLD}}>NOW</div>
