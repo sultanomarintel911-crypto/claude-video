@@ -478,24 +478,12 @@ const KadTrailer: React.FC<{text: string; len: number}> = ({text, len}) => {
   );
 };
 
-// bar sinema 2.39:1: masuk bila robot muncul, terbuka perlahan bila wajah didedahkan
-const BarSinema: React.FC<{len: number; buka: number}> = ({len, buka}) => {
-  const fr = useCurrentFrame();
-  const h = 138 * ci(fr, 0, 10, 0, 1, easeOut) * (1 - ci(fr, f(buka), f(buka) + 60, 0, 1, easeInOut)) * (1 - ci(fr, f(len) - 4, f(len)));
-  return (
-    <AbsoluteFill style={{pointerEvents: 'none'}}>
-      <div style={{position: 'absolute', left: 0, right: 0, top: 0, height: h, background: '#000'}} />
-      <div style={{position: 'absolute', left: 0, right: 0, bottom: 0, height: h, background: '#000'}} />
-    </AbsoluteFill>
-  );
-};
-
 const RobotShot: React.FC<{s: RShot; len: number}> = ({s, len}) => {
   const [, k, from, rate] = s;
   if (k === 'hitam') return <AbsoluteFill style={{background: '#000'}} />;
   if (k.startsWith('kad:')) return <KadTrailer text={k.slice(4)} len={len} />;
   if (k.startsWith('img:')) return <KImg src={k.slice(4)} len={len} z={[1.0, 1.14]} />;
-  return <Vid src={`v8/robot/${k}.mp4`} from={from} len={len} rate={rate} z={k === 'robot_jalan' ? [1.0, 1.08] : [1.02, 1.07]} />;
+  return <Vid src={`v8/robot/${k}.mp4`} from={from} len={len} rate={rate} z={[1.0, 1.03]} />;
 };
 
 const GbPentas: React.FC<{len: number}> = ({len}) => {
@@ -642,11 +630,8 @@ export const TrailerBahagian2: React.FC = () => {
       <Sequence from={f(kStart + 12.5 + 4.6)} durationInFrames={f(1.4)}>
         <OffthreadVideo src={staticFile('v8/flow/morph_laju.mp4')} muted trimBefore={f(4.6)} />
       </Sequence>
-      <Sequence from={f(kStart + 18.5)} durationInFrames={f(5.0)}>
-        <Kelipan len={5.0} music={CC0 + 18.5} />
-      </Sequence>
-      <Sequence from={f(kStart + 23.5)} durationInFrames={f(3.5)}>
-        <KImg src="v8/img/K2.jpg" len={3.5} z={[1.0, 1.1]} music={CC0 + kStart + 23.5 - KLIMAKS} />
+      <Sequence from={f(kStart + 18.5)} durationInFrames={f(8.5)}>
+        <Kelipan len={8.5} music={CC0 + 18.5} />
       </Sequence>
       {/* ROBOT: pentas -> langkah -> pentas bulat -> pengumuman -> butang topi keledar */}
       {RSHOT.map((r, i) => {
@@ -663,13 +648,10 @@ export const TrailerBahagian2: React.FC = () => {
       </Sequence>
       {/* E. PENDEDAHAN */}
       <Sequence from={f(DROP)} durationInFrames={f(DEDAH_LEN)}>
-        <Vid src="v8/robot/dedah.mp4" from={0} len={DEDAH_LEN} rate={1.3} z={[1.0, 1.04]} />
+        <Vid src="v8/robot/dedah.mp4" from={0} len={DEDAH_LEN} rate={1.3} z={[1.0, 1.0]} />
       </Sequence>
       <Sequence from={f(DROP + DEDAH_LEN)} durationInFrames={f(AKHIR - DROP - DEDAH_LEN)}>
         <SceneReveal />
-      </Sequence>
-      <Sequence from={f(ROBOT)} durationInFrames={f(DROP + DEDAH_LEN - ROBOT)}>
-        <BarSinema len={DROP + DEDAH_LEN - ROBOT} buka={DROP - ROBOT + 1.0} />
       </Sequence>
       <FilmLook />
 
