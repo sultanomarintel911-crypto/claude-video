@@ -67,7 +67,7 @@ const RSHOT: RShot[] = [
   [77.15, 'kad:SATU PENTAS.', 0, 1],
   [78.25, 'robot_masuk', 1.7, 1],
   [80.99, 'kad:SATU NAMA.', 0, 1],
-  [82.08, 'robot_jalan', 3.6, 1],
+  [82.08, 'tengah', 0.0, 0.59], // berjalan & berhenti tepat di tengah bulatan
   [86.25, 'robot_pentas', 6.9, 1],
   [87.39, 'robot_pentas', 8.0, 1],
   [89.48, 'img:v8/img/K1.jpg', 0, 1],
