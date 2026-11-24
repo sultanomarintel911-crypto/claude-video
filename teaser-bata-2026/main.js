@@ -7,7 +7,8 @@ import { COL, BRICK, PLATE, brick, plate, mesh, roundGeo, coneGeo, plastic } fro
 import { buildSet, TOP } from './set.js';
 
 const Q = new URLSearchParams(location.search);
-const W = innerWidth || 2160, H = innerHeight || 3840, K = W / 1080;   // K: skala teks (reka letak pada 1080 lebar)
+const W = innerWidth || 2160, H = innerHeight || 3840, K = Math.min(W, H) / 1080;   // K: skala teks (reka letak pada sisi pendek 1080)
+const LAND = W > H, L = (p, l) => (LAND ? l : p) * K;   // 16:9 melintang: kedudukan teks sendiri, FOV menegak lebih sempit
 const SSAA = parseFloat(Q.get('ssaa') || '1');
 const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: true });
 renderer.setPixelRatio(1); renderer.setSize(W, H);
@@ -139,6 +140,7 @@ function placePieces(t) {
 }
 
 // ---------- kamera (24 fps, lancar) ----------
+const FOVL = { macro: .8, base: .82, stem: .85, cup: .9, crown: .92, orbit: .9, slot: 1.0, q: .95 };   // pengecilan FOV menegak bagi 16:9
 const SHOTS = [[0, 3.85, 'macro'], [3.85, 10, 'base'], [10, 14, 'stem'], [14, 20, 'cup'], [20, 24, 'crown'], [24, 30, 'orbit'], [30, 34.2, 'slot'], [34.2, 45, 'q']];
 function cam(t) {
   const [t0, t1, nm] = SHOTS.find(s => t < s[1]) || SHOTS[SHOTS.length - 1], u = seg(t, t0, t1);
@@ -160,7 +162,7 @@ function cam(t) {
       const r = ss(seg(t, 34.6, 36.2)); focus = V(0, 6, 0).lerp(REST_P, r); aper = 1100;
     }
   }
-  camera.position.copy(pos); camera.fov = fov; camera.updateProjectionMatrix(); camera.lookAt(look);
+  camera.position.copy(pos); camera.fov = LAND ? fov * (FOVL[nm] || .95) : fov; camera.updateProjectionMatrix(); camera.lookAt(look);
   const k = set.key, fc = focus || look, span = nm === 'orbit' ? 22 : 16;
   k.target.position.copy(fc); k.position.copy(fc).add(V(-60, 110, 50)); k.target.updateMatrixWorld();
   Object.assign(k.shadow.camera, { left: -span, right: span, top: span, bottom: -span }); k.shadow.camera.updateProjectionMatrix();
@@ -189,17 +191,17 @@ function title(text, yy, size, col, t, t0, t1, w = 700) {
 }
 function hud(t) {
   g.clearRect(0, 0, W, H);
-  title('TOKOH MURID 2026', 330 * K, 112, '#fff', t, .4, 3.75);
-  title('SK SULTAN OMAR · DUNGUN', 420 * K, 40, '#f2cd37', t, .8, 3.75, 600);
+  title('TOKOH MURID 2026', L(330, 175), 112, '#fff', t, .4, 3.75);
+  title('SK SULTAN OMAR · DUNGUN', L(420, 265), 40, '#f2cd37', t, .8, 3.75, 600);
   const cap = [[6.6, 9.9, '18 PENYERTAAN', '#c91a09'], [12.1, 13.9, '06 PERINGKAT KEBANGSAAN', '#0055bf'], [18.1, 19.9, '05 JAWATAN', '#237841'], [22.1, 23.9, '04 NEGARA', '#fe8a18'], [26.8, 29.9, 'SATU KEPINGAN LAGI…', '#f2cd37']];
-  for (const [a, b, s, c] of cap) if (t >= a && t < b) pill(s, 1440 * K, c, seg(t, a, a + .1) * (1 - seg(t, b - .2, b)));
+  for (const [a, b, s, c] of cap) if (t >= a && t < b) pill(s, L(1440, 900), c, seg(t, a, a + .1) * (1 - seg(t, b - .2, b)));
   if (t >= 38) {
     const sh = g.createLinearGradient(0, 0, 0, H * .45); sh.addColorStop(0, `rgba(10,12,16,${.55 * seg(t, 38, 38.5)})`); sh.addColorStop(1, 'rgba(10,12,16,0)'); g.fillStyle = sh; g.fillRect(0, 0, W, H * .45);
   }
-  title('SIAPAKAH DIA?', 360 * K, 120, '#fff', t, 38.0, 45.1);
-  title('DIDEDAHKAN DI MAJLIS', 480 * K, 44, '#fff', t, 39.0, 45.1, 600);
-  title('ANUGERAH KECEMERLANGAN 2026', 540 * K, 44, '#fff', t, 39.0, 45.1, 600);
-  title('SK SULTAN OMAR · DUNGUN', 620 * K, 36, '#f2cd37', t, 39.6, 45.1, 600);
+  title('SIAPAKAH DIA?', L(360, 170), 120, '#fff', t, 38.0, 45.1);
+  title('DIDEDAHKAN DI MAJLIS', L(480, 285), 44, '#fff', t, 39.0, 45.1, 600);
+  title('ANUGERAH KECEMERLANGAN 2026', L(540, 345), 44, '#fff', t, 39.0, 45.1, 600);
+  title('SK SULTAN OMAR · DUNGUN', L(620, 425), 36, '#f2cd37', t, 39.6, 45.1, 600);
   if (t > 44.2) { g.fillStyle = `rgba(0,0,0,${seg(t, 44.2, 45)})`; g.fillRect(0, 0, W, H); }
 }
 
