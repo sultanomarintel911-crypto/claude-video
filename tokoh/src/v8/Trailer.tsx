@@ -23,8 +23,8 @@ type Shot = [number, string, number, number, number, number?]; // [..., kadar ma
 const SHOTS: Shot[] = [
   [45.0, 'drones_rise_roof', 0, 7.85, 0.9],
   [52.85, 'drones_taking_off', 0, 7.65, 0.8],
-  [60.5, 'drone_wall_opening', 0, 7.85, 0.8],
-  [68.35, 'drone_into_lift', 0, 6.08, 0], // drone terbang masuk ke dalam lif bercahaya
+  [60.5, 'drone_buka_perlahan', 0, 7.85, 0.8, 0.99], // lif terbuka & drone berundur (sumber 3.9-7.83 s, gerak perlahan)
+  [68.35, 'drone_masuk_perlahan', 0, 6.08, 0, 0.965], // terus pada drone bergerak masuk ke lif (sumber 3.1 s ->)
   [74.43, 'to_the_basement', 0, 7.85, 0], // suara Inggeris dibuang -> GB_01
   // (syot GB bercakap ke peranti dibuang) lif dibuka dimainkan perlahan; arahan GB sebagai suara luar layar
   [82.28, 'lift_opens_basement', 0, 9.62, 0.7, 0.816],
