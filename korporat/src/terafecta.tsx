@@ -3,7 +3,7 @@
 // Setiap kad foto masuk tepat pada rentak lagu A (123 BPM), dari kecil ke
 // anugerah terbesar, kemudian keempat-empatnya berkumpul sebagai penutup.
 import React from 'react';
-import {AbsoluteFill, Easing, Img, interpolate, staticFile, useCurrentFrame} from 'remotion';
+import {AbsoluteFill, Easing, Img, interpolate, OffthreadVideo, staticFile, useCurrentFrame} from 'remotion';
 import {C, MONO, ORB, Particles, SANS} from './fx';
 
 const FPS = 30;
@@ -25,7 +25,15 @@ const MULA_AKHIR = MULA_KAD + PANJANG_KAD * ANUGERAH.length; // 23
 const Latar: React.FC<{t: number}> = ({t}) => {
   const ayun = (k: number) => Math.sin(t * 0.9 + k) * 18;
   return (
-    <AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 40%, #0d1f45 0%, #050a1a 55%, #010205 100%)', overflow: 'hidden'}}>
+    <AbsoluteFill style={{background: '#010205', overflow: 'hidden'}}>
+      {/* sedikit visual video promosi rasmi Terafecta sebagai latar (kabur & gelap, tanpa audio) */}
+      <OffthreadVideo
+        src={staticFile('video/terafecta_bg.mp4')}
+        muted
+        playbackRate={11.7 / 13.65}
+        style={{position: 'absolute', inset: -30, width: 1980, height: 1140, objectFit: 'cover', filter: 'blur(7px) brightness(0.6) saturate(1.25)', opacity: 0.55}}
+      />
+      <AbsoluteFill style={{background: 'radial-gradient(ellipse at 50% 40%, rgba(13,31,69,.45) 0%, rgba(5,10,26,.7) 55%, rgba(1,2,5,.93) 100%)'}} />
       {/* sinar berputar */}
       <div
         style={{
