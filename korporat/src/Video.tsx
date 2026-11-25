@@ -11,7 +11,6 @@ import {BabTag, glitchAmt, GlitchOverlay, Grade, Hud, Label} from './fx';
 import {Emblem3D, Graf3D, Terowong3D} from './tiga';
 import {IntroBadge} from './intro';
 import {MaklumatGlob} from './maklumat3d';
-import {Terafecta} from './terafecta';
 import {Bio, Emas, KadAsal, KadPentadbir, Kertas, Klip, PanelHem, Statistik, Tutup} from './scenes';
 
 // ---------- Lapisan kesan HyperFrames (dirender oleh hyperframes/, lihat README di situ)
@@ -98,7 +97,8 @@ const SegView: React.FC<{s: Seg}> = ({s}) => {
     case 'terafecta':
       return (
         <AbsoluteFill>
-          <Terafecta fd={s.fd} />
+          {/* adegan 3D dirender berasingan (npm run terafecta) supaya render penuh stabil */}
+          <OffthreadVideo src={staticFile('video/terafecta_3d.mp4')} muted style={{width: '100%', height: '100%'}} />
           <HFSuar op={0.5} rate={8 / 13.65} />
         </AbsoluteFill>
       );

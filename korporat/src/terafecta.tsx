@@ -233,7 +233,7 @@ const Adegan: React.FC<{t: number; tex: THREE.Texture[]; led: THREE.Texture}> = 
       <Habuk t={t} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, -12]}>
         <planeGeometry args={[70, 80]} />
-        <MeshReflectorMaterial blur={[200, 60]} resolution={1024} mixBlur={0.8} mixStrength={90} roughness={0.55} depthScale={1.1} minDepthThreshold={0.4} maxDepthThreshold={1.4} color="#0a0e18" metalness={0.7} mirror={0.8} />
+        <MeshReflectorMaterial blur={[200, 60]} resolution={512} mixBlur={0.8} mixStrength={90} roughness={0.55} depthScale={1.1} minDepthThreshold={0.4} maxDepthThreshold={1.4} color="#0a0e18" metalness={0.7} mirror={0.8} />
       </mesh>
       <EffectComposer multisampling={4}>
         <Bloom mipmapBlur intensity={1.15} luminanceThreshold={0.72} luminanceSmoothing={0.25} />
