@@ -1,0 +1,4 @@
+{"images": "assets/dscf2468.jpg,assets/dscf2470.jpg,assets/dscf2473.jpg,assets/terafecta_1.jpg,assets/terafecta_2.jpg,assets/terafecta_3.jpg,assets/terafecta_4.jpg,assets/badge.png",
+ "imageMix": 0.85, "fill": 0.75, "speed": 4.2,
+ "palette": "#FFC83D,#38E8FF,#123A7A,#1E9E55,#7A4DFF,#E8A93A",
+ "edgeColor": "#38E8FF", "edgeOpacity": 0.45, "backdrop": "#02040a", "fog": 12}

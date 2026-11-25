@@ -3,3 +3,6 @@ public/
 out/
 prompt/lokasi/
 bahan_muzik/
+hyperframes/*/assets/
+hyperframes/*/renders/
+hyperframes/*/.hyperframes/

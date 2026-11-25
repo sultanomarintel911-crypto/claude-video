@@ -315,13 +315,19 @@
       "energi": 3
     },
     {
+      "id": "terowong_capai",
+      "kind": "hfterowong",
+      "dur": 4.2,
+      "energi": 3,
+      "bab": "04 // PENCAPAIAN"
+    },
+    {
       "id": "titc",
       "src": "video/korporat_bersih.mp4",
       "from": 196.0,
       "to": 202.0,
       "rate": 1,
-      "energi": 3,
-      "bab": "04 // PENCAPAIAN"
+      "energi": 3
     },
     {
       "id": "emas",

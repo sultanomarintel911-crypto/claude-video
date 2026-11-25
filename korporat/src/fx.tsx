@@ -28,7 +28,7 @@ const tc = (frame: number) => {
 };
 
 // ---------- HUD global (halus, di tepi skrin) ----------
-const SEMBUNYI_HUD = new Set(['bio', 'statistik', 'emas', 'tutup', 'emblem3d', 'intro', 'sinema', 'terafecta', 'terowong', 'graf3d', 'maklumat']);
+const SEMBUNYI_HUD = new Set(['bio', 'statistik', 'emas', 'tutup', 'emblem3d', 'intro', 'sinema', 'terafecta', 'hfterowong', 'terowong', 'graf3d', 'maklumat']);
 export const Hud: React.FC = () => {
   const frame = useCurrentFrame();
   const s = SEGS.find((x) => frame >= x.f0 && frame < x.f0 + x.fd);

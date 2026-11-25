@@ -5,7 +5,7 @@ import '@fontsource/orbitron/900.css';
 import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/700.css';
 import React from 'react';
-import {AbsoluteFill, Audio, interpolate, random, Sequence, staticFile, useCurrentFrame} from 'remotion';
+import {AbsoluteFill, Audio, Easing, interpolate, OffthreadVideo, random, Sequence, staticFile, useCurrentFrame} from 'remotion';
 import {FPS, Seg, SEGS, VO_FILE} from './data';
 import {BabTag, glitchAmt, GlitchOverlay, Grade, Hud, Label} from './fx';
 import {Emblem3D, Graf3D, Terowong3D} from './tiga';
@@ -13,6 +13,41 @@ import {IntroBadge} from './intro';
 import {MaklumatGlob} from './maklumat3d';
 import {Terafecta} from './terafecta';
 import {Bio, Emas, KadAsal, KadPentadbir, Kertas, Klip, PanelHem, Statistik, Tutup} from './scenes';
+
+// ---------- Lapisan kesan HyperFrames (dirender oleh hyperframes/, lihat README di situ)
+// Kebocoran cahaya filem (WebM beralfa) dan suar anamorfik (latar hitam, adunan 'screen').
+const HFCahaya: React.FC<{op?: number}> = ({op = 0.85}) => (
+  <OffthreadVideo src={staticFile('video/hf_cahaya.webm')} transparent muted style={{position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: op, mixBlendMode: 'screen'}} />
+);
+const HFSuar: React.FC<{op?: number; rate?: number}> = ({op = 0.6, rate = 1}) => (
+  <OffthreadVideo
+    src={staticFile('video/hf_suar.mp4')}
+    muted
+    playbackRate={rate}
+    style={{position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: op, mixBlendMode: 'screen', filter: 'grayscale(1) sepia(1) hue-rotate(185deg) saturate(3.2) brightness(1.25)'}}
+  />
+);
+
+// Pembuka bab 04 // PENCAPAIAN: terowong galeri foto pencapaian (blok HyperFrames gallery-tunnel)
+const HFTerowong: React.FC<{s: Seg}> = ({s}) => {
+  const frame = useCurrentFrame();
+  const c = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
+  const m = interpolate(frame, [10, 26], [0, 1], {...c, easing: Easing.out(Easing.cubic)});
+  const k = interpolate(frame, [s.fd - 14, s.fd - 2], [1, 0], c);
+  return (
+    <AbsoluteFill>
+      <OffthreadVideo src={staticFile('video/hf_terowong.mp4')} muted style={{width: '100%', height: '100%', objectFit: 'cover'}} />
+      <AbsoluteFill style={{background: 'radial-gradient(ellipse at center, rgba(2,4,10,.55) 0%, rgba(2,4,10,0) 38%)'}} />
+      <div style={{position: 'absolute', left: 0, right: 0, top: 455, textAlign: 'center', opacity: m * k, transform: `scale(${0.8 + 0.2 * m + (1 - k) * 0.4})`}}>
+        <div style={{fontFamily: "'JetBrains Mono', monospace", fontSize: 30, letterSpacing: 14, color: '#38e8ff', textShadow: '0 0 14px #38e8ff'}}>BAB 04</div>
+        <div style={{fontFamily: "'Orbitron', sans-serif", fontWeight: 900, fontSize: 110, letterSpacing: 16, color: '#fff', textShadow: '0 0 30px rgba(56,232,255,.9), 0 0 60px rgba(255,200,61,.5), 0 6px 10px #000'}}>PENCAPAIAN</div>
+      </div>
+      <Sequence from={s.fd - 40}>
+        <HFCahaya op={0.9} />
+      </Sequence>
+    </AbsoluteFill>
+  );
+};
 
 // Syot pemanduan GB: bar letterbox 2.39:1 yang masuk pada syot pertama dan keluar pada syot terakhir
 const Sinema: React.FC<{s: Seg}> = ({s}) => {
@@ -26,6 +61,8 @@ const Sinema: React.FC<{s: Seg}> = ({s}) => {
   return (
     <AbsoluteFill>
       <Klip s={s} />
+      {(s.id === 'drv_jambatan' || s.id === 'drv_wira') && <HFCahaya op={s.id === 'drv_wira' ? 0.75 : 0.9} />}
+      {s.id === 'drv_wira' && <HFSuar op={0.55} />}
       {/* smash to black: skrin gelap sekejap sebelum drop muzik, GB keluar kereta */}
       {s.id === 'drv_pergi' && frame >= s.fd - 12 && <AbsoluteFill style={{background: '#000'}} />}
       <div style={{position: 'absolute', left: 0, right: 0, top: 0, height: bar, background: '#000'}} />
@@ -59,7 +96,14 @@ const SegView: React.FC<{s: Seg}> = ({s}) => {
     case 'sinema':
       return <Sinema s={s} />;
     case 'terafecta':
-      return <Terafecta fd={s.fd} />;
+      return (
+        <AbsoluteFill>
+          <Terafecta fd={s.fd} />
+          <HFSuar op={0.5} rate={8 / 13.65} />
+        </AbsoluteFill>
+      );
+    case 'hfterowong':
+      return <HFTerowong s={s} />;
     case 'kad':
       return <KadAsal jawatan="GPK HAL EHWAL MURID" nama="ROAZMI BIN MOHAMAD" fd={s.fd} />;
     default:

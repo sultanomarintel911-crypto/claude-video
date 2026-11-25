@@ -7,7 +7,7 @@ export const W = 1920;
 export const H = 1080;
 export const f = (sec: number) => Math.round(sec * FPS);
 
-export type Kind = 'video' | 'bio' | 'kertas' | 'statistik' | 'emas' | 'tutup' | 'kad' | 'emblem3d' | 'intro' | 'sinema' | 'terafecta' | 'terowong' | 'graf3d' | 'maklumat';
+export type Kind = 'video' | 'bio' | 'kertas' | 'statistik' | 'emas' | 'tutup' | 'kad' | 'emblem3d' | 'intro' | 'sinema' | 'terafecta' | 'hfterowong' | 'terowong' | 'graf3d' | 'maklumat';
 export type Seg = {
   id: string;
   kind: Kind;
