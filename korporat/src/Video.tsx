@@ -26,6 +26,8 @@ const Sinema: React.FC<{s: Seg}> = ({s}) => {
   return (
     <AbsoluteFill>
       <Klip s={s} />
+      {/* smash to black: skrin gelap sekejap sebelum drop muzik, GB keluar kereta */}
+      {s.id === 'drv_pergi' && frame >= s.fd - 12 && <AbsoluteFill style={{background: '#000'}} />}
       <div style={{position: 'absolute', left: 0, right: 0, top: 0, height: bar, background: '#000'}} />
       <div style={{position: 'absolute', left: 0, right: 0, bottom: 0, height: bar, background: '#000'}} />
     </AbsoluteFill>

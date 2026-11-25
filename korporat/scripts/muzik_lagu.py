@@ -149,6 +149,13 @@ if len(sys.argv) > 3:
         out[i:j] += (s * g[:, None] * 1.5)[:j - i]
     print('enjin    -> dimasukkan pada', len(ENJIN), 'syot')
 
+# smash to black: senyap 0.4 s sebelum drop (selari dengan skrin gelap), kemudian drop menghentam
+h = T('drv_wira')
+g0, g1 = h - 12 / 30, h - 0.005
+tv = np.arange(n) / SR
+senyap = np.clip(np.maximum((g0 - tv) / 0.03, (tv - g1) / 0.005), 0, 1)
+out *= np.maximum(senyap, 0.0)[:, None]
+
 # rendahkan muzik semasa suara latar
 v0 = T('elearning')
 v1 = max(T(k) + (mula[k][2]['voTo'] - mula[k][2]['from']) / mula[k][2].get('rate', 1) for k in mula if mula[k][2].get('vo'))
