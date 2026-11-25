@@ -107,18 +107,10 @@
       "energi": 2
     },
     {
-      "id": "dron_gerbang",
-      "src": "video/korporat_bersih.mp4",
-      "from": 18.0,
-      "to": 25.0,
-      "rate": 1,
-      "energi": 2
-    },
-    {
       "id": "senja",
       "src": "video/korporat_bersih.mp4",
-      "from": 28.0,
-      "to": 31.0,
+      "from": 25.25,
+      "to": 31.05,
       "rate": 1,
       "energi": 2
     },
