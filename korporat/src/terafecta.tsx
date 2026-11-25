@@ -119,21 +119,20 @@ const Tajuk: React.FC<{t: number}> = ({t}) => {
   const y = interpolate(naik, [0, 1], [430, 40]);
   return (
     <div style={{position: 'absolute', left: 0, right: 0, top: y, textAlign: 'center', transform: `scale(${sk})`, transformOrigin: '50% 0', opacity: masuk, filter: `blur(${(1 - masuk) * 14}px)`}}>
-      <div
-        style={{
-          fontFamily: ORB,
-          fontWeight: 900,
-          fontSize: 190,
-          letterSpacing: 18,
-          lineHeight: 1,
-          background: `linear-gradient(100deg, #b17a22 0%, #ffd25a ${kilau - 20}%, #fffbe6 ${kilau}%, #ffd25a ${kilau + 20}%, #b17a22 100%)`,
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          color: 'transparent',
-          filter: 'drop-shadow(0 0 30px rgba(255,190,60,.55)) drop-shadow(0 6px 4px rgba(0,0,0,.6))',
-        }}
-      >
-        TERAFECTA
+      {/* teks emas padu + lapisan kilauan bertopeng (elak background-clip:text yang tidak stabil semasa render) */}
+      <div style={{position: 'relative', fontFamily: ORB, fontWeight: 900, fontSize: 190, letterSpacing: 18, lineHeight: 1}}>
+        <div style={{color: '#f2bf4a', textShadow: '0 0 30px rgba(255,190,60,.55), 0 2px 0 #9a6415, 0 6px 6px rgba(0,0,0,.6)'}}>TERAFECTA</div>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            color: '#fff8dc',
+            WebkitMaskImage: `linear-gradient(100deg, rgba(0,0,0,0) ${kilau - 14}%, rgba(0,0,0,1) ${kilau}%, rgba(0,0,0,0) ${kilau + 14}%)`,
+            maskImage: `linear-gradient(100deg, rgba(0,0,0,0) ${kilau - 14}%, rgba(0,0,0,1) ${kilau}%, rgba(0,0,0,0) ${kilau + 14}%)`,
+          }}
+        >
+          TERAFECTA
+        </div>
       </div>
       <div style={{fontFamily: ORB, fontWeight: 700, fontSize: 46, letterSpacing: 22, color: C.putih, marginTop: 18, textShadow: `0 0 20px ${C.cyan}`}}>DIGITAL LUMINARIES AWARDS</div>
     </div>
@@ -211,11 +210,8 @@ const Kad: React.FC<{a: (typeof ANUGERAH)[number]; t: number; t0: number; t1: nu
             fontSize: a.tajuk.length > 30 ? 50 : 60,
             letterSpacing: 3,
             marginTop: 6,
-            background: EMAS_GRAD,
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            color: 'transparent',
-            filter: 'drop-shadow(0 0 16px rgba(255,190,60,.6)) drop-shadow(0 3px 3px rgba(0,0,0,.8))',
+            color: '#f7c955',
+            textShadow: '0 0 16px rgba(255,190,60,.6), 0 2px 0 #8a5a14, 0 4px 4px rgba(0,0,0,.8)',
           }}
         >
           {a.tajuk}
@@ -267,7 +263,7 @@ const Himpun: React.FC<{t: number}> = ({t}) => {
       })}
       <div style={{position: 'absolute', left: 0, right: 0, top: 455, textAlign: 'center', opacity: teks, transform: `scale(${0.8 + 0.2 * teks})`}}>
         <div style={{display: 'inline-block', padding: '16px 40px', background: 'rgba(3,8,20,.82)', border: '2px solid #e8b94a', boxShadow: '0 0 40px rgba(255,190,60,.5)'}}>
-          <div style={{fontFamily: ORB, fontWeight: 900, fontSize: 40, letterSpacing: 6, background: EMAS_GRAD, WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent'}}>SK SULTAN OMAR</div>
+          <div style={{fontFamily: ORB, fontWeight: 900, fontSize: 40, letterSpacing: 6, color: '#f7c955', textShadow: '0 0 14px rgba(255,190,60,.6)'}}>SK SULTAN OMAR</div>
           <div style={{fontFamily: MONO, fontSize: 20, letterSpacing: 5, color: C.cyan, marginTop: 6}}>4 PENGIKTIRAFAN · TERAFECTA</div>
         </div>
       </div>
