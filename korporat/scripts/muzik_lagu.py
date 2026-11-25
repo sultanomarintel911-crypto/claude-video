@@ -64,10 +64,10 @@ offA4 = 146.10 - T('emas')
 print('terowong ->', round(96.53 - offA3, 3), 'video', round(T('terowong'), 3))
 print('emas     ->', round(146.10 - offA4, 3), 'video', round(T('emas'), 3))
 
-# lagu B: langkau 12 rentak pada syot percikan roda supaya drop 39.82 s jatuh
+# lagu B mengalir terus; syot pemanduan disusun supaya drop 39.82 s jatuh
 # tepat ketika GB keluar dari kereta (syot drv_wira)
 BEAT_B = 28.049 / 62
-offB2 = offB + 12 * BEAT_B
+offB2 = offB
 print('wira     ->', round(39.822 - offB2, 3), 'video', round(T('drv_wira'), 3))
 # lagu A masuk pada '01 // PENGENALAN SEKOLAH': drop 33.95 s tepat pada babak panel
 print('panel    ->', round(33.95 - offA2, 3), 'video', round(T('panel'), 3))
@@ -132,6 +132,7 @@ if len(sys.argv) > 3:
     S = baca(sys.argv[3])
     ENJIN = [
         (9.50, 15.32, 'drv_jambatan', 0.0),   # deruan naik, puncak lalu pada potongan ke syot kejar
+        (44.90, 47.60, 'drv_depan', 0.0),     # enjin kuat semasa GB memandu masuk sekolah
         (61.40, 62.70, 'drv_percik', 0.0),    # rev pendek semasa percikan roda
         (65.90, 69.55, 'drv_cermin', 0.0),    # enjin berterusan: cermin depan + sisi
         (77.10, 79.40, 'drv_gerbang', 0.0),   # lalu di gerbang sekolah

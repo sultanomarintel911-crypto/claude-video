@@ -29,9 +29,9 @@
       "id": "drv_jambatan",
       "kind": "sinema",
       "src": "video/drv1.mp4",
-      "from": 0.6,
-      "to": 3.9,
-      "rate": 1.06436,
+      "from": 0.5,
+      "to": 4.0,
+      "rate": 1.12886,
       "energi": 2
     },
     {
@@ -41,6 +41,42 @@
       "from": 7.0,
       "to": 9.95,
       "rate": 1.08679,
+      "energi": 2
+    },
+    {
+      "id": "drv_udara",
+      "kind": "sinema",
+      "src": "video/drv2.mp4",
+      "from": 0.6,
+      "to": 3.9,
+      "rate": 1.21573,
+      "energi": 2
+    },
+    {
+      "id": "drv_depan",
+      "kind": "sinema",
+      "src": "video/drv2.mp4",
+      "from": 4.3,
+      "to": 6.35,
+      "rate": 1.13284,
+      "energi": 2
+    },
+    {
+      "id": "drv_dalam",
+      "kind": "sinema",
+      "src": "video/drv2.mp4",
+      "from": 7.0,
+      "to": 8.6,
+      "rate": 1.17889,
+      "energi": 2
+    },
+    {
+      "id": "drv_gerbang",
+      "kind": "sinema",
+      "src": "video/drv2.mp4",
+      "from": 8.85,
+      "to": 10.8,
+      "rate": 1.07758,
       "energi": 2
     },
     {
@@ -68,15 +104,6 @@
       "from": 5.0,
       "to": 6.95,
       "rate": 1.07758,
-      "energi": 2
-    },
-    {
-      "id": "drv_gerbang",
-      "kind": "sinema",
-      "src": "video/drv2.mp4",
-      "from": 9.1,
-      "to": 11.5,
-      "rate": 1.061,
       "energi": 2
     },
     {
