@@ -5,6 +5,12 @@
 import React, {useEffect, useState} from 'react';
 import {AbsoluteFill, continueRender, delayRender, Img, staticFile, useCurrentFrame} from 'remotion';
 import '@fontsource/exo-2/900-italic.css';
+import '@fontsource/oxanium/800.css';
+import '@fontsource/chakra-petch/700.css';
+import '@fontsource/chakra-petch/700-italic.css';
+import '@fontsource/saira/900-italic.css';
+import '@fontsource/saira/800-italic.css';
+import '@fontsource/russo-one/400.css';
 import L from './layout.json';
 
 export const METEOR_FPS = 30;
@@ -16,7 +22,25 @@ const H = 1920;
 const TAU = Math.PI * 2;
 const CX = 540;
 const CY = 820;
-const FONT = '"Exo 2", sans-serif';
+// Pilihan fon (props `font` / `tagFont`). Nilai modul ditetapkan pada setiap render.
+export const FONTS = {
+  exo: {family: '"Exo 2", sans-serif', style: 'italic', weight: 900, size: 1},
+  oxanium: {family: '"Oxanium", sans-serif', style: 'italic', weight: 800, size: 1.0},
+  chakra: {family: '"Chakra Petch", sans-serif', style: 'italic', weight: 700, size: 1.0},
+  saira: {family: '"Saira", sans-serif', style: 'italic', weight: 900, size: 1.0},
+  russo: {family: '"Russo One", sans-serif', style: 'italic', weight: 400, size: 0.95},
+} as const;
+export type FontKey = keyof typeof FONTS;
+let FONT: string = FONTS.exo.family;
+let FSTYLE: string = 'italic';
+let FWEIGHT: number = 900;
+let TFONT: string = FONTS.exo.family;
+let TSTYLE: string = 'italic';
+let TWEIGHT: number = 900;
+const useFonts = (font: FontKey, tagFont: FontKey) => {
+  FONT = FONTS[font].family; FSTYLE = FONTS[font].style; FWEIGHT = FONTS[font].weight;
+  TFONT = FONTS[tagFont].family; TSTYLE = FONTS[tagFont].style; TWEIGHT = FONTS[tagFont].weight;
+};
 
 const C = {cyan: '#2fd2ff', blue: '#1b7dff', yellow: '#ffd21f', amber: '#ffb800'};
 const col = (c: string) => (c === 'y' ? C.yellow : C.cyan);
@@ -560,7 +584,7 @@ const ROCK_SIZE = 640;
 let measureCtx: CanvasRenderingContext2D | null = null;
 const measure = (txt: string) => {
   if (!measureCtx) measureCtx = document.createElement('canvas').getContext('2d');
-  measureCtx!.font = `italic 900 ${FS}px "Exo 2"`;
+  measureCtx!.font = `${FSTYLE} ${FWEIGHT} ${FS}px ${FONT}`;
   return measureCtx!.measureText(txt).width;
 };
 
@@ -616,7 +640,8 @@ const meteorState = (i: number, s: number, t: number): MSt | null => {
 };
 
 const MeteorGlyph: React.FC<{ch: string; i: number; w: number; st: MSt; s: number; t: number}> = ({ch, i, w, st, s, t}) => {
-  const base: React.CSSProperties = {position: 'absolute', left: 0, top: 0, fontFamily: FONT, fontStyle: 'italic', fontWeight: 900, fontSize: FS, lineHeight: '320px', whiteSpace: 'nowrap'};
+  // padding: glif condong (italik sintetik) terkeluar dari kotak; tanpa ini tekstur terpotong
+  const base: React.CSSProperties = {position: 'absolute', left: -120, top: 0, padding: '0 120px', fontFamily: FONT, fontStyle: FSTYLE, fontWeight: FWEIGHT, fontSize: FS, lineHeight: '320px', whiteSpace: 'nowrap'};
   const bgPos = `${-i * 173}px ${-i * 241}px`;
   const rockBg: React.CSSProperties = {
     backgroundImage: `url(${staticFile('rock.png')})`, backgroundSize: `${ROCK_SIZE}px`, backgroundPosition: bgPos,
@@ -834,7 +859,7 @@ const Tagline: React.FC<Env> = ({s, t}) => {
   const sweep = frac(t * 4) * 1.6 - 0.3; // kilauan pada lencana
   const line1: React.CSSProperties = {
     position: 'absolute', left: 0, right: 0, top: TAG1_Y - 50, height: 100, lineHeight: '100px', textAlign: 'center',
-    fontFamily: FONT, fontStyle: 'italic', fontWeight: 900, fontSize: 70, letterSpacing: 3, whiteSpace: 'pre',
+    fontFamily: TFONT, fontStyle: TSTYLE, fontWeight: TWEIGHT, fontSize: 70, letterSpacing: 3, whiteSpace: 'pre',
   };
   return (
     <AbsoluteFill style={{opacity: Math.min(1, env1 * 1.2)}}>
@@ -871,7 +896,7 @@ const Tagline: React.FC<Env> = ({s, t}) => {
           {[-1, 1].map((d) => (
             <div key={d} style={{position: 'absolute', top: 10, height: 68, width: 14, left: d < 0 ? -48 : 694, transform: 'skewX(-18deg)', background: C.yellow, opacity: 0.85, boxShadow: '0 0 12px rgba(255,200,30,0.7)'}} />
           ))}
-          <div style={{position: 'absolute', inset: 0, lineHeight: '88px', textAlign: 'center', fontFamily: FONT, fontStyle: 'italic', fontWeight: 900, fontSize: 54, letterSpacing: 2, color: '#0a1f5c', whiteSpace: 'nowrap'}}>{TAG2}</div>
+          <div style={{position: 'absolute', inset: 0, lineHeight: '88px', textAlign: 'center', fontFamily: TFONT, fontStyle: TSTYLE, fontWeight: TWEIGHT, fontSize: 54, letterSpacing: 2, color: '#0a1f5c', whiteSpace: 'nowrap'}}>{TAG2}</div>
         </div>
       )}
     </AbsoluteFill>
@@ -893,7 +918,8 @@ const shake = (s: number) => {
   return [x, y];
 };
 
-export const HaksMeteor: React.FC = () => {
+export const HaksMeteor: React.FC<{font?: FontKey; tagFont?: FontKey}> = ({font = 'exo', tagFont = 'exo'}) => {
+  useFonts(font, tagFont);
   const frame = useCurrentFrame();
   const f = frame % METEOR_FRAMES;
   const s = f / METEOR_FPS;
@@ -908,10 +934,11 @@ export const HaksMeteor: React.FC = () => {
       im.src = src;
     });
     Promise.all([
-      document.fonts.load(`italic 900 ${FS}px ${FONT}`).then(() => document.fonts.ready),
+      document.fonts.load(`${FSTYLE} ${FWEIGHT} ${FS}px ${FONT}`),
+      document.fonts.load(`${TSTYLE} ${TWEIGHT} 70px ${TFONT}`),
       img(staticFile('rock.png')),
       img(staticFile('cracks.png')),
-    ]).then(() => {
+    ]).then(() => document.fonts.ready).then(() => {
       setWs(ITEMS.map(measure));
       continueRender(handle);
     });
