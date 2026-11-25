@@ -35,7 +35,7 @@ const IGNITE = 16.5; // retakan menyala penuh
 const OUT = 17.2; // melancar keluar
 
 const vmode = (_s: number) => 1;
-const RING_VY = 762;
+const RING_VY = 727;
 const ringCY = (_s: number) => RING_VY;
 const ringScale = (_s: number) => 1.35;
 
@@ -158,7 +158,7 @@ const Planet: React.FC<Env> = ({s, t}) => {
   const tileH = 400;
   const {cx, cy, r} = PLANET;
   return (
-    <div style={{position: 'absolute', inset: 0, transform: `translateY(${vmode(s) * 300}px)`}}>
+    <div style={{position: 'absolute', inset: 0, transform: `translateY(${vmode(s) * 370}px)`}}>
       {/* halo atmosfera */}
       <div
         style={{
@@ -280,7 +280,7 @@ const Slashes: React.FC<Env> = ({s, t}) => {
       </defs>
       <g style={{filter: 'drop-shadow(0 0 10px rgba(47,210,255,0.55))'}}>
         {bands(120, 150, false, 'tl')}
-        {bands(980, 1730, true, 'br')}
+        {bands(1065, 1935, true, 'br')}
       </g>
     </svg>
   );
@@ -372,7 +372,7 @@ const MeshWave: React.FC<Env> = ({s, t}) => {
     for (let c = 0; c <= w.cols; c++) {
       const u = c / w.cols;
       const x = -60 + u * (W + 120);
-      let y = w.y - 90 + 200 * vmode(s) - w.depth * (1 - z) + 72 * (0.5 - u);
+      let y = w.y - 90 + 250 * vmode(s) - w.depth * (1 - z) + 72 * (0.5 - u);
       for (const k of w.comps) {
         y += k.a * (0.55 + 0.45 * z) * Math.sin((k.k / 10000) * (x + r * 38) - TAU * k.m * t + k.ph);
       }
@@ -547,11 +547,11 @@ const Flare: React.FC<Env> = ({s, t}) => {
 const ITEMS = ['H', 'A', 'K', 'S', '26'];
 const FS = 318;
 const POS: {y: number; scale: number}[] = [
-  {y: 290, scale: 1.24},
-  {y: 605, scale: 1.24},
-  {y: 920, scale: 1.24},
-  {y: 1235, scale: 1.24},
-  {y: 1535, scale: 0.82},
+  {y: 262, scale: 1.24},
+  {y: 572, scale: 1.24},
+  {y: 882, scale: 1.24},
+  {y: 1192, scale: 1.24},
+  {y: 1478, scale: 0.8},
 ];
 const DEPTH = 11; // lapisan ketebalan
 const DSTEP = 3.4; // px setiap lapisan
@@ -761,7 +761,7 @@ const Impact: React.FC<{set: number; dt: number; x: number; y: number; size: num
 const VGlints: React.FC<Env> = ({s, t}) => {
   const env = win(s, GAH - 0.3, GAH + 0.4, OUT, OUT + 0.6);
   if (env <= 0.001) return null;
-  const ys = [447, 762, 1077, 1392];
+  const ys = [417, 727, 1037, 1340];
   return (
     <AbsoluteFill>
       {ys.map((y, i) => {
@@ -795,6 +795,85 @@ const Letters: React.FC<Env & {ws: number[]}> = ({s, t, ws}) => {
       {trails}
       {glyphs}
       {impacts}
+    </AbsoluteFill>
+  );
+};
+
+
+// ================================================================ TAGLINE (2 baris, melintang di bawah)
+const TAG1 = 'PEMIMPIN MASA DEPAN';
+const TAG2 = 'TEKNOLOGI & DIGITAL';
+const TAG1_Y = 1652;
+const TAG2_Y = 1752;
+const TAG_IN = GAH + 0.55; // mula nyahsulit baris 1
+const TAG2_IN = TAG_IN + 0.95; // lencana baris 2 meluncur masuk
+const SCRAMBLE = 'ABCDEFGHJKLMNPRSTUVWXYZ0123456789#$%&@';
+const hash = (a: number, b: number) => {
+  const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453;
+  return x - Math.floor(x);
+};
+
+const Tagline: React.FC<Env> = ({s, t}) => {
+  const out = ramp(s, OUT - 0.1, OUT + 0.4);
+  const env1 = ramp(s, TAG_IN - 0.15, TAG_IN + 0.1) * (1 - out);
+  if (env1 <= 0.001) return null;
+  const frame = Math.floor(s * 30);
+  // baris 1: nyahsulit huruf demi huruf
+  const chars = TAG1.split('').map((ch, i) => {
+    if (ch === ' ') return ' ';
+    const at = TAG_IN + i * 0.04;
+    if (s >= at + 0.18) return ch;
+    if (s < at) return ' ';
+    return SCRAMBLE[Math.floor(hash(frame, i) * SCRAMBLE.length)];
+  });
+  const lockGlow = decay(s, TAG_IN + TAG1.length * 0.04 + 0.18, 3);
+  const pulse = 0.75 + 0.25 * wave(t, 5, 0.3);
+  // baris 2: lencana kuning meluncur dari kiri
+  const b = outExpo((s - TAG2_IN) / 0.6);
+  const bx = (1 - b) * -900 + out * 900;
+  const sweep = frac(t * 4) * 1.6 - 0.3; // kilauan pada lencana
+  const line1: React.CSSProperties = {
+    position: 'absolute', left: 0, right: 0, top: TAG1_Y - 50, height: 100, lineHeight: '100px', textAlign: 'center',
+    fontFamily: FONT, fontStyle: 'italic', fontWeight: 900, fontSize: 70, letterSpacing: 3, whiteSpace: 'pre',
+  };
+  return (
+    <AbsoluteFill style={{opacity: Math.min(1, env1 * 1.2)}}>
+      {/* plat gelap lembut di belakang teks untuk kebolehbacaan */}
+      <div style={{position: 'absolute', left: -40, right: -40, top: TAG1_Y - 95, height: 250, background: 'radial-gradient(ellipse 60% 50% at 50% 50%, rgba(2,10,40,0.75) 0%, rgba(2,10,40,0.45) 55%, rgba(2,10,40,0) 100%)'}} />
+      {/* garis aksen */}
+      <div style={{position: 'absolute', left: CX - 470, width: 940, top: TAG1_Y - 62, height: 3, transform: `scaleX(${ramp(s, TAG_IN - 0.1, TAG_IN + 0.5)})`, background: 'linear-gradient(90deg, rgba(47,210,255,0), rgba(47,210,255,0.95) 20%, rgba(255,255,255,1) 50%, rgba(47,210,255,0.95) 80%, rgba(47,210,255,0))', boxShadow: '0 0 12px rgba(47,210,255,0.8)'}} />
+      <div style={{...line1, color: 'transparent', WebkitTextStroke: '14px rgba(47,170,255,0.6)', filter: `blur(${10 + 6 * lockGlow}px)`}}>{chars.join('')}</div>
+      <div style={{...line1, color: '#0b1838', WebkitTextStroke: '10px #0b1838'}}>{chars.join('')}</div>
+      <div
+        style={{
+          ...line1,
+          backgroundImage: 'linear-gradient(180deg, #ffffff 0%, #f2f7ff 45%, #c9d8f0 52%, #ffffff 58%, #dfe9f8 100%)',
+          WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent',
+          filter: `drop-shadow(0 0 ${8 * pulse + 18 * lockGlow}px rgba(120,220,255,0.9))`,
+        }}
+      >
+        {chars.join('')}
+      </div>
+      {/* lencana baris 2 */}
+      {b > 0.001 && (
+        <div style={{position: 'absolute', left: CX - 330 + bx, width: 660, top: TAG2_Y - 44, height: 88}}>
+          <div
+            style={{
+              position: 'absolute', inset: 0, transform: 'skewX(-18deg)',
+              background: 'linear-gradient(180deg, #ffe46a 0%, #ffd21f 45%, #ffb800 100%)',
+              boxShadow: `0 0 ${24 * pulse}px rgba(255,200,30,0.7), inset 0 3px 0 rgba(255,250,210,0.9), inset 0 -4px 0 rgba(160,90,0,0.45)`,
+              overflow: 'hidden',
+            }}
+          >
+            <div style={{position: 'absolute', top: 0, bottom: 0, width: 120, left: `${sweep * 100}%`, background: 'linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.75), rgba(255,255,255,0))'}} />
+          </div>
+          {/* tanda serong di hujung lencana */}
+          {[-1, 1].map((d) => (
+            <div key={d} style={{position: 'absolute', top: 10, height: 68, width: 14, left: d < 0 ? -48 : 694, transform: 'skewX(-18deg)', background: C.yellow, opacity: 0.85, boxShadow: '0 0 12px rgba(255,200,30,0.7)'}} />
+          ))}
+          <div style={{position: 'absolute', inset: 0, lineHeight: '88px', textAlign: 'center', fontFamily: FONT, fontStyle: 'italic', fontWeight: 900, fontSize: 54, letterSpacing: 2, color: '#0a1f5c', whiteSpace: 'nowrap'}}>{TAG2}</div>
+        </div>
+      )}
     </AbsoluteFill>
   );
 };
@@ -858,6 +937,7 @@ export const HaksMeteor: React.FC = () => {
         <Flare {...env} />
         <VGlints {...env} />
         {ws && <Embers {...env} ws={ws} />}
+        <Tagline {...env} />
         {ws && <Letters {...env} ws={ws} />}
       </AbsoluteFill>
       <AbsoluteFill style={{background: 'radial-gradient(ellipse 75% 60% at 50% 46%, rgba(0,0,0,0) 55%, rgba(1,4,18,0.55) 100%)'}} />
