@@ -7,7 +7,7 @@ import {HaksMeteor, METEOR_FRAMES, METEOR_FPS} from './HaksMeteor';
 
 export const RemotionRoot: React.FC = () => (
   <>
-    <Composition id="HaksMeteor" component={HaksMeteor} durationInFrames={METEOR_FRAMES} fps={METEOR_FPS} width={1080} height={1920} defaultProps={{font: 'oxanium', tagFont: 'oxanium'}} />
+    <Composition id="HaksMeteor" component={HaksMeteor} durationInFrames={METEOR_FRAMES} fps={METEOR_FPS} width={1080} height={1920} defaultProps={{font: 'exo', tagFont: 'oxanium'}} />
     <Composition id="HaksCombo" component={HaksCombo} durationInFrames={COMBO_FRAMES} fps={COMBO_FPS} width={1080} height={1920} />
     <Composition id="HaksGah" component={HaksGah} durationInFrames={GAH_FRAMES} fps={GAH_FPS} width={1080} height={1920} />
     <Composition id="HaksLoop" component={HaksLoop} durationInFrames={LOOP_FRAMES} fps={FPS} width={1080} height={1920} />
