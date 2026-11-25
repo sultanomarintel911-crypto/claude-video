@@ -11,7 +11,26 @@ import {BabTag, glitchAmt, GlitchOverlay, Grade, Hud, Label} from './fx';
 import {Emblem3D, Graf3D, Terowong3D} from './tiga';
 import {IntroBadge} from './intro';
 import {MaklumatGlob} from './maklumat3d';
+import {Terafecta} from './terafecta';
 import {Bio, Emas, KadAsal, KadPentadbir, Kertas, Klip, PanelHem, Statistik, Tutup} from './scenes';
+
+// Syot pemanduan GB: bar letterbox 2.39:1 yang masuk pada syot pertama dan keluar pada syot terakhir
+const Sinema: React.FC<{s: Seg}> = ({s}) => {
+  const frame = useCurrentFrame();
+  const i = SEGS.indexOf(s);
+  const pertama = SEGS[i - 1]?.kind !== 'sinema';
+  const akhir = SEGS[i + 1]?.kind !== 'sinema';
+  const c = {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'} as const;
+  const k = (pertama ? interpolate(frame, [0, 14], [0, 1], c) : 1) * (akhir ? interpolate(frame, [s.fd - 12, s.fd], [1, 0], c) : 1);
+  const bar = 138 * k;
+  return (
+    <AbsoluteFill>
+      <Klip s={s} />
+      <div style={{position: 'absolute', left: 0, right: 0, top: 0, height: bar, background: '#000'}} />
+      <div style={{position: 'absolute', left: 0, right: 0, bottom: 0, height: bar, background: '#000'}} />
+    </AbsoluteFill>
+  );
+};
 
 const SegView: React.FC<{s: Seg}> = ({s}) => {
   switch (s.kind) {
@@ -35,6 +54,10 @@ const SegView: React.FC<{s: Seg}> = ({s}) => {
       return <Graf3D fd={s.fd} />;
     case 'maklumat':
       return <MaklumatGlob fd={s.fd} />;
+    case 'sinema':
+      return <Sinema s={s} />;
+    case 'terafecta':
+      return <Terafecta fd={s.fd} />;
     case 'kad':
       return <KadAsal jawatan="GPK HAL EHWAL MURID" nama="ROAZMI BIN MOHAMAD" fd={s.fd} />;
     default:

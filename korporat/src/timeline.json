@@ -26,18 +26,83 @@
       "energi": 1
     },
     {
-      "id": "kereta_1",
-      "src": "video/korporat_bersih.mp4",
-      "from": 12.2,
-      "to": 14.0,
-      "rate": 1,
+      "id": "drv_jambatan",
+      "kind": "sinema",
+      "src": "video/drv1.mp4",
+      "from": 0.6,
+      "to": 3.9,
+      "rate": 1.06436,
       "energi": 2
     },
     {
-      "id": "kereta_2",
-      "src": "video/korporat_bersih.mp4",
-      "from": 15.2,
-      "to": 17.4,
+      "id": "drv_kejar",
+      "kind": "sinema",
+      "src": "video/drv1.mp4",
+      "from": 7.0,
+      "to": 9.95,
+      "rate": 1.08679,
+      "energi": 2
+    },
+    {
+      "id": "drv_percik",
+      "kind": "sinema",
+      "src": "video/drv3.mp4",
+      "from": 0.0,
+      "to": 1.4,
+      "rate": 1.03153,
+      "energi": 2
+    },
+    {
+      "id": "drv_cermin",
+      "kind": "sinema",
+      "src": "video/drv3.mp4",
+      "from": 1.45,
+      "to": 3.55,
+      "rate": 1.16047,
+      "energi": 2
+    },
+    {
+      "id": "drv_sisi",
+      "kind": "sinema",
+      "src": "video/drv3.mp4",
+      "from": 5.0,
+      "to": 6.95,
+      "rate": 1.07758,
+      "energi": 2
+    },
+    {
+      "id": "drv_gerbang",
+      "kind": "sinema",
+      "src": "video/drv2.mp4",
+      "from": 9.1,
+      "to": 11.5,
+      "rate": 1.061,
+      "energi": 2
+    },
+    {
+      "id": "drv_brek",
+      "kind": "sinema",
+      "src": "video/drv31.mp4",
+      "from": 1.6,
+      "to": 3.0,
+      "rate": 1.03153,
+      "energi": 2
+    },
+    {
+      "id": "drv_pergi",
+      "kind": "sinema",
+      "src": "video/drv31.mp4",
+      "from": 3.5,
+      "to": 5.6,
+      "rate": 1.16047,
+      "energi": 2
+    },
+    {
+      "id": "drv_wira",
+      "kind": "sinema",
+      "src": "video/drv31.mp4",
+      "from": 7.4,
+      "to": 13.7336,
       "rate": 1,
       "energi": 2
     },
@@ -61,7 +126,7 @@
       "id": "panel",
       "src": "video/korporat_bersih.mp4",
       "from": 32.2,
-      "to": 43.9,
+      "to": 42.6,
       "rate": 1,
       "energi": 1,
       "bab": "01 // PENGENALAN SEKOLAH"
@@ -242,9 +307,15 @@
     {
       "id": "emas",
       "kind": "emas",
-      "dur": 14.0,
+      "dur": 13.6533,
       "energi": 3,
       "hit": 0.0
+    },
+    {
+      "id": "terafecta",
+      "kind": "terafecta",
+      "dur": 13.6533,
+      "energi": 3
     },
     {
       "id": "maklumat",

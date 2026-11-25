@@ -11,7 +11,7 @@ Lagu disusun supaya dentuman kuat jatuh tepat pada sorotan video:
 Lompatan dalam lagu A dibuat dalam gandaan rentak (123 BPM) supaya alunan
 tidak tergelincir. Muzik direndahkan semasa suara latar (e-learning walk).
 
-Guna: python3 scripts/muzik_lagu.py bahan_muzik/lagu_a.wav bahan_muzik/lagu_b.wav
+Guna: python3 scripts/muzik_lagu.py bahan_muzik/lagu_a.wav bahan_muzik/lagu_b.wav [bahan_muzik/sfx_kereta.wav]
 """
 import json
 import os
@@ -64,15 +64,27 @@ offA4 = 146.10 - T('emas')
 print('terowong ->', round(96.53 - offA3, 3), 'video', round(T('terowong'), 3))
 print('emas     ->', round(146.10 - offA4, 3), 'video', round(T('emas'), 3))
 
+# lagu B: langkau 12 rentak pada syot percikan roda supaya drop 39.82 s jatuh
+# tepat ketika GB keluar dari kereta (syot drv_wira)
+BEAT_B = 28.049 / 62
+offB2 = offB + 12 * BEAT_B
+print('wira     ->', round(39.822 - offB2, 3), 'video', round(T('drv_wira'), 3))
+# lagu A masuk pada '01 // PENGENALAN SEKOLAH': drop 33.95 s tepat pada babak panel
+print('panel    ->', round(33.95 - offA2, 3), 'video', round(T('panel'), 3))
+# Terafecta: ulang drop besar 146.10 s (undur 28 rentak = panjang babak emas)
+offA5 = offA4 - 28 * BEAT_A
+print('terafecta->', round(146.10 - offA5, 3), 'video', round(T('terafecta'), 3))
+
 # senarai keratan: (lagu, offset, v0, v1, pudar_masuk, pudar_keluar)
-xB_tamat = T('lima_guru') - 1.35  # lagu A senyap bermula di sini
 lomp3 = T('koko')
 lomp4 = T('elearning')
 KER = [
-    (B, offB, 0.0, xB_tamat + 0.5, 0.0, 1.0),
-    (A, offA2, xB_tamat, lomp3, 0.05, 0.04),
+    (B, offB, 0.0, T('drv_percik') + 0.02, 0.0, 0.02),
+    (B, offB2, T('drv_percik'), T('panel') + 0.05, 0.02, 0.45),
+    (A, offA2, T('panel') - 0.45, lomp3, 0.45, 0.04),
     (A, offA3, lomp3, lomp4, 0.04, 0.05),
-    (A, offA4, lomp4, JUM, 0.05, 2.2),
+    (A, offA4, lomp4, T('terafecta') + 0.02, 0.05, 0.02),
+    (A, offA5, T('terafecta'), JUM, 0.02, 2.2),
 ]
 
 n = int(np.ceil(JUM * SR)) + 1
@@ -92,6 +104,11 @@ for y, off, v0, v1, fi, fo in KER:
     out[i0:i1] += seg * g[:, None]
 
 
+# muzik direndahkan sedikit semasa pemanduan supaya bunyi enjin jelas
+tv = np.arange(n) / SR
+d0, d1 = T('drv_jambatan'), T('drv_wira')
+out *= (1 - 0.25 * np.clip(np.minimum((tv - d0) / 0.4, (d1 - tv) / 0.3), 0, 1))[:, None]
+
 # dentuman sub tambahan pada babak data (statistik & graf 3D)
 def dentum(at, kuat=0.5):
     L = int(1.4 * SR)
@@ -108,6 +125,29 @@ def dentum(at, kuat=0.5):
 
 dentum(T('statistik'), 0.45)
 dentum(T('graf3d'), 0.4)
+
+# bunyi enjin kereta sport untuk babak pemanduan GB (pilihan: argumen ke-3)
+# (sfx_dari, sfx_hingga, syot, anjakan_dalam_syot)
+if len(sys.argv) > 3:
+    S = baca(sys.argv[3])
+    ENJIN = [
+        (9.50, 15.32, 'drv_jambatan', 0.0),   # deruan naik, puncak lalu pada potongan ke syot kejar
+        (61.40, 62.70, 'drv_percik', 0.0),    # rev pendek semasa percikan roda
+        (65.90, 69.55, 'drv_cermin', 0.0),    # enjin berterusan: cermin depan + sisi
+        (77.10, 79.40, 'drv_gerbang', 0.0),   # lalu di gerbang sekolah
+        (99.20, 100.60, 'drv_brek', 0.0),     # rev/brek
+        (101.50, 103.60, 'drv_pergi', 0.0),   # memecut pergi, pudar sebelum GB keluar
+    ]
+    for a0, a1, sid, d0 in ENJIN:
+        v = T(sid) + d0
+        i = int(v * SR)
+        s = S[int(a0 * SR):int(a1 * SR)].copy()
+        L = len(s)
+        tt = np.arange(L) / SR
+        g = np.clip(tt / 0.08, 0, 1) * np.clip((tt[-1] - tt) / (0.35 if sid == 'drv_pergi' else 0.1), 0, 1)
+        j = min(n, i + L)
+        out[i:j] += (s * g[:, None] * 1.5)[:j - i]
+    print('enjin    -> dimasukkan pada', len(ENJIN), 'syot')
 
 # rendahkan muzik semasa suara latar
 v0 = T('elearning')

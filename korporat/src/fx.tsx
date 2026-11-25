@@ -28,7 +28,7 @@ const tc = (frame: number) => {
 };
 
 // ---------- HUD global (halus, di tepi skrin) ----------
-const SEMBUNYI_HUD = new Set(['bio', 'statistik', 'emas', 'tutup', 'emblem3d', 'intro', 'terowong', 'graf3d', 'maklumat']);
+const SEMBUNYI_HUD = new Set(['bio', 'statistik', 'emas', 'tutup', 'emblem3d', 'intro', 'sinema', 'terafecta', 'terowong', 'graf3d', 'maklumat']);
 export const Hud: React.FC = () => {
   const frame = useCurrentFrame();
   const s = SEGS.find((x) => frame >= x.f0 && frame < x.f0 + x.fd);
@@ -72,7 +72,10 @@ export const Grade: React.FC = () => (
 );
 
 // ---------- Glitch pada setiap potongan ----------
-export const CUTS = SEGS.slice(1).map((s) => s.f0);
+// tiada glitch antara syot sinematik berturutan (potongan bersih gaya filem)
+export const CUTS = SEGS.slice(1)
+  .filter((s, i) => !(s.kind === 'sinema' && SEGS[i].kind === 'sinema'))
+  .map((s) => s.f0);
 export const glitchAmt = (frame: number) => {
   let g = 0;
   for (const c of CUTS) {
