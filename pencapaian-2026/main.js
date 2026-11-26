@@ -7,6 +7,7 @@ import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { CHAPTERS, OUTRO, SEKOLAH } from './content.js';
 import { buildTimeline } from './timeline.js';
+import { makeFilm } from './film.js';
 const TL = buildTimeline(), DUR = TL.DUR;
 
 const W = innerWidth || 1920, H = innerHeight || 1080, ASP = W / H;
@@ -405,7 +406,7 @@ function sparkShow(t, t0, t1, edgeOnly = true) {
 // ---------- bina semua elemen daripada garis masa ----------
 const ttf = await new TTFLoader().loadAsync('fonts/Fredoka-Bold.ttf');
 font = new Font(ttf);
-await document.fonts.load('700 100px Fredoka');
+await Promise.all(['700 100px Fredoka', '700 100px Cinzel', '600 100px "Cormorant Garamond"', 'italic 500 100px "Cormorant Garamond"'].map(f => document.fonts.load(f)));
 
 const cardMesh = async (ph) => {
   const pivot = new THREE.Group(); camera.add(pivot);
@@ -430,10 +431,13 @@ for (const S0 of TL.seg) {
     S.rib = ribbonPlane(S.it.ribbon, 1.75);
     S.sub = pillPlane(S.it.sub, pal.accent, 1.15);
     S.photos = await Promise.all(S.photos.map(cardMesh));
+  } else if (S.type === 'film') {
+    S.film = makeFilm(renderer, W, H, CHAPTERS[S.ci], S);
   } else if (S.type === 'outro') {
     S.title = word3D(['TAHNIAH!'], 3.4, PAL.pink, 17, .9);
     S.rib = ribbonPlane(SEKOLAH, 1.7);
     S.sub = pillPlane(CHAPTERS.map(c => c.nama.join(' ')).join('  ·  '), '#7f5cf0', 1.05);
+    S.subFit = Math.min(1, 25 / S.sub.geometry.parameters.width);
     S.pol = await Promise.all(OUTRO.slice(0, 5).map(async f => {
       const m = new THREE.Mesh(new THREE.PlaneGeometry(5.0, 5.0 / ASP), photoMat(await loadTex(f), {}));
       m.material.uniforms.border.value = .055; m.material.uniforms.radius.value = .06; m.visible = false; scene.add(m); return m;
@@ -516,7 +520,7 @@ function render(t) {
       });
       animWord(S.title, t, o + 1.0, DUR + 5, { stagger: .07, drop: 6 }); S.title.position.set(1.2, 3.9, 0);
       popPlane(S.rib, t, o + 1.9, DUR + 5); S.rib.position.set(0, 1.25, 1);
-      popPlane(S.sub, t, o + 2.4, DUR + 5); S.sub.position.set(0, -.45, 1);
+      popPlane(S.sub, t, o + 2.4, DUR + 5, S.subFit); S.sub.position.set(0, -.45, 1);
     }
   }
 
@@ -543,7 +547,14 @@ function render(t) {
 }
 const fadeQuad = new THREE.Mesh(new THREE.PlaneGeometry(VW * 2, VH * 2), new THREE.MeshBasicMaterial({ color: 0xfff4fa, transparent: true, opacity: 0, depthTest: false, toneMapped: false }));
 fadeQuad.position.z = -1; fadeQuad.renderOrder = 999; camera.add(fadeQuad);
-window.render = t => { fadeQuad.material.opacity = eio(seg(t, DUR - .9, DUR)) + (1 - eo3(seg(t, 0, .5))); render(t); };
+const FILM = segs.filter(s => s.type === 'film');
+window.render = async t => {
+  const F = FILM.find(s => t >= s.start && t < s.end);
+  if (F) return F.film.render(t);
+  const after = FILM.find(s => t >= s.end && t < s.end + .6);   // keluar dari bab filem: putih → pastel
+  fadeQuad.material.opacity = Math.min(1, eio(seg(t, DUR - .9, DUR)) + (1 - eo3(seg(t, 0, .5))) + (after ? 1 - eo3(seg(t, after.end, after.end + .6)) : 0));
+  render(t);
+};
 window.DUR = DUR;
 window.ready = true;
 if (!new URLSearchParams(location.search).has('still')) {

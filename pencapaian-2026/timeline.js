@@ -20,6 +20,14 @@ export function buildTimeline() {
     return p;
   };
   CHAPTERS.forEach((ch, ci) => {
+    if (ch.gaya === 'filem') {   // bab dokumentari: pembuka hitam → syot → kad akhir emas
+      const s0 = t, shots = []; let u = s0 + 2 * BAR;
+      E(s0, 'burnIn'); E(s0 + .6, 'filmTitle');
+      ch.shots.forEach((sh, k) => { shots.push({ ...sh, start: u, end: u + sh.dur }); E(u, 'cut', { k }); if (sh.video) E(u, 'clipAudio', { dur: sh.dur }); u += sh.dur; });
+      const fin = { start: u, end: u + 2 * BAR }; E(u - 1.6, 'riser'); E(u, 'goldHit'); E(fin.end - .7, 'burnOut');
+      seg.push({ type: 'film', ci, start: s0, end: fin.end, shots, fin });
+      t = fin.end; return;
+    }
     const first = ci === 0, s = t, dur = ch.hero ? 4 * BAR : 2 * BAR;
     const o = { type: 'opener', ci, start: s, end: s + dur, first };
     o.titleIn = first ? s + 1.1 : s - .35; o.titleOut = s + (ch.hero ? 4.5 : 4.0);

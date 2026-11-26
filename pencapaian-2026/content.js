@@ -35,7 +35,19 @@ export const CHAPTERS = [
         sub: 'Kementerian Pendidikan', foto: [{ f: 'foto/dpd/ampd2.jpg' }] },
     ],
   },
+  {
+    // Bab gaya DOKUMENTARI SINEMATIK (warna filem, grain, letterbox, kamera perlahan)
+    gaya: 'filem', nama: ['MAJLIS DUTA 2026'], sub: 'Digital Utilisation and Technology Awards', kecil: 'Kementerian Pendidikan',
+    shots: [
+      // video distabilkan (vid.stab) → bingkai JPEG: bahan/duta_vid/001.jpg … (lihat tools/duta_video.sh)
+      { video: 'bahan/duta_vid', fps: 25, n: 150, dur: 6.0, lower: ['Detik Penyerahan', 'SK Sultan Omar, Terengganu'] },
+      { f: 'foto/duta/3.jpg', crop: 100, gerak: 'masuk', dur: 5.25, lower: ['Anugerah Emas', 'Pendidikan Digital Terbaik · Sekolah Rendah'] },
+      { f: 'foto/duta/2.jpg', crop: 100, gerak: 'kiri', dur: 4.5 },
+      { f: 'foto/duta/1.jpg', crop: 100, gerak: 'keluar', dur: 4.5, lower: ['Sumbangan', 'RM1,200'] },
+    ],
+    akhir: { atas: 'ANUGERAH EMAS', tengah: 'Pendidikan Digital Terbaik · Sekolah Rendah', bawah: 'SK SULTAN OMAR · TERENGGANU', kecil: 'Majlis DUTA 2026' },
+  },
 ];
 
 // Penutup: kad polaroid (maks 5) + "TAHNIAH!"
-export const OUTRO = ['foto/5.jpg', 'foto/3.jpg', 'foto/1.jpg', 'foto/dpd/pasukan.jpg', 'foto/dpd/ampd2.jpg'];
+export const OUTRO = ['foto/3.jpg', 'foto/1.jpg', 'foto/duta/3.jpg', 'foto/dpd/pasukan.jpg', 'foto/dpd/ampd2.jpg'];

@@ -5,7 +5,7 @@ import os, json
 import numpy as np, soundfile as sf
 HERE = os.path.dirname(os.path.abspath(__file__))
 TL = json.load(open(os.path.join(HERE, 'out/timeline.json')))   # dari: node tools/timeline.mjs
-DUR = TL['DUR']; EV = TL['ev']; BIG = TL['big']; OUT = DUR - 9.0
+DUR = TL['DUR']; EV = TL['ev']; BIG = TL['big']; FILM = TL.get('film', []); OUT = DUR - 9.0
 SR = 44100; N = int((DUR + 1) * SR)
 mus = np.zeros((N, 2)); sfx = np.zeros((N, 2))
 rng = np.random.default_rng(3)
@@ -82,6 +82,7 @@ for k, m in enumerate([72, 76, 79, 84, 79, 76, 79, 84]): add(mus, glock(m, 1.4),
 t = intro_end
 while t < DUR - 1.2:
     bar = int(round((t - intro_end) / BAR)); c = chord_at(t - intro_end); ch = CH[c]
+    if any(a - .01 <= t < b - .01 for a, b in FILM): t += BAR; continue   # bab filem: skor sinematik sendiri
     big = t >= OUT or any(a - .1 <= t < b for a, b in BIG)   # anugerah klimaks + penutup: lapisan tambahan
     for e in range(8):
         s = t + e*B/2; mi = MOT[bar % 4][e]
@@ -103,6 +104,35 @@ while t < DUR - 1.2:
 # akord akhir
 for j, m in enumerate([48, 60, 64, 67, 72, 76, 79, 84]): add(mus, glock(m, 3.5) if m > 70 else ks(m, 3, .5, .9995), DUR - 1.4 + j*.03, .14, (j/7-.5)*.6)
 add(mus, kick(), DUR - 1.4, .5)
+
+# ---------------- SKOR SINEMATIK (bab filem) ----------------
+def piano(m, d=3.0):
+    f = mtof(m); t = tt(d)
+    x = sum(a * np.sin(2*np.pi*f*k*np.sqrt(1 + .0004*k*k)*t) * np.exp(-t*(.9 + k*.5)) for k, a in [(1,1),(2,.45),(3,.22),(4,.12),(5,.06)])
+    return fade(x * np.minimum(1, t*300) * .5, 30)
+def pad(ms, d, cut=900):   # string: saw terdetun, penapis lembut, attack & release panjang
+    t = tt(d); x = np.zeros(len(t))
+    for m in ms:
+        f = mtof(m)
+        for k in (-1, 0, 1): x += 2*((t*f*(1 + k*.003) + rng.random()) % 1) - 1
+    x = fband(x, 60, cut) / (len(ms)*3)
+    return x * np.clip(t/1.2, 0, 1) * np.clip((d - t)/1.0, 0, 1)
+PROG = [[57,60,64],[53,57,60],[48,55,64],[55,59,62]]
+for a, b in FILM:
+    L = b - a
+    add(mus, pad([33, 40, 45], L, 300) * np.clip(tt(L)/2.5, 0, 1), a, .55)                  # drone A
+    for k in range(int(L / BAR)):
+        s0 = a + k*BAR; ch = PROG[k % 4]
+        add(mus, piano(ch[0] - 12, 3.2), s0, .32, -.2)
+        for j, m in enumerate(ch): add(mus, piano(m + 12, 2.6), s0 + (j + 1)*B*.75, .16, (j - 1)*.3)
+        if k % 2 == 1: add(mus, piano([76, 72, 74, 71][(k//2) % 4] + 0, 3.0), s0 + B*2, .14, .25)
+        if k >= 3: add(mus, pad([m + 12 for m in ch], BAR + 1.0, 700 + 120*k), s0, .07 + .012*k, 0)   # string memuncak
+    # projektor: klik 24 Hz + desis
+    pr = np.zeros(int(L*SR)); ck = fband(noise(.004), 1500, 6000) * envx(.004, .001)
+    for i in range(int(L*24)): o = int(i/24*SR); pr[o:o+len(ck)] += ck * (.6 + .4*rng.random())
+    pr += fband(noise(L), 3000, 9000) * .05
+    add(sfx, pr * np.clip(tt(L)/.8, 0, 1) * np.clip((L - tt(L))/.8, 0, 1), a, .12)
+CLIP = os.path.join(HERE, 'bahan/duta_audio.wav')
 
 # ---------------- KESAN BUNYI (dari garis masa yang sama dengan main.js) ----------------
 duck = np.ones(N)
@@ -126,6 +156,17 @@ for e in EV:
     elif k == 'confettiExtra': add(sfx, confpop(), t, .35); add(sfx, sparkle(6, 91), t, .25)
     elif k == 'confetti': add(sfx, confpop(), t, .3)
     elif k == 'ding': add(sfx, ding(96), t, .3)
+    elif k == 'burnIn': add(sfx, whoosh(.9, False), t - .2, .45); add(sfx, boom(), t, .45)
+    elif k == 'filmTitle': add(sfx, piano(81, 3.5), t, .2, .2)
+    elif k == 'riser':
+        d = 1.6; x = fband(noise(d), 800, 9000) * (tt(d)/d)**2.5; add(sfx, x, t, .35)
+    elif k == 'goldHit':
+        add(sfx, boom(), t, .8); add(sfx, sparkle(6, 96), t + .05, .25)
+        for j, m in enumerate([45, 57, 64, 69, 72, 76]): add(mus, pad([m], 4.2, 2500) if m > 50 else piano(m, 4.5), t, .1 if m > 50 else .4, (j/5 - .5)*.6)
+    elif k == 'burnOut': add(sfx, whoosh(.9, True), t, .45)
+    elif k == 'clipAudio' and os.path.exists(CLIP):
+        x, sr = sf.read(CLIP); x = x.mean(1) if x.ndim > 1 else x; n = int(e['dur']*SR); x = x[:n]
+        add(sfx, x * np.clip(tt(len(x)/SR)/.5, 0, 1) * np.clip((len(x)/SR - tt(len(x)/SR))/.6, 0, 1), t, .22)
 
 mix = mus * duck[:, None] * .9 + sfx
 mix[:int(.02*SR)] *= np.linspace(0, 1, int(.02*SR))[:, None]
