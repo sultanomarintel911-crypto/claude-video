@@ -1,0 +1,8 @@
+{
+  "dur": 45,
+  "bpm": 120,
+  "sections": {
+    "spiral": [0, 4], "marquee": [4, 8], "tunnel": [8, 12], "stacks": [12, 16], "carpet": [16, 20],
+    "window": [20, 24], "ring": [24, 28], "single": [28, 32], "sphere": [32, 40], "end": [40, 45]
+  }
+}
