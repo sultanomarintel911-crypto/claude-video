@@ -7,11 +7,12 @@
 html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}
 </style></head><body><canvas id="c" width="1920" height="1080"></canvas>
 <script>
-// ───────── Teaser "Bukti Bertaburan" · Tokoh Murid 2026 · kad 3D + tipografi kinetik ─────────
+// ───────── Teaser "Bukti Bertaburan" v2 · Tokoh Murid 2026 · kad 3D + tipografi kinetik ─────────
+// v2: enam babak 8 s, gerakan ease in-out, lebur silang 0.8 s, tiada kerangka pemain; hanya 18 penyertaan, 4 negara, 2× Johan, satu kad "?", sfera.
 // Kanvas 2D deterministik (window.render(t)). Kad ialah segi empat dalam ruang 3D, diunjur dengan transformasi afin per kad,
 // disusun mengikut kedalaman. Setiap babak (2 bar @ 120 BPM) ialah satu formasi. Identiti dirahsiakan.
 const W = 1920, H = 1080, FOC = 1150;
-const cv = document.getElementById('c'), x = cv.getContext('2d');
+const cv = document.getElementById('c'); let x = cv.getContext('2d');
 const GOLD = '#F5C542', WHITE = '#F4F1EA', DIM = 'rgba(244,241,234,.55)';
 let FILM, SEC, FR = 0, LAND, TEX = {}, BACK, NOISE = [], REC = null;
 const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
@@ -104,19 +105,19 @@ function drawCards(list, fog = [2600, 5200], filt, both) {
 
 // ── Tipografi kinetik ──
 function tw(s, sz, w = 700, f = 'Disp', ls = 0) { x.save(); x.font = `${w} ${sz}px ${f}`; x.letterSpacing = ls + 'px'; const r = x.measureText(s).width; x.restore(); return r; }
-function words(s, X, Y, sz, t0, t, o = {}) {   // perkataan naik + kabur → tajam, berperingkat; keluar pudar
-  if (t < t0) return; const ws = s.split(' '), al = o.al || 'left', w = o.w || 700, f = o.f || 'Disp', ls = o.ls || 0, out = o.out ? 1 - seg(t, o.out, o.out + .25) : 1;
-  const full = tw(s, sz, w, f, ls); let cx = al === 'center' ? X - full / 2 : al === 'right' ? X - full : X; const sp = tw(' ', sz, w, f, ls);
-  ws.forEach((wd, i) => { const k = seg(t, t0 + i * (o.st ?? .07), t0 + i * (o.st ?? .07) + .38); const e = eo(k), ww = tw(wd, sz, w, f, ls);
-    if (k > 0) { x.save(); x.globalAlpha = e * out; x.font = `${w} ${sz}px ${f}`; x.letterSpacing = ls + 'px'; x.fillStyle = (o.hi && o.hi.includes(i)) ? GOLD : (o.c || WHITE);
-      if (k < 1) x.filter = `blur(${(1 - e) * 14}px)`; x.shadowColor = 'rgba(0,0,0,.55)'; x.shadowBlur = 30; x.fillText(wd, cx, Y + (1 - e) * sz * .45); x.restore(); }
+function words(s, X, Y, sz, t0, t, o = {}) {   // perkataan muncul perlahan: naik sedikit + kabur → tajam (ease in-out), keluar pudar lembut
+  if (t < t0) return; const ws = s.split(' '), al = o.al || 'left', w = o.w || 700, f = o.f || 'Disp', ls = o.ls || 0, out = o.out ? 1 - eio(seg(t, o.out, o.out + .7)) : 1;
+  const full = tw(s, sz, w, f, ls); let cx = al === 'center' ? X - full / 2 : al === 'right' ? X - full : X; const sp = tw(' ', sz, w, f, ls), st = o.st ?? .14, D = o.d ?? 1.0;
+  ws.forEach((wd, i) => { const e = eio(seg(t, t0 + i * st, t0 + i * st + D)), ww = tw(wd, sz, w, f, ls);
+    if (e > 0) { x.save(); x.globalAlpha = e * out; x.font = `${w} ${sz}px ${f}`; x.letterSpacing = ls + 'px'; x.fillStyle = (o.hi && o.hi.includes(i)) ? GOLD : (o.c || WHITE);
+      if (e < 1) x.filter = `blur(${(1 - e) * 8}px)`; x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 30; x.fillText(wd, cx, Y + (1 - e) * sz * .22); x.restore(); }
     cx += ww + sp; });
-  if (REC && t > t0 + ws.length * .07 + .4) REC.push({ id: o.id || s, text: s });
+  if (REC && t > t0 + ws.length * st + D) REC.push({ id: o.id || s, text: s });
 }
 function mono(s, X, Y, sz, a, c = DIM, al = 'left', ls = 3) { x.save(); x.globalAlpha = a; x.font = `500 ${sz}px Mono`; x.letterSpacing = ls + 'px'; x.fillStyle = c; x.textAlign = al; x.fillText(s, X, Y); x.restore(); }
-function pill(s, X, Y, a, c = GOLD, tc = '#111') { if (a <= 0) return; x.save(); x.globalAlpha = a; x.font = '500 22px Mono'; x.letterSpacing = '2px'; const w = x.measureText(s).width + 44; x.fillStyle = c; x.beginPath(); x.roundRect(X - w / 2, Y - 24, w, 48, 24); x.fill(); x.fillStyle = tc; x.textAlign = 'center'; x.fillText(s, X, Y + 8); x.restore(); }
-function bigCount(n, X, Y, sz, t0, t, c = WHITE, dur = .7) { if (t < t0) return; const k = seg(t, t0, t0 + dur), v = Math.round(n * eo(k)); const e = eob(seg(t, t0, t0 + .45));
-  x.save(); x.font = `700 ${sz}px Disp`; x.letterSpacing = '-6px'; x.fillStyle = c; x.globalAlpha = seg(t, t0, t0 + .12); x.translate(X, Y); x.scale(lerp(.7, 1, e), lerp(.7, 1, e)); x.shadowColor = c === GOLD ? 'rgba(245,197,66,.35)' : 'rgba(0,0,0,.5)'; x.shadowBlur = 50; x.fillText(String(v).padStart(2, '0'), 0, 0); x.restore(); }
+function bigCount(n, X, Y, sz, t0, t, c = WHITE, dur = 1.8, out) { if (t < t0) return; const k = eio(seg(t, t0, t0 + dur)), v = Math.round(n * k), e = eio(seg(t, t0, t0 + 1.1)), o = out ? 1 - eio(seg(t, out, out + .7)) : 1;
+  x.save(); x.font = `700 ${sz}px Disp`; x.letterSpacing = '-6px'; x.fillStyle = c; x.globalAlpha = e * o; x.translate(X, Y); const s2 = lerp(.94, 1, e); x.scale(s2, s2); if (e < 1) x.filter = `blur(${(1 - e) * 10}px)`;
+  x.shadowColor = c === GOLD ? 'rgba(245,197,66,.3)' : 'rgba(0,0,0,.45)'; x.shadowBlur = 50; x.fillText(String(v).padStart(2, '0'), 0, 0); x.restore(); }
 function scrim(X, Y, R, a = .55) { const g = x.createRadialGradient(X, Y, 0, X, Y, R); g.addColorStop(0, `rgba(4,5,8,${a})`); g.addColorStop(1, 'rgba(4,5,8,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H); }
 
 // ── Latar setiap babak ──
@@ -124,158 +125,85 @@ const BGC = { spiral: ['#123a40', '#05080a'], marquee: ['#3c1626', '#07060a'], t
   window: ['#0f3530', '#040807'], ring: ['#2a3212', '#060704'], single: ['#1c1a46', '#05050c'], sphere: ['#2c1a4a', '#06050c'], end: ['#1a1238', '#030308'] };
 function bg(k, t) { const [a, b] = BGC[k]; const g = x.createRadialGradient(W * .5 + Math.sin(t * .3) * 120, H * .4, 50, W * .5, H * .5, W * .75); g.addColorStop(0, a); g.addColorStop(1, b); x.fillStyle = g; x.fillRect(0, 0, W, H); }
 
-// ═════════ Babak ═════════
-const N = 90;
-function sSpiral(t, l) {
-  CAM = { p: [0, 0, lerp(-500, 0, eo(seg(l, 0, 1.2)))], yaw: 0, pitch: 0, roll: -.08 };
-  const L = []; for (let i = 0; i < 70; i++) { const s = frac(i / 70 + l * .075), a = s * Math.PI * 7 + i * .9; const R = 300 + 80 * Math.sin(i);
-    const p = [430 + Math.cos(a) * R, Math.sin(a) * R * .8 + lerp(-200, 400, s) - 100, lerp(4200, 380, s)];
-    L.push(card(texOf(i), p, Math.sin(a) * .5, Math.cos(a) * .7 + .4, a * .35, .9, seg(s, 0, .08) * (1 - seg(s, .93, 1)))); }
+// ═════════ Babak (v2: lebih perlahan, lebih sedikit elemen; semua gerakan ease in-out) ═════════
+function sSpiral(t, l) {   // 0–8: 18 penyertaan
+  CAM = { p: [0, 0, lerp(-350, 120, eio(seg(l, 0, 8)))], yaw: 0, pitch: 0, roll: lerp(-.04, -.09, eio(seg(l, 0, 8))) };
+  const L = []; for (let i = 0; i < 30; i++) { const s = frac(i / 30 + l * .028), a = s * Math.PI * 5 + i * 1.3, R = 320 + 60 * Math.sin(i * 2.1);
+    const p = [470 + Math.cos(a) * R, Math.sin(a) * R * .75 + lerp(-160, 300, s) - 70, lerp(4000, 600, s)];
+    L.push(card(texOf(i * 3 + 1), p, Math.sin(a) * .35, Math.cos(a) * .5 + .3, a * .22, 1.0, eio(seg(s, 0, .15)) * (1 - eio(seg(s, .85, 1))))); }
   drawCards(L, [3000, 4300]);
-  scrim(420, 520, 700, .5);
-  mono('REKOD · BUKTI · 2026', 150, 330, 22, seg(l, .3, .6));
-  bigCount(18, 140, 600, 300, .5, l, WHITE, .9);
-  words('penyertaan direkod.', 150, 700, 64, 1.2, l, { c: WHITE, out: 3.7 }); words('Setiap satu meninggalkan jejak.', 152, 770, 40, 1.9, l, { c: DIM, w: 600, out: 3.7 });
+  scrim(430, 540, 720, .45);
+  bigCount(18, 150, 610, 320, 1.0, l, WHITE, 2.0, 7.0);
+  words('penyertaan.', 160, 720, 76, 2.2, l, { out: 7.0 });
 }
-function sMarquee(t, l) {
-  CAM = { p: [0, 0, lerp(400, 0, eo(seg(l, 0, .8)))], yaw: 0, pitch: 0, roll: 0 };
-  const L = [], sp = 250; for (let j = -3; j <= 3; j++) for (let k = -8; k <= 8; k++) { const dir = j % 2 ? 1 : -1, off = frac(l * .45 * (1 + Math.abs(j) * .15)) * sp * dir;
-    let p = [k * sp + off, j * 300, 0]; p = rot(p, .25, -.55, .05); p = add(p, [0, 0, 1700]); const tex = texOf(j * 17 + k + 40);
-    L.push(cardUV(tex, p, rot([1, 0, 0], .25, -.55, .05), rot([0, -1, 0], .25, -.55, .05), .95)); }
-  drawCards(L, [2600, 4200]);
-  scrim(W / 2, H / 2, 820, .72);
-  bigCount(6, W / 2 - 220, 600, 300, .35, l, GOLD, .6);
-  words('peringkat kebangsaan.', W / 2, 720, 70, .9, l, { al: 'center', out: 3.7 });
-  mono('KEBANGSAAN 6 · NEGERI 4 · ZON 3 · DAERAH 5', W / 2, 800, 24, seg(l, 1.6, 1.9) * (1 - seg(l, 3.7, 3.95)), DIM, 'center');
+function sTunnel(t, l) {   // 8–16: 04 negara
+  CAM = { p: [0, 0, 0], yaw: Math.sin(l * .25) * .03, pitch: 0, roll: lerp(0, .35, eio(seg(l, 0, 8))) };
+  const L = [], sp = 460; for (let k = 0; k < 9; k++) { const z = k * sp + 300 - frac(l * .55) * sp; for (let i = 0; i < 7; i++) { const a = i / 7 * Math.PI * 2 + k * .45 + l * .1, R = 640;
+    L.push(cardUV(texOf(k * 7 + i + 3), [Math.cos(a) * R, Math.sin(a) * R, z], [-Math.sin(a), Math.cos(a), 0], [0, 0, -1], 1.05, eio(seg(z, 250, 700)))); } }
+  drawCards(L, [2800, 4400]);
+  scrim(W / 2, H / 2, 640, .55);
+  bigCount(4, W / 2 - 500, 600, 300, .9, l, WHITE, 1.4, 7.0);
+  words('negara.', W / 2 - 40, 600, 128, 1.8, l, { out: 7.0 });
 }
-function sTunnel(t, l) {
-  CAM = { p: [0, 0, 0], yaw: Math.sin(l * .6) * .05, pitch: 0, roll: l * .12 };
-  const L = []; const sp = 380; for (let k = 0; k < 12; k++) { const z = k * sp + 250 - frac(l * 2.4) * sp; for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2 + k * .35 + l * .35, R = 620;
-    const p = [Math.cos(a) * R, Math.sin(a) * R, z]; const u = [-Math.sin(a), Math.cos(a), 0], v = [0, 0, -1]; L.push(cardUV(texOf(k * 9 + i + 3), p, u, v, 1.05, seg(z, 150, 420))); } }
-  drawCards(L, [2800, 4600]);
-  scrim(W / 2, H / 2, 600, .6);
-  bigCount(4, W / 2 - 440, 570, 280, .3, l, WHITE, .5);
-  words('negara.', W / 2 - 60, 570, 120, .7, l, { out: 3.7 });
-  mono('≈ 22,844 KM DARI DUNGUN', W / 2, 680, 26, seg(l, 1.3, 1.6) * (1 - seg(l, 3.7, 3.95)), GOLD, 'center');
-  mono('▇▇▇▇▇  ·  ▇▇▇▇  ·  ▇▇▇▇▇▇  ·  ▇▇▇▇▇', W / 2, 740, 22, seg(l, 1.8, 2.1) * (1 - seg(l, 3.7, 3.95)), DIM, 'center');
+function sCarpet(t, l) {   // 16–24: 2× Johan
+  CAM = { p: [0, 420, lerp(-250, 150, eio(seg(l, 0, 8)))], yaw: lerp(.22, .12, eio(seg(l, 0, 8))), pitch: .42, roll: .04 };
+  const L = [], sp = 300; for (let i = -4; i <= 4; i++) for (let j = 0; j < 12; j++) { const z = j * sp + 300 - frac(l * .14) * sp, X = i * sp + 60;
+    const ph = X * .004 + z * .0035 - l * 1.1, y = -200 + Math.sin(ph) * 60, rx = -1.25 + Math.cos(ph) * .18;
+    L.push(card(texOf(i * 5 + j + 11), [X, y, z], rx, .05, 0, .95, eio(seg(z, 220, 700)))); }
+  drawCards(L, [2800, 4300], null, 1);
+  const g = x.createLinearGradient(0, 0, W * .7, 0); g.addColorStop(0, 'rgba(6,5,3,.8)'); g.addColorStop(1, 'rgba(6,5,3,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+  words('2× Johan.', 150, 600, 230, 1.0, l, { c: GOLD, ls: -4, out: 7.0, st: .25 });
 }
-function sStacks(t, l) {
-  CAM = { p: [0, lerp(-300, -120, eo(seg(l, 0, 1))), 0], yaw: lerp(.12, -.06, l / 4), pitch: .12, roll: 0 };
-  const L = []; for (let c = 0; c < 5; c++) { const X = (c - 2) * 390, sp2 = 230, spd = 120 + c * 40; for (let k = -4; k < 9; k++) { const y = k * sp2 + frac(l * spd / sp2 + c * .3) * sp2 - 700;
-    L.push(card(texOf(c * 13 + k + 70), [X, y, 1500 + (c % 2) * 160], -.15, .1 * (c - 2), (hash(c * 31 + k) - .5) * .12, .95, 1 - seg(Math.abs(y), 700, 1000))); } }
-  drawCards(L, [2600, 4200]);
-  scrim(W / 2, 560, 760, .72);
-  bigCount(5, W / 2 - 540, 610, 300, .3, l, WHITE, .5);
-  words('jawatan.', W / 2 - 130, 610, 150, .7, l, { out: 3.7, hi: [] });
-  mono('KEPIMPINAN · PERKHIDMATAN · SUKAN · KELAB', W / 2, 720, 24, seg(l, 1.3, 1.6) * (1 - seg(l, 3.7, 3.95)), DIM, 'center');
-}
-function sCarpet(t, l) {
-  CAM = { p: [0, 420, lerp(-300, 0, eo(seg(l, 0, 1)))], yaw: .18, pitch: .42, roll: .05 };
-  const L = [], sp = 260; for (let i = -7; i <= 7; i++) for (let j = 0; j < 16; j++) { const z = j * sp + 300 - frac(l * .5) * sp, X = i * sp + 40;
-    const y = -200 + Math.sin(X * .004 + z * .0035 - l * 3) * 70; const rx = -1.25 + Math.cos(X * .004 + z * .0035 - l * 3) * .22;
-    L.push(card(texOf(i * 5 + j + 11), [X, y, z], rx, .05, 0, .95, seg(z, 200, 500))); }
-  drawCards(L, [2800, 4400], null, 1);
-  const g = x.createLinearGradient(0, 0, W * .7, 0); g.addColorStop(0, 'rgba(6,5,3,.85)'); g.addColorStop(1, 'rgba(6,5,3,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
-  mono('PENCAPAIAN · REKOD 2026', 150, 330, 22, seg(l, .2, .5));
-  words('2× JOHAN', 140, 560, 220, .35, l, { c: GOLD, ls: -4, out: 3.7 });
-  words('+ 2× KETIGA', 150, 660, 60, 1.0, l, { out: 3.7 });
-  ['DAERAH', 'NEGERI', 'ZON'].forEach((s, i) => pill(s, 210 + i * 170, 750, seg(l, 1.5 + i * .12, 1.7 + i * .12) * (1 - seg(l, 3.7, 3.95)), i < 2 ? GOLD : 'rgba(244,241,234,.18)', i < 2 ? '#111' : WHITE));
-  mono('Bukti sebenar. Bukan rekaan.', 152, 840, 24, seg(l, 2.0, 2.3) * (1 - seg(l, 3.7, 3.95)));
-}
-function sWindow(t, l) {
+function sSingle(t, l) {   // 24–32: satu kad "?" — Seorang murid. → Satu nama.
   CAM = { p: [0, 0, 0], yaw: 0, pitch: 0, roll: 0 };
-  words('Semua bukti. Satu nama.', W / 2, 250, 76, .2, l, { al: 'center', hi: [2, 3], out: 3.75 });
-  const a = eo(seg(l, .1, .5)) * (1 - seg(l, 3.75, 4)), X = 400, Y = 330, w = 1120, h = 520 + (1 - eo(seg(l, .1, .5))) * -60;
-  x.save(); x.globalAlpha = a; x.shadowColor = 'rgba(0,0,0,.6)'; x.shadowBlur = 80; x.shadowOffsetY = 30; x.fillStyle = 'rgba(16,22,24,.88)'; x.beginPath(); x.roundRect(X, Y, w, h, 22); x.fill(); x.shadowColor = 'transparent';
-  x.strokeStyle = 'rgba(255,255,255,.14)'; x.stroke(); ['#FF5F57', '#FEBC2E', '#28C840'].forEach((c, i) => { x.fillStyle = c; x.beginPath(); x.arc(X + 34 + i * 26, Y + 30, 8, 0, 7); x.fill(); });
-  x.fillStyle = 'rgba(255,255,255,.07)'; x.beginPath(); x.roundRect(X + 420, Y + 16, 280, 28, 14); x.fill(); x.restore();
-  mono('fail-kes/tm-26', X + 560, Y + 37, 18, a, DIM, 'center', 1); pill('SULIT', X + w - 70, Y + 30, a * .95);
-  // karusel kad di dalam tetingkap
-  x.save(); x.beginPath(); x.rect(X + 10, Y + 64, w - 20, h - 150); x.clip();
-  CAM = { p: [0, 0, 0], yaw: 0, pitch: 0, roll: 0 }; const L = [], sp = 250; for (let k = -6; k <= 6; k++) { const xx = k * sp - frac(l * .55) * sp; const d = Math.abs(xx) / 900;
-    L.push(card(texOf(k + 200 + Math.floor(l * .55) * 3), [xx, -10, 1500 + d * 200], 0, xx * -.0007, 0, k === 0 ? 1.15 : 1, a)); }
-  drawCards(L, [3000, 5000]); x.restore();
-  const pk = eo(seg(l, .6, 3.2)), n = Math.max(1, Math.round(18 * pk));
-  x.save(); x.globalAlpha = a; x.fillStyle = 'rgba(255,255,255,.1)'; x.fillRect(X + 40, Y + h - 56, w - 80, 6); x.fillStyle = GOLD; x.fillRect(X + 40, Y + h - 56, (w - 80) * pk, 6); x.restore();
-  mono(`MENGUMPUL BUKTI  ${String(n).padStart(2, '0')}/18`, X + 40, Y + h - 76, 20, a, WHITE, 'left', 2); mono(Math.round(pk * 100) + '%', X + w - 40, Y + h - 76, 20, a, GOLD, 'right', 2);
-  mono('NAMA DIRAHSIAKAN   ·   WAJAH DIRAHSIAKAN   ·   KELAS DIRAHSIAKAN', W / 2, Y + h + 70, 20, a * seg(l, 1, 1.3), DIM, 'center');
-}
-function sRing(t, l) {
-  CAM = { p: [0, 160, lerp(-500, 0, eo(seg(l, 0, 1.2)))], yaw: 0, pitch: -.08, roll: 0 };
-  const L = [], n = 28; for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2 + l * .55; const p = [Math.cos(a) * 1050, -170 + Math.sin(a) * 140, 1900 + Math.sin(a) * 700];
-    const u = [-Math.sin(a), 0, Math.cos(a) * .55]; const ul = Math.hypot(...u); L.push(cardUV(texOf(i + 300), p, sc(u, 1 / ul), [0, -1, 0], 1.0)); }
-  const back = L.filter(c => view(c.p)[2] > 1900), front = L.filter(c => view(c.p)[2] <= 1900);
-  drawCards(back, [3200, 5000], null, 1);
-  const a = seg(l, .5, .8) * (1 - seg(l, 3.7, 3.95)), e = eob(seg(l, .5, 1.0));
-  x.save(); x.globalAlpha = a; x.translate(W / 2, 470); x.scale(lerp(.8, 1, e), lerp(.8, 1, e));
-  x.fillStyle = GOLD; x.beginPath(); x.roundRect(-430, -70, 110, 110, 26); x.fill(); x.fillStyle = '#111'; x.beginPath(); for (let k = 0; k < 10; k++) { const ang = -Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? 18 : 40; x.lineTo(-375 + Math.cos(ang) * r, -15 + Math.sin(ang) * r); } x.fill();
-  x.font = '700 104px Disp'; x.fillStyle = WHITE; x.letterSpacing = '-2px'; x.shadowColor = 'rgba(0,0,0,.5)'; x.shadowBlur = 30; x.fillText('Tokoh Murid 2026', -290, 20); x.restore();
-  words('SK Sultan Omar · Dungun', W / 2, 580, 40, 1.0, l, { al: 'center', w: 600, c: DIM, out: 3.7 });
-  pill('Majlis Anugerah Kecemerlangan  →', W / 2, 660, seg(l, 1.5, 1.8) * (1 - seg(l, 3.7, 3.95)));
-  drawCards(front, [3200, 5000], null, 1);
-}
-function sSingle(t, l) {
-  CAM = { p: [0, 0, 0], yaw: 0, pitch: 0, roll: 0 };
-  const k = eo(seg(l, 0, .8)), z = lerp(2600, 1250, k) - seg(l, 2.0, 4) * 500;
-  const c = card(TEX.q, [0, 10, z], Math.sin(l * 1.3) * .12, lerp(Math.PI * 1.5, 0, eo(seg(l, 0, 1.1))) + Math.sin(l * 1.1) * .25, Math.sin(l) * .05, 1.25);
-  const behind = l < 2.0;
-  if (!behind) words('Satu nama.', W / 2, 590, 190, 2.0, l, { al: 'center', out: 3.8 });
+  const z = lerp(2400, 1350, eio(seg(l, 0, 3.5))) - eio(seg(l, 3.8, 7.5)) * 420;
+  const c = card(TEX.q, [0, 10, z], Math.sin(l * .5) * .08, lerp(Math.PI, 0, eio(seg(l, 0, 3.0))) + Math.sin(l * .45) * .18, 0, 1.25, eio(seg(l, 0, 1.2)));
+  const behind = l < 3.9;
+  if (!behind) words('Satu nama.', W / 2, 600, 190, 4.1, l, { al: 'center', out: 7.1 });
   drawCards([c], [4000, 6000]);
-  if (behind) words('Seorang murid.', W / 2, 590, 190, .5, l, { al: 'center', out: 1.75 });
+  if (behind) words('Seorang murid.', W / 2, 600, 190, .9, l, { al: 'center', out: 3.2 });
 }
-function sphereCards(l, intro, rad = 640, cz = 1700) {
-  const L = [], n = 110, ga = Math.PI * (3 - Math.sqrt(5)); for (let i = 0; i < n; i++) { const yy = 1 - (i / (n - 1)) * 2, r = Math.sqrt(1 - yy * yy), th = ga * i;
-    let d = [Math.cos(th) * r, yy, Math.sin(th) * r]; d = rot(d, .25, l * .45, 0);
-    const home = [d[0] * rad, d[1] * rad, cz + d[2] * rad], far = [(hash(i) - .5) * 5000, (hash(i + 9) - .5) * 3000, 3500 + hash(i + 3) * 2500];
-    const k = eo(seg(intro, hash(i * 3) * .4, .6 + hash(i * 3) * .4)); const p = [lerp(far[0], home[0], k), lerp(far[1], home[1], k), lerp(far[2], home[2], k)];
+function sphereCards(l, intro, rad = 640, cz = 1700, n = 64) {
+  const L = [], ga = Math.PI * (3 - Math.sqrt(5)); for (let i = 0; i < n; i++) { const yy = 1 - (i / (n - 1)) * 2, r = Math.sqrt(1 - yy * yy), th = ga * i;
+    let d = [Math.cos(th) * r, yy, Math.sin(th) * r]; d = rot(d, .25, l * .16, 0);
+    const home = [d[0] * rad, d[1] * rad, cz + d[2] * rad], far = [(hash(i) - .5) * 4000, (hash(i + 9) - .5) * 2600, 3600 + hash(i + 3) * 2200];
+    const k = eio(seg(intro, hash(i * 3) * .5, 1.5 + hash(i * 3) * .5)); const p = [lerp(far[0], home[0], k), lerp(far[1], home[1], k), lerp(far[2], home[2], k)];
     const up = Math.abs(d[1]) > .98 ? [1, 0, 0] : [0, 1, 0]; const u0 = [up[1] * d[2] - up[2] * d[1], up[2] * d[0] - up[0] * d[2], up[0] * d[1] - up[1] * d[0]]; const ul = Math.hypot(...u0) || 1, u = sc(u0, 1 / ul);
     const v = [d[1] * u[2] - d[2] * u[1], d[2] * u[0] - d[0] * u[2], d[0] * u[1] - d[1] * u[0]];
-    L.push({ c: cardUV(texOf(i + 500), p, sc(u, -1), v, .62), dz: d[2] }); }
+    L.push({ c: cardUV(texOf(i + 500), p, sc(u, -1), v, .7, k), dz: d[2] }); }
   return L;
 }
-function sSphere(t, l) {
-  CAM = { p: [0, 0, lerp(-200, 300, l / 8)], yaw: 0, pitch: 0, roll: Math.sin(l * .4) * .04 };
-  const L = sphereCards(l, l * 1.2);
+function sSphere(t, l) {   // 32–40: Siapakah dia?
+  CAM = { p: [0, 0, lerp(-250, 150, eio(seg(l, 0, 8)))], yaw: 0, pitch: 0, roll: 0 };
+  const L = sphereCards(l, l);
   drawCards(L.filter(q => q.dz >= -.9).map(q => q.c), [3600, 6000]);
-  const hit = eob(seg(l, .15, .6));
-  x.save(); x.globalAlpha = seg(l, .15, .3); x.translate(W / 2, 580); x.scale(lerp(1.3, 1, hit), lerp(1.3, 1, hit)); x.font = '700 200px Disp'; x.letterSpacing = '-6px'; x.textAlign = 'center'; x.fillStyle = WHITE;
-  x.shadowColor = 'rgba(0,0,0,.6)'; x.shadowBlur = 50; x.fillText('Siapakah dia?', 0, 0); x.restore(); if (REC && l > .7) REC.push({ id: 'q', text: 'Siapakah dia?' });
-  drawCards(L.filter(q => q.dz < -.9).map(q => { q.c.a = .32; return q.c; }), [3600, 6000]);
-  mono('IDENTITI: DIRAHSIAKAN', W / 2, 700, 24, seg(l, 1.2, 1.5) * (1 - seg(l, 7.6, 7.9)), GOLD, 'center');
+  words('Siapakah dia?', W / 2, 590, 200, 1.4, l, { al: 'center', ls: -5, st: .3, d: 1.3 });
+  drawCards(L.filter(q => q.dz < -.9).map(q => { q.c.a *= .3; return q.c; }), [3600, 6000]);
 }
-function sEnd(t, l) {
-  CAM = { p: [0, 0, 300], yaw: 0, pitch: 0, roll: 0 };
-  const col = eio(seg(l, 0, .9)), L = sphereCards(8 + l * .8, 99, lerp(640, 40, col), lerp(1700, 1800, col));
-  L.forEach(q => q.c.a = 1 - seg(col, .75, 1)); drawCards(L.map(q => q.c), [3600, 6000]);
-  if (l > .8 && l < 1.05) { x.save(); x.globalAlpha = (1 - seg(l, .85, 1.05)) * .5; x.fillStyle = '#fff'; x.fillRect(0, 0, W, H); x.restore(); }
-  const k = eob(seg(l, .9, 1.5)); if (l > .9) drawCards([card(TEX.q, [0, 120, lerp(3000, 1500, eo(seg(l, .9, 1.5)))], 0, Math.sin(l * .8) * .3, 0, 1.0)], [5000, 7000]);
-  scrim(W / 2, 800, 900, .6);
-  words('Didedahkan di Majlis', W / 2, 860, 64, 1.6, l, { al: 'center' });
-  words('Anugerah Kecemerlangan 2026', W / 2, 936, 64, 1.9, l, { al: 'center', hi: [0, 1, 2] });
-  mono('TOKOH MURID 2026 · SK SULTAN OMAR · DUNGUN', W / 2, 1000, 22, seg(l, 2.6, 2.9), DIM, 'center');
+function sEnd(t, l) {   // 40–45: sfera menguncup ke satu kad, janji majlis
+  CAM = { p: [0, 0, 150], yaw: 0, pitch: 0, roll: 0 };
+  const col = eio(seg(l, 0, 1.8)), L = sphereCards(8 + l, 99, lerp(640, 30, col), 1700);
+  L.forEach(q => q.c.a = 1 - eio(seg(col, .6, 1))); drawCards(L.map(q => q.c), [3600, 6000]);
+  if (l > .9) drawCards([card(TEX.q, [0, 200, lerp(2600, 1250, eio(seg(l, .9, 3.0)))], 0, Math.sin(l * .5) * .2, 0, 1.0, eio(seg(l, .9, 1.9)))], [5000, 7000]);
+  scrim(W / 2, 850, 900, .5);
+  words('Didedahkan di Majlis', W / 2, 870, 62, 1.1, l, { al: 'center' });
+  words('Anugerah Kecemerlangan 2026', W / 2, 946, 62, 1.6, l, { al: 'center', hi: [0, 1, 2] });
 }
 
-// ── Kerangka pemain (label, garis kemajuan, kod masa) ──
-const NAMES = { spiral: 'Spiral · Rekod', marquee: 'Marquee · Peringkat', tunnel: 'Terowong · Negara', stacks: 'Timbunan · Jawatan', carpet: 'Hamparan · Pencapaian', window: 'Fail · Bukti', ring: 'Cincin · Tokoh', single: 'Satu · Subjek', sphere: 'Sfera · Soalan', end: 'Majlis' };
-function chrome(t, k) {
-  const a = seg(t, .2, .6) * (1 - seg(t, 44.2, 44.8));
-  mono('TOKOH MURID 2026', 60, 64, 18, a * .9, WHITE, 'left', 2); mono('KES TM-26', W - 60, 64, 18, a * .7, DIM, 'right', 2);
-  x.save(); x.globalAlpha = a; x.fillStyle = 'rgba(255,255,255,.14)'; x.fillRect(60, H - 46, W - 120, 2); x.fillStyle = GOLD; x.fillRect(60, H - 46, (W - 120) * t / 45, 2); x.beginPath(); x.arc(60 + (W - 120) * t / 45, H - 45, 5, 0, 7); x.fill(); x.restore();
-  x.save(); x.globalAlpha = a; x.fillStyle = GOLD; x.beginPath(); x.arc(66, H - 70, 4, 0, 7); x.fill(); x.restore(); mono(NAMES[k], 80, H - 64, 16, a * .85, WHITE, 'left', 1);
-  mono(`${t.toFixed(2)}s / 45.00s`, W - 60, H - 64, 16, a * .7, DIM, 'right', 1);
-}
-const SCN = { spiral: sSpiral, marquee: sMarquee, tunnel: sTunnel, stacks: sStacks, carpet: sCarpet, window: sWindow, ring: sRing, single: sSingle, sphere: sSphere, end: sEnd };
+const SCN = { spiral: sSpiral, tunnel: sTunnel, carpet: sCarpet, single: sSingle, sphere: sSphere, end: sEnd };
+const BUF = document.createElement('canvas'); BUF.width = W; BUF.height = H;
+function scene(k, t) { const l = t - SEC[k][0]; bg(k, t); SCN[k](t, l); x.setTransform(1, 0, 0, 1, 0, 0); x.globalAlpha = 1; x.filter = 'none'; }
 window.render = function (t) {
   FR = Math.floor(t * 30); x.setTransform(1, 0, 0, 1, 0, 0); x.globalAlpha = 1; x.filter = 'none';
-  const k = Object.keys(SEC).find(n => t >= SEC[n][0] && t < SEC[n][1]) || 'end', l = t - SEC[k][0];
-  bg(k, t); SCN[k](t, l); x.setTransform(1, 0, 0, 1, 0, 0);
-  // kilat potongan (0.1 s) pada setiap babak kecuali yang pertama
-  if (k !== 'spiral' && l < .1) { x.globalAlpha = (1 - l / .1) * .35; x.fillStyle = '#fff'; x.fillRect(0, 0, W, H); x.globalAlpha = 1; }
-  if (t < .35) { x.fillStyle = `rgba(0,0,0,${1 - t / .35})`; x.fillRect(0, 0, W, H); }
-  const v = x.createRadialGradient(W / 2, H / 2, H * .35, W / 2, H / 2, H * 1.0); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.55)'); x.fillStyle = v; x.fillRect(0, 0, W, H);
-  chrome(t, k);
-  x.save(); x.globalCompositeOperation = 'overlay'; x.globalAlpha = .1; const n = NOISE[FR % 6]; for (let gy = 0; gy < H; gy += 256) for (let gx = 0; gx < W; gx += 256) x.drawImage(n, gx, gy); x.restore();
-  const fo = seg(t, 44.3, 45); if (fo > 0) { x.fillStyle = `rgba(0,0,0,${fo})`; x.fillRect(0, 0, W, H); }
+  const ks = Object.keys(SEC), k = ks.find(n => t >= SEC[n][0] && t < SEC[n][1]) || 'end', XF = FILM.xfade;
+  scene(k, t);
+  // lebur silang (ease in-out) ke babak seterusnya pada hujung babak
+  const nx = ks[ks.indexOf(k) + 1]; if (nx && t > SEC[k][1] - XF) { const m = x; const bx = BUF.getContext('2d'); bx.setTransform(1, 0, 0, 1, 0, 0); x = bx; scene(nx, t); x = m;
+    x.save(); x.globalAlpha = eio(seg(t, SEC[k][1] - XF, SEC[k][1])); x.drawImage(BUF, 0, 0); x.restore(); }
+  if (t < .8) { x.fillStyle = `rgba(0,0,0,${1 - eio(t / .8)})`; x.fillRect(0, 0, W, H); }
+  const v = x.createRadialGradient(W / 2, H / 2, H * .35, W / 2, H / 2, H * 1.0); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.5)'); x.fillStyle = v; x.fillRect(0, 0, W, H);
+  x.save(); x.globalCompositeOperation = 'overlay'; x.globalAlpha = .08; const n = NOISE[FR % 6]; for (let gy = 0; gy < H; gy += 256) for (let gx = 0; gx < W; gx += 256) x.drawImage(n, gx, gy); x.restore();
+  const fo = eio(seg(t, 44.1, 45)); if (fo > 0) { x.fillStyle = `rgba(0,0,0,${fo})`; x.fillRect(0, 0, W, H); }
 };
 window.TEXTS = function (t) { REC = []; window.render(t); const r = REC; REC = null; return r; };
 window.EV = [];

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Lagu asli 120 BPM (A minor: Am – F – C – G) + kesan bunyi untuk teaser "Bukti Bertaburan" → out/mix.wav (48 kHz stereo).
 Semua bunyi disintesis dalam kod (numpy). Masa sama dengan film.json / index.html.
-Struktur: intro 0–4 · beat penuh 4–28 · pecahan + riser 28–32 · drop 32–40 · hentakan & ekor 40–45."""
+Struktur v2 (perlahan, separuh masa): intro 0–8 · beat 8–28 · pecahan + riser 28–32 · drop 32–40 · ekor 40–45."""
 import json, os, sys
 import numpy as np, soundfile as sf
 D = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -36,14 +36,14 @@ def hat(open_=False, v=1.0):
     d = .18 if open_ else .05; return hp(noise(d), 7500) * env_exp(d, .06 if open_ else .012) * v * .5
 kicks = []
 for b in range(int(DUR / BEAT)):
-    t = b * BEAT; full = (4 <= t < 28) or (32 <= t < 40)
-    if full:
-        add(drm, kick(1), t, .9); kicks.append(t)
-        if b % 2 == 1: add(drm, clap(1), t, .55, .05)
-    if full or 2 <= t < 4 or 28 <= t < 31:
-        add(drm, hat(False, .8), t + .25, .35, .25); add(drm, hat(False, .5), t + .125, .2, -.25) if full else None
-        if full and b % 4 == 3: add(drm, hat(True, .7), t + .25, .3, .3)
-for k in range(16): add(drm, clap(.5 + k / 24), 31 + k * .0625, .35 + k * .02, 0)   # gulungan sebelum drop
+    t = b * BEAT; full = (8 <= t < 28) or (32 <= t < 40)
+    if full and b % 2 == 0:
+        add(drm, kick(1), t, .8); kicks.append(t)
+        if b % 4 == 2: add(drm, clap(1), t, .45, .05)
+    if full or 4 <= t < 8 or 28 <= t < 31:
+        add(drm, hat(False, .7), t + .25, .22, .25)
+        if full and b % 8 == 7: add(drm, hat(True, .6), t + .25, .22, .3)
+for k in range(8): add(drm, clap(.5 + k / 16), 31 + k * .125, .25 + k * .02, 0)   # gulungan sebelum drop
 add(drm, kick(1.2), 40, 1.0); kicks.append(40)
 
 # ── Sidechain (pam) ──
@@ -53,7 +53,7 @@ for t in kicks:
 
 # ── Bes (lapan) ──
 for b in range(int(DUR / .25)):
-    t = b * .25; full = (4 <= t < 28) or (32 <= t < 40)
+    t = b * .25; full = (8 <= t < 28) or (32 <= t < 40)
     if not full or b % 2 == 0 and False: continue
     if b % 2 == 0: continue   # luar rentak: bes "off-beat" (pada &)
     f = hz(ROOT[chord_at(t)] - 12 + 12 * (t >= 32)); d = .22
@@ -69,25 +69,25 @@ for c in range(12):
     notes = CH[chord_at(t0)]; sig = np.zeros(len(t_(d)))
     for m in notes:
         for det in (-.006, 0, .007): sig += saw(hz(m), d, det)
-    cut = 900 if t0 < 4 else 1500 if t0 < 28 else 700 if t0 < 32 else 2200 if t0 < 40 else 1200
+    cut = 900 if t0 < 8 else 1500 if t0 < 28 else 700 if t0 < 32 else 2200 if t0 < 40 else 1200
     sig = lp(sig, cut) * adsr(d, .4, .5, .8, .6) / 9
     add(mus, sig, t0, .5 if t0 < 40 else .65, 0)
 
 # ── Arpeggio (enam belas, pluck) ──
 arp = np.zeros((N, 2))
-for b in range(int(DUR / .125)):
-    t = b * .125
+for b in range(int(DUR / .25)):
+    t = b * .25
     if 40 <= t and b % 4: continue
     if t >= 44: break
     ch = CH[chord_at(t)]; pat = [0, 1, 2, 1, 2, 0, 1, 2]; m = ch[pat[b % 8]] + 12 + (12 if (b // 8) % 2 and t >= 4 else 0)
     d = .2; s = (saw(hz(m), d) * .6 + np.sign(np.sin(2 * np.pi * hz(m) * t_(d))) * .4)
-    cut = 900 + 2600 * min(1, t / 4) if t < 4 else 3200 if t < 28 else 1200 + 3000 * ((t - 28) / 4) if t < 32 else 4200
-    s = lp(s, min(cut, 7000)) * env_exp(d, .07)
-    add(arp, s, t, .16 + .06 * (t >= 32), .35 if b % 2 else -.35)
+    cut = 900 + 1800 * min(1, t / 8) if t < 8 else 2600 if t < 28 else 1200 + 3000 * ((t - 28) / 4) if t < 32 else 4200
+    s = lp(s, min(cut, 6000)) * env_exp(d, .12)
+    add(arp, s, t, .14 + .04 * (t >= 32), .3 if b % 2 else -.3)
 mus += arp
 # ── Stab drop (32–40): kord pada luar rentak ──
-for b in range(16):
-    t = 32 + b * .5 + .25; ch = CH[chord_at(t)]; d = .18; s = sum(saw(hz(m + 12), d) + saw(hz(m + 12), d, .008) for m in ch)
+for b in range(8):
+    t = 32 + b * 1.0 + .5; ch = CH[chord_at(t)]; d = .18; s = sum(saw(hz(m + 12), d) + saw(hz(m + 12), d, .008) for m in ch)
     add(mus, lp(s, 3500) * env_exp(d, .06) / 4, t, .28, .15 if b % 2 else -.15)
 mus = S.room(mus.astype(np.float32), size=.55, mix=.18)[:N]
 mus *= sc[:, None]
@@ -106,15 +106,11 @@ def flick(v=1.0):
     d = .06; return hp(noise(d), 2500) * env_exp(d, .01) * v
 def ding(v=1.0):
     d = 1.2; tt = t_(d); return (np.sin(2 * np.pi * 1760 * tt) + .4 * np.sin(2 * np.pi * 2640 * tt)) * env_exp(d, .35) * .4 * v
-for c in [4, 8, 12, 16, 20, 24, 28, 32, 40]: add(fx, whoosh(.45, 1), c - .38, .45, 0)
-for t, v in [(.5, .7), (4.35, .8), (8.3, .8), (12.3, .8), (16.35, .8), (24.5, .7), (28.5, .6), (30.0, .7), (32.15, 1.0), (40.0, 1.0)]: add(fx, impact(v), t, .5 * v)
-add(fx, riser(4.0), 28.0, .55); add(fx, riser(1.2, .7), 38.8, .4)
+for c in [8, 16, 24, 32, 40]: add(fx, whoosh(.9, .7), c - .7, .3, 0)
+for t, v in [(1.0, .5), (8.9, .55), (17.0, .6), (24.9, .45), (28.1, .5), (33.4, .9), (40.0, .8)]: add(fx, impact(v), t, .4 * v)
+add(fx, riser(4.0), 28.0, .45)
 r = np.random.default_rng(3)
-for k in range(26): add(fx, flick(.8), .4 + k * .13 + r.random() * .05, .25, r.uniform(-.6, .6))
-for k in range(17): add(fx, tick(.9, 2200 + k * 40), 20.6 + k * (2.6 / 17), .3, .1)
-add(fx, ding(1), 23.2, .5)
-for t in (40.85,): add(fx, whoosh(.3, 1), t, .4)
-
+for k in range(10): add(fx, flick(.6), .9 + k * .55 + r.random() * .1, .15, r.uniform(-.6, .6))
 out = mus * .9 + drm * .85 + fx * .9
 tail = int(.8 * SR); out[-tail:] *= np.linspace(1, 0, tail)[:, None]
 out = np.stack([limit(out[:, c], .5) for c in range(2)], 1)
