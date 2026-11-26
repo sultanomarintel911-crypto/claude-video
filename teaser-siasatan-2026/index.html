@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ms"><head><meta charset="utf-8"><title>Fail Kes TM-26</title>
+<style>
+@font-face{font-family:Sans;src:url(fonts/sans400.woff2) format('woff2');font-weight:400}
+@font-face{font-family:Sans;src:url(fonts/sans700.woff2) format('woff2');font-weight:700}
+@font-face{font-family:Mono;src:url(fonts/mono400.woff2) format('woff2');font-weight:400}
+@font-face{font-family:Mono;src:url(fonts/mono600.woff2) format('woff2');font-weight:600}
+html,body{margin:0;background:#0B0C0E;overflow:hidden}canvas{display:block}
+</style></head><body><canvas id="c" width="1920" height="1080"></canvas>
+<script>
+// ───────── Teaser "Fail Kes TM-26" · Tokoh Murid 2026 · gaya Penyiasatan Visual ─────────
+// Kanvas 2D tunggal, deterministik: window.render(t). Masa bahagian dalam film.json (dikongsi dengan audio/mix.py).
+// Identiti dirahsiakan: tiada nama, wajah, jantina, kelas; butiran program/jawatan/negara dihitamkan.
+const W = 1920, H = 1080;
+const cv = document.getElementById('c'), x = cv.getContext('2d');
+const C = { bg:'#0B0C0E', panel:'#141619', line:'#2E3238', text:'#ECEAE4', dim:'#8B9097', faint:'#4A4F57', acc:'#FF4A2E', paper:'#E4E0D4', ink:'#1D1D1B' };
+const F = { sans:'Sans', mono:'Mono' };
+let FILM = null, SEC = {}, FR = 0, REC = null, LAND50 = null, LAND110 = null, GRAIN = [];
+
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const eo = k => 1 - Math.pow(1 - k, 3), eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const lerp = (a, b, k) => a + (b - a) * k;
+function rnd(s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; let t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const inS = (t, k) => t >= SEC[k][0] && t < SEC[k][1];
+
+// ── Masa peristiwa (sama dengan audio/mix.py) ──
+const ROW_T = i => 5.9 + i * .19, KEB = [0, 1, 3, 5, 6, 9], HL_T = k => 9.7 + k * .32;
+const ARC_T = [14.9, 16.2, 17.5, 18.8], ARC_D = .7, NEG_T = 20.2;
+const LINK_T = i => 22.6 + i * .62, JAW_T = 25.9;
+const K_T = i => 28.3 + i * .4, U_T = i => 30.8 + i * .5;
+const B_T = i => 36.15 + i * .15, BADGE_T = i => 37.0 + i * .12, Q_T = 38.6;
+
+async function boot() {
+  FILM = await (await fetch('film.json')).json(); SEC = FILM.sections; window.DUR = FILM.dur;
+  LAND50 = (await (await fetch('assets/ne_50m_land.geojson')).json()).features;
+  LAND110 = (await (await fetch('assets/ne_110m_land.geojson')).json()).features;
+  await Promise.all(['700 40px Sans', '400 20px Sans', '400 20px Mono', '600 20px Mono'].map(f => document.fonts.load(f)));
+  for (let g = 0; g < 6; g++) { const c = document.createElement('canvas'); c.width = c.height = 256; const gx = c.getContext('2d'); const d = gx.createImageData(256, 256); const r = rnd(g * 99 + 7);
+    for (let i = 0; i < d.data.length; i += 4) { const v = 128 + (r() + r() + r() - 1.5) * 120; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } gx.putImageData(d, 0, 0); GRAIN.push(c); }
+  window.READY = true;
+}
+
+// ── Primitif ──
+function txt(s, X, Y, o = {}) {
+  x.save(); x.font = `${o.w || 400} ${o.s || 24}px ${o.f || F.sans}`; x.fillStyle = o.c || C.text; x.globalAlpha *= (o.a ?? 1);
+  x.textAlign = o.al || 'left'; x.textBaseline = 'alphabetic'; x.letterSpacing = (o.ls || 0) + 'px';
+  if (x.globalAlpha > 0.001) x.fillText(s, X, Y);
+  const w = x.measureText(s).width; x.restore();
+  if (REC && o.id && (o.a ?? 1) > 0.5) { const sz = o.s || 24, x0 = o.al === 'right' ? X - w : o.al === 'center' ? X - w / 2 : X; REC.push({ id: o.id, text: s, x0, y0: Y - sz * .9, x1: x0 + w, y1: Y + sz * .25 }); }
+  return w;
+}
+function tw(s, o = {}) { x.save(); x.font = `${o.w || 400} ${o.s || 24}px ${o.f || F.sans}`; x.letterSpacing = (o.ls || 0) + 'px'; const w = x.measureText(s).width; x.restore(); return w; }
+function hair(x0, y0, x1, y1, c = C.line, w = 1, dash) { x.save(); x.strokeStyle = c; x.lineWidth = w; if (dash) x.setLineDash(dash); x.beginPath(); x.moveTo(x0, y0); x.lineTo(x1, y1); x.stroke(); x.restore(); }
+function rect(X, Y, w, h, c = C.line, lw = 1, dash) { x.save(); x.strokeStyle = c; x.lineWidth = lw; if (dash) x.setLineDash(dash); x.strokeRect(X + .5, Y + .5, w - 1, h - 1); x.restore(); }
+function fill(X, Y, w, h, c) { x.fillStyle = c; x.fillRect(X, Y, w, h); }
+function flashRect(t, at, X, Y, w, h, d = .12) { const k = 1 - seg(t, at, at + d); if (t < at || k <= 0) return; x.save(); x.globalAlpha = k; fill(X, Y, w, h, '#fff'); x.restore(); }
+function cutIn(t, at) { return seg(t, at, at + .06); }
+function bar(X, Y, w, h, c = C.text, a = 1) { x.save(); x.globalAlpha *= a; fill(X, Y, w, h, c); x.restore(); }   // bar penghitaman
+function tag(s, X, Y, o = {}) { const w = txt(s, X + 14, Y, { s: o.s || 16, f: F.mono, c: o.c || C.text, w: 600, ls: 1, a: o.a ?? 1 }); x.save(); x.globalAlpha *= o.a ?? 1; fill(X, Y - 11, 6, 12, o.chip || C.text); x.restore(); return w; }
+function badge(X, Y, t, at) {
+  const k = seg(t, at, at + .06); if (k <= 0) return; x.save(); x.globalAlpha *= k; const s = 1 + .3 * (1 - seg(t, at, at + .18)); x.translate(X, Y); x.scale(s, s);
+  x.fillStyle = 'rgba(11,12,14,0.85)'; x.fillRect(-15, -15, 30, 30); x.strokeStyle = C.acc; x.lineWidth = 2; x.strokeRect(-15, -15, 30, 30);
+  x.beginPath(); x.moveTo(-8, 0); x.lineTo(-2, 7); x.lineTo(9, -7); x.lineWidth = 3; x.stroke(); x.restore(); }
+function ring(cx, cy, r, k, label, side = 1, sub, id) {
+  if (k <= 0) return; x.save(); x.strokeStyle = C.acc; x.lineWidth = 2.5;
+  x.beginPath(); x.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * eo(k)); x.stroke(); x.restore();
+  if (label && k > .6) { const a = seg(k, .6, .75); const lx = cx + side * (r * .72), ly = cy - r * .72, ex = lx + side * 46, ey = ly - 36;
+    x.save(); x.globalAlpha *= a; hair(lx, ly, ex, ey, C.acc, 1.5); hair(ex, ey, ex + side * 14, ey, C.acc, 1.5); x.restore();
+    txt(label, ex + side * 22, ey + 8, { s: 26, w: 700, al: side > 0 ? 'left' : 'right', a, id });
+    if (sub) txt(sub, ex + side * 22, ey + 36, { s: 16, f: F.mono, c: C.dim, al: side > 0 ? 'left' : 'right', a }); }
+}
+function grain(X, Y, w, h, a) { x.save(); x.beginPath(); x.rect(X, Y, w, h); x.clip(); x.globalCompositeOperation = 'overlay'; x.globalAlpha = a; const g = GRAIN[FR % 6];
+  for (let gy = Y; gy < Y + h; gy += 256) for (let gx = X; gx < X + w; gx += 256) x.drawImage(g, gx, gy); x.restore(); }
+function dashBox(X, Y, w, h, t, at, lab) {   // kotak "SUBJEK ?": garis putus merah, tanda soal
+  const k = cutIn(t, at); if (k <= 0) return; x.save(); x.globalAlpha *= k; fill(X, Y, w, h, 'rgba(255,74,46,0.06)'); rect(X, Y, w, h, C.acc, 2, [10, 8]);
+  const pul = .75 + .25 * Math.sin(t * 4.2);
+  txt('?', X + w / 2, Y + h * .64, { s: h * .5, w: 700, c: C.acc, al: 'center', a: pul }); x.restore();
+  if (lab) txt(lab, X, Y - 16, { s: 18, f: F.mono, w: 600, c: C.acc, ls: 2, a: k, id: 'sub' + X });
+}
+function bigNum(n, X, Y, sz, c, lab, a, id) { txt(n, X, Y, { s: sz, w: 700, c, a, id: id + 'n' }); if (lab) txt(lab, X + 6, Y + sz * .26, { s: Math.round(sz * .16), w: 700, c: C.dim, ls: 3, a, id: id + 'l' }); }
+
+// ── Peta (unjuran equirectangular) ──
+function mapDraw(feats, V, X, Y, w, h, o = {}) {
+  const P = (lon, lat) => [X + w / 2 + (lon - V.lon) * V.k, Y + h / 2 - (lat - V.lat) * V.k];
+  x.save(); x.beginPath(); x.rect(X, Y, w, h); x.clip(); fill(X, Y, w, h, '#0E1013');
+  const st = o.grid || 1; x.strokeStyle = '#1A1D21'; x.lineWidth = 1; x.beginPath();
+  for (let lon = Math.floor((V.lon - w / 2 / V.k) / st) * st; lon <= V.lon + w / 2 / V.k; lon += st) { const [px] = P(lon, 0); x.moveTo(px, Y); x.lineTo(px, Y + h); }
+  for (let lat = Math.floor((V.lat - h / 2 / V.k) / st) * st; lat <= V.lat + h / 2 / V.k; lat += st) { const [, py] = P(0, lat); x.moveTo(X, py); x.lineTo(X + w, py); }
+  x.stroke();
+  x.beginPath();
+  for (const f of feats) { const g = f.geometry, polys = g.type === 'Polygon' ? [g.coordinates] : g.coordinates;
+    for (const poly of polys) for (const ring of poly) { ring.forEach(([lo, la], i) => { const [px, py] = P(lo, la); i ? x.lineTo(px, py) : x.moveTo(px, py); }); x.closePath(); } }
+  x.fillStyle = '#1C1F24'; x.fill('evenodd'); x.strokeStyle = '#5A6068'; x.lineWidth = o.lw || 1.2; x.stroke();
+  x.restore(); return P;
+}
+const DUNGUN = [103.42, 4.76];
+const NEG = [[103.82, 1.35], [121.47, 31.23], [28.98, 41.01], [-1.89, 52.49]];   // urutan jarak: dekat → jauh (nama dirahsiakan)
+function km(a, b) { const R = 6371, r = Math.PI / 180, dLa = (b[1] - a[1]) * r, dLo = (b[0] - a[0]) * r;
+  const h = Math.sin(dLa / 2) ** 2 + Math.cos(a[1] * r) * Math.cos(b[1] * r) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
+const KM = NEG.map(p => km(DUNGUN, p));
+
+// ═════════ Bahagian ═════════
+function sOpen(t) {   // 0–5.5: kod kes ditaip → peta Semenanjung ditolak ke Dungun
+  if (t < 1.7) {
+    const l1 = 'FAIL KES · TM-26', n1 = Math.floor(seg(t, .15, .75) * l1.length);
+    fill(160, 452, 8, 16, C.acc);
+    txt(l1.slice(0, n1), 184, 470, { s: 46, f: F.mono, w: 600, ls: 2 });
+    if (t > .8) { const s2 = 'SUBJEK', n2 = Math.floor(seg(t, .8, 1.05) * 6); txt(s2.slice(0, n2), 184, 540, { s: 30, f: F.mono, c: C.dim, ls: 2 });
+      if (t > 1.08) bar(330, 516, lerp(0, 330, eo(seg(t, 1.08, 1.3))), 32, C.text);
+      if (t > 1.3) txt('TIDAK DIKENAL PASTI', 690, 540, { s: 30, f: F.mono, w: 600, c: C.acc, ls: 2, a: cutIn(t, 1.3) }); }
+    if (Math.floor(t * 2.5) % 2 === 0 && t < 1.3) fill(184 + tw(l1.slice(0, n1), { s: 46, f: F.mono, w: 600, ls: 2 }) + 6, 432, 22, 44, C.text);
+    return;
+  }
+  const k = eio(seg(t, 1.7, 5.4)), V = { lon: lerp(102.6, 103.25, k), lat: lerp(4.2, 4.65, k), k: lerp(150, 270, k) };
+  const X = 60, Y = 60, w = 1800, h = 960;
+  const P = mapDraw(LAND50, V, X, Y, w, h, { grid: 1 }); flashRect(t, 1.7, X, Y, w, h);
+  rect(X, Y, w, h); tag('PETA · NATURAL EARTH', X, Y - 18, { a: 0 });
+  // label grid
+  x.save(); x.globalAlpha = .9; for (let lat = 2; lat <= 7; lat++) { const [, py] = P(0, lat); if (py > Y + 20 && py < Y + h - 10) txt(lat + '°U', X + 14, py - 6, { s: 14, f: F.mono, c: C.faint }); }
+  for (let lon = 100; lon <= 106; lon++) { const [px] = P(lon, 0); if (px > X + 60 && px < X + w - 40) txt(lon + '°T', px + 6, Y + h - 14, { s: 14, f: F.mono, c: C.faint }); } x.restore();
+  const [dx, dy] = P(...DUNGUN);
+  x.fillStyle = C.acc; x.beginPath(); x.arc(dx, dy, 6, 0, 7); x.fill();
+  ring(dx, dy, 46, seg(t, 2.3, 2.8), 'DUNGUN', -1, '4.76°U · 103.42°T', 'dg');
+  // lower third
+  const kl = cutIn(t, 3.1); if (kl > 0) { x.save(); x.globalAlpha = kl; const lx = lerp(X + 40, X + 80, eo(seg(t, 3.1, 3.5)));
+    fill(lx, 820, 6, 92, C.acc); txt('SK SULTAN OMAR', lx + 26, 864, { s: 44, w: 700, id: 'lt1' }); txt('DUNGUN · TERENGGANU', lx + 28, 898, { s: 18, f: F.mono, c: C.dim, ls: 3, id: 'lt2' }); x.restore(); }
+  const ks = cutIn(t, 3.8); if (ks > 0) { x.save(); x.globalAlpha = ks; fill(X + w - 520, Y + 40, 480, 120, 'rgba(11,12,14,.85)'); rect(X + w - 520, Y + 40, 480, 120);
+    txt('KES TM-26', X + w - 496, Y + 86, { s: 22, f: F.mono, w: 600, ls: 2, id: 'ks1' }); txt('SUBJEK TIDAK DIKENAL PASTI', X + w - 496, Y + 130, { s: 22, f: F.mono, w: 600, c: C.acc, ls: 1, id: 'ks2' }); x.restore(); }
+}
+
+const LEVEL = ['KEBANGSAAN', 'KEBANGSAAN', 'NEGERI', 'KEBANGSAAN', 'NEGERI', 'KEBANGSAAN', 'KEBANGSAAN', 'NEGERI', 'NEGERI', 'KEBANGSAAN', 'DAERAH', 'ZON', 'DAERAH', 'DAERAH', 'ZON', 'DAERAH', 'DAERAH', 'DAERAH'];
+const RW = (() => { const r = rnd(11); return LEVEL.map(() => { const a = 160 + r() * 240, b = r() < .5 ? 0 : 60 + r() * 120; return [a, Math.min(b, 470 - a - 12) > 40 ? Math.min(b, 470 - a - 12) : 0]; }); })();
+function sRekod(t) {   // 5.5–14: kad rekod bertaip + matriks 18 titik
+  const X = 60, Y = 76, w = 1060, h = 930, ka = cutIn(t, 5.5);
+  x.save(); x.globalAlpha = ka; fill(X, Y, w, h, C.paper); grain(X, Y, w, h, .1); rect(X, Y, w, h, '#bdb8aa'); x.restore();
+  flashRect(t, 5.5, X, Y, w, h);
+  txt('REKOD PENYERTAAN', X + 36, Y + 60, { s: 30, w: 700, c: C.ink, a: ka, id: 'rk1' });
+  txt('TRANSKRIPSI · BUTIRAN DIHITAMKAN', X + w - 36, Y + 58, { s: 15, f: F.mono, w: 600, c: '#6b675e', al: 'right', a: ka });
+  hair(X + 36, Y + 84, X + w - 36, Y + 84, '#a9a496'); const cols = [X + 36, X + 110, X + 640, X + 880];
+  ['NO', 'PROGRAM', 'PERINGKAT', 'STATUS'].forEach((s, i) => txt(s, cols[i], Y + 116, { s: 15, f: F.mono, w: 600, c: '#6b675e', ls: 1, a: ka }));
+  const RH = 42, R0 = Y + 160;
+  LEVEL.forEach((lv, i) => { const at = ROW_T(i); if (t < at) return; const ry = R0 + i * RH, kk = cutIn(t, at);
+    x.save(); x.globalAlpha = kk;
+    const hi = KEB.indexOf(i); if (hi >= 0) { const hk = seg(t, HL_T(hi), HL_T(hi) + .28); if (hk > 0) { x.save(); x.globalCompositeOperation = 'multiply'; fill(X + 24, ry - 28, (w - 48) * eo(hk), RH - 4, 'rgba(255,74,46,0.6)'); x.restore(); } }
+    txt(String(i + 1).padStart(2, '0'), cols[0], ry, { s: 19, f: F.mono, w: 600, c: C.ink });
+    bar(cols[1], ry - 17, RW[i][0], 20, C.ink); if (RW[i][1]) bar(cols[1] + RW[i][0] + 12, ry - 17, RW[i][1], 20, C.ink);
+    txt(lv, cols[2], ry, { s: 19, f: F.mono, w: 600, c: C.ink }); txt('PENYERTAAN', cols[3], ry, { s: 19, f: F.mono, c: C.ink });
+    x.restore(); hair(X + 36, ry + 14, X + w - 36, ry + 14, '#cfcabd'); });
+  // kanan: pembilang + matriks titik
+  const nRow = LEVEL.filter((_, i) => t >= ROW_T(i)).length, nKeb = KEB.filter((_, k) => t >= HL_T(k) + .14).length;
+  const RX = 1200;
+  bigNum(String(nRow).padStart(2, '0'), RX, 300, 230, C.text, 'PENYERTAAN', ka, 'n18');
+  const DX = RX + 10, DY = 470, DS = 62;
+  for (let i = 0; i < 18; i++) { if (t < ROW_T(i)) continue; const cx = DX + (i % 9) * DS + 22, cy = DY + Math.floor(i / 9) * DS + 22, hi = KEB.indexOf(i);
+    const red = hi >= 0 && t >= HL_T(hi) + .14; x.save();
+    if (red) { const s = 1 + .5 * (1 - seg(t, HL_T(hi) + .14, HL_T(hi) + .34)); x.strokeStyle = C.acc; x.lineWidth = 3; x.beginPath(); x.arc(cx, cy, 16 * s, 0, 7); x.stroke(); x.fillStyle = C.acc; x.beginPath(); x.arc(cx, cy, 7, 0, 7); x.fill(); }
+    else { x.fillStyle = C.text; x.globalAlpha = cutIn(t, ROW_T(i)); x.beginPath(); x.arc(cx, cy, 11, 0, 7); x.fill(); } x.restore(); }
+  if (t >= HL_T(0)) { const a = cutIn(t, HL_T(0)); hair(RX, 640, 1860, 640, C.line); bigNum(String(nKeb).padStart(2, '0'), RX, 850, 200, C.acc, 'PERINGKAT KEBANGSAAN', a, 'n06'); }
+}
+
+function sDunia(t) {   // 14–22: peta dunia, 4 lengkung dari Dungun, pin dihitamkan
+  const X = 60, Y = 60, w = 1800, h = 960, k = eio(seg(t, 14, 22));
+  const V = { lon: lerp(70, 66, k), lat: lerp(24, 26, k), k: lerp(9.6, 10.2, k) };
+  const P = mapDraw(LAND110, V, X, Y, w, h, { grid: 15, lw: 1 }); flashRect(t, 14, X, Y, w, h); rect(X, Y, w, h);
+  const [dx, dy] = P(...DUNGUN);
+  let tot = 0;
+  NEG.forEach((p, i) => { const at = ARC_T[i], kk = seg(t, at, at + ARC_D); if (kk <= 0) return; const [px, py] = P(...p);
+    const mx = (dx + px) / 2, my = (dy + py) / 2 - Math.hypot(px - dx, py - dy) * .28, e = eo(kk), N = 48;
+    x.save(); x.strokeStyle = C.acc; x.lineWidth = 2; x.setLineDash([7, 6]); x.beginPath();
+    for (let j = 0; j <= N * e; j++) { const u = j / N, qx = (1 - u) ** 2 * dx + 2 * (1 - u) * u * mx + u * u * px, qy = (1 - u) ** 2 * dy + 2 * (1 - u) * u * my + u * u * py; j ? x.lineTo(qx, qy) : x.moveTo(qx, qy); }
+    x.stroke(); x.restore();
+    tot += KM[i] * e;
+    if (kk >= 1) { x.fillStyle = C.acc; x.beginPath(); x.moveTo(px, py - 9); x.lineTo(px + 8, py); x.lineTo(px, py + 9); x.lineTo(px - 8, py); x.fill();
+      ring(px, py, 26, seg(t, at + ARC_D, at + ARC_D + .4)); badge(px + 40, py - 40, t, at + ARC_D + .1);
+      const lx = px + (i === 3 ? -60 : 52), al = i === 3 ? 'right' : 'left', a = cutIn(t, at + ARC_D + .15);
+      txt('NEGARA 0' + (i + 1), lx, py + 44, { s: 18, f: F.mono, w: 600, c: C.text, al, a, id: 'ng' + i });
+      bar(al === 'left' ? lx : lx - 150, py + 54, 150, 16, C.text, a); }
+  });
+  x.fillStyle = C.acc; x.beginPath(); x.arc(dx, dy, 7, 0, 7); x.fill(); ring(dx, dy, 18 + 4 * Math.sin(t * 5), 1);
+  txt('DUNGUN', dx + 26, dy + 34, { s: 18, f: F.mono, w: 600, a: cutIn(t, 14.2) });
+  // bacaan jarak
+  const JX = X + w - 560; x.save(); fill(JX, Y + 30, 530, 130, 'rgba(11,12,14,.88)'); rect(JX, Y + 30, 530, 130); x.restore();
+  txt('JARAK DARI DUNGUN', JX + 24, Y + 70, { s: 16, f: F.mono, w: 600, c: C.dim, ls: 2 });
+  txt('≈ ' + Math.round(tot).toLocaleString('en-US') + ' KM', JX + 24, Y + 132, { s: 50, f: F.mono, w: 600, c: C.text });
+  if (t >= NEG_T) { const a = cutIn(t, NEG_T); x.save(); x.globalAlpha = a; fill(X + 30, Y + h - 300, 560, 270, 'rgba(11,12,14,.9)'); rect(X + 30, Y + h - 300, 560, 270); x.restore(); flashRect(t, NEG_T, X + 30, Y + h - 300, 560, 270);
+    bigNum('04', X + 60, Y + h - 100, 190, C.acc, 'NEGARA', a, 'n04'); }
+}
+
+const JBOX = [0, 1, 2, 3, 4].map(i => ({ x: 900, y: 120 + i * 168, w: 620, h: 116 }));
+function sJawatan(t) {   // 22–28: skema 5 jawatan → SUBJEK ?
+  flashRect(t, 22, 0, 0, W, H, .1);
+  const SX = 120, SY = 400, SW = 420, SH = 280; dashBox(SX, SY, SW, SH, t, 22.05, 'SUBJEK');
+  JBOX.forEach((b, i) => { const at = LINK_T(i), kk = eo(seg(t, at, at + .4)); if (t < at) return;
+    const x0 = SX + SW, y0 = SY + SH / 2, xm = 720, y1 = b.y + b.h / 2;
+    // garis ortogon: kanan → menegak → kanan
+    const L1 = xm - x0, L2 = Math.abs(y1 - y0), L3 = b.x - xm, L = (L1 + L2 + L3) * kk;
+    x.save(); x.strokeStyle = C.acc; x.lineWidth = 1.6; x.setLineDash([6, 5]); x.beginPath(); x.moveTo(x0, y0);
+    x.lineTo(x0 + Math.min(L, L1), y0); if (L > L1) x.lineTo(xm, y0 + Math.sign(y1 - y0) * Math.min(L - L1, L2)); if (L > L1 + L2) x.lineTo(xm + Math.min(L - L1 - L2, L3), y1); x.stroke(); x.restore();
+    const ab = at + .35, a = cutIn(t, ab); if (a <= 0) return;
+    x.save(); x.globalAlpha = a; fill(b.x, b.y, b.w, b.h, C.panel); rect(b.x, b.y, b.w, b.h); x.restore(); flashRect(t, ab, b.x, b.y, b.w, b.h);
+    txt('JAWATAN 0' + (i + 1), b.x + 28, b.y + 44, { s: 18, f: F.mono, w: 600, c: C.dim, ls: 2, a, id: 'jw' + i });
+    bar(b.x + 28, b.y + 64, 220 + (i * 67 % 200), 24, C.text, a); badge(b.x + b.w - 40, b.y + b.h / 2, t, ab + .1);
+  });
+  if (t >= JAW_T) { const a = cutIn(t, JAW_T); flashRect(t, JAW_T, 1580, 300, 300, 420); bigNum('05', 1590, 560, 230, C.acc, 'JAWATAN', a, 'n05'); }
+  tag('SKEMA', 900, 96, { a: cutIn(t, 22.6), c: C.dim, chip: C.dim });
+}
+
+const KNOWN = ['18 penyertaan', '06 peringkat kebangsaan', '04 negara', '05 jawatan', 'SK Sultan Omar · Dungun'];
+const UNK = ['NAMA', 'WAJAH', 'KELAS'];
+function sPapan(t) {   // 28–36: diketahui / belum diketahui
+  flashRect(t, 28, 0, 0, W, H, .1);
+  const LX = 100, RX = 1060;
+  txt('DIKETAHUI', LX, 170, { s: 30, f: F.mono, w: 600, ls: 4, id: 'pk' }); hair(LX, 196, 900, 196, C.line);
+  txt('BELUM DIKETAHUI', RX, 170, { s: 30, f: F.mono, w: 600, c: C.acc, ls: 4, a: cutIn(t, 30.5), id: 'pu' }); if (t > 30.5) hair(RX, 196, 1820, 196, C.acc);
+  KNOWN.forEach((s, i) => { const at = K_T(i); if (t < at) return; const y = 280 + i * 130, a = cutIn(t, at);
+    badge(LX + 18, y - 14, t, at); txt(s, LX + 64, y, { s: 44, w: 700, a, id: 'kn' + i }); flashRect(t, at, LX - 10, y - 56, 820, 80, .1); });
+  UNK.forEach((s, i) => { const at = U_T(i); if (t < at) return; const y = 300 + i * 190, a = cutIn(t, at);
+    x.save(); x.globalAlpha = a; rect(RX, y - 80, 760, 140, C.acc, 2, [10, 8]); x.restore(); flashRect(t, at, RX, y - 80, 760, 140, .1);
+    txt(s, RX + 36, y - 20, { s: 22, f: F.mono, w: 600, c: C.acc, ls: 3, a, id: 'un' + i });
+    const bw = eo(seg(t, at + .1, at + .5)) * (380 + i * 90); bar(RX + 36, y + 2, bw, 30, C.text, a);
+    txt('?', RX + 720, y + 28, { s: 64, w: 700, c: C.acc, al: 'right', a: a * (.7 + .3 * Math.sin(t * 4 + i)) }); });
+}
+
+// lakaran kecil (peta bukti)
+function thumb(i, X, Y, w, h) {
+  fill(X, Y, w, h, C.panel); rect(X, Y, w, h);
+  if (i === 0) { fill(X + 14, Y + 14, w - 28, h - 28, C.paper); for (let r = 0; r < 7; r++) { const ry = Y + 40 + r * 22; if (r % 3 === 0) { x.save(); x.globalCompositeOperation = 'multiply'; fill(X + 20, ry - 12, w - 40, 16, 'rgba(255,74,46,.6)'); x.restore(); } bar(X + 30, ry - 9, 60 + (r * 37 % 80), 10, C.ink); } }
+  if (i === 1) for (let j = 0; j < 18; j++) { const cx = X + 30 + (j % 6) * ((w - 60) / 5), cy = Y + 50 + Math.floor(j / 6) * 50; x.fillStyle = KEB.includes(j) ? C.acc : C.text; x.beginPath(); x.arc(cx, cy, 7, 0, 7); x.fill(); }
+  if (i === 2) { const P = mapDraw(LAND110, { lon: 60, lat: 25, k: w / 200 }, X + 1, Y + 1, w - 2, h - 2, { grid: 30, lw: .6 }); const [dx, dy] = P(...DUNGUN);
+    NEG.forEach(p => { const [px, py] = P(...p); hair(dx, dy, px, py, C.acc, 1.2, [3, 3]); }); }
+  if (i === 3) { rect(X + 16, Y + h / 2 - 30, 70, 60, C.acc, 1.5, [4, 3]); for (let j = 0; j < 5; j++) { const by = Y + 18 + j * (h - 36) / 5; hair(X + 86, Y + h / 2, X + 120, by + 12, C.acc, 1, [3, 3]); fill(X + 120, by, w - 140, 24, C.line); } }
+}
+const TH = ['REKOD', 'TITIK', 'PETA', 'SKEMA'];
+function sBukti(t) {   // 36–41.5: peta bukti → SUBJEK ?
+  flashRect(t, 36, 0, 0, W, H, .12);
+  const BX = 1180, BY = 330, BW = 600, BH = 420;
+  const pos = [[100, 140], [520, 140], [100, 600], [520, 600]], tw_ = 360, th_ = 260;
+  pos.forEach(([X, Y], i) => { const at = B_T(i); if (t < at) return; thumb(i, X, Y, tw_, th_); flashRect(t, at, X, Y, tw_, th_);
+    txt(TH[i], X, Y - 16, { s: 18, f: F.mono, w: 600, c: C.dim, ls: 2, id: 'th' + i });
+    const kl = eo(seg(t, at + .25, at + .75)), sx = X + tw_, sy = Y + th_ / 2, ex = BX, ey = BY + BH / 2 + (i - 1.5) * 60;
+    hair(sx, sy, lerp(sx, ex, kl), lerp(sy, ey, kl), C.acc, 1.6, [6, 5]); badge(X + tw_ - 22, Y + 22, t, BADGE_T(i)); });
+  dashBox(BX, BY, BW, BH, t, 36.1, 'SUBJEK · KES TM-26');
+  if (t >= Q_T) { const a = cutIn(t, Q_T); txt('SIAPAKAH DIA?', BX, 230, { s: 72, w: 700, a, id: 'q1' }); flashRect(t, Q_T, BX - 10, 150, 640, 100, .1); }
+}
+
+function sAkhir(t) {   // 41.5–45: soalan + janji majlis
+  const k = cutIn(t, 41.5); flashRect(t, 41.5, 0, 0, W, H, .14);
+  fill(120, 330, 10, 150, C.acc);
+  txt('SIAPAKAH DIA?', 160, 460, { s: 150, w: 700, a: k, id: 'e1' });
+  x.save(); x.globalAlpha = k; hair(164, 530, lerp(164, 1500, eo(seg(t, 41.6, 42.2))), 530, C.dim, 1); x.restore();
+  const k2 = cutIn(t, 42.2); txt('Didedahkan di Majlis Anugerah Kecemerlangan 2026', 164, 610, { s: 46, w: 700, a: k2, id: 'e2' });
+  const k3 = cutIn(t, 42.8); txt('TOKOH MURID 2026 · SK SULTAN OMAR · DUNGUN', 166, 672, { s: 22, f: F.mono, w: 600, c: C.dim, ls: 3, a: k3, id: 'e3' });
+  txt('Peta: Natural Earth (domain awam)', 166, 1010, { s: 15, f: F.mono, c: C.faint, a: k3 });
+  const fo = seg(t, 44.2, 45); if (fo > 0) { x.save(); x.globalAlpha = fo; fill(0, 0, W, H, '#000'); x.restore(); }
+}
+
+window.render = function (t) {
+  FR = Math.floor(t * 30); x.setTransform(1, 0, 0, 1, 0, 0); x.globalAlpha = 1; fill(0, 0, W, H, C.bg);
+  if (inS(t, 'open')) sOpen(t); else if (inS(t, 'rekod')) sRekod(t); else if (inS(t, 'dunia')) sDunia(t); else if (inS(t, 'jawatan')) sJawatan(t);
+  else if (inS(t, 'papan')) sPapan(t); else if (inS(t, 'bukti')) sBukti(t); else sAkhir(t);
+};
+window.TEXTS = function (t) { REC = []; window.render(t); const r = REC; REC = null; return r; };
+window.EV = [];
+boot();
+</script></body></html>
