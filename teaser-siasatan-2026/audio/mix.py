@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Adunan teaser "Fail Kes TM-26" → out/mix.wav (48 kHz stereo). Tiada suara; jam ialah rentak.
-Masa peristiwa sama dengan index.html (LAMP_T, FLAP_T, P_T, HL_T, ARC_T, TICK_T, K_T, U_T, STR_T, CAP_T, END_T).
+Masa peristiwa sama dengan index.html (ROW_T, HL_T, ARC_T, LINK_T, K_T, U_T, B_T, BADGE_T).
 Skor: core/audio/sampler (VSCO 2 CE / VCSL, CC0), D minor. Kesan bunyi: core/audio/sfx (sintesis)."""
 import json, os, sys
 import numpy as np, soundfile as sf
@@ -12,27 +12,26 @@ from core.audio.sfx import SR, add, bp, hp, lp, noise, env_exp, t_, whoosh, thum
 F = json.load(open(os.path.join(D, 'film.json'))); DUR = F['dur']
 N = int(DUR * SR); mus = np.zeros((N, 2), np.float32); fx = np.zeros((N, 2), np.float32)
 S.seed(26); rng = np.random.default_rng(26)
-LAMP_T = .5; FLAP_T = 3.4; P_T = lambda i: 4.6 + i * .13
-HL_T = lambda k: 7.2 + k * .55; N18_T = 10.8; N06_T = 11.8; TALLY_T = 12.6
-ARC_T = [15.0, 16.2, 17.4, 18.6]; ARC_D = .7; NEG_T = 20.0; KM_T = 20.6
-TICK_T = lambda i: 23.0 + i * .55; JAW_T = 26.0
-K_T = lambda i: 28.6 + i * .45; U_T = lambda i: 31.6 + i * .6
-STR_T = lambda i: 37.2 + i * .2; CAP_T = 39.6; END_T = 41.5
+ROW_T = lambda i: 5.9 + i * .19; KEB = [0, 1, 3, 5, 6, 9]; HL_T = lambda k: 9.7 + k * .32
+ARC_T = [14.9, 16.2, 17.5, 18.8]; ARC_D = .7; NEG_T = 20.2
+LINK_T = lambda i: 22.6 + i * .62; JAW_T = 25.9
+K_T = lambda i: 28.3 + i * .4; U_T = lambda i: 30.8 + i * .5
+B_T = lambda i: 36.15 + i * .15; BADGE_T = lambda i: 37.0 + i * .12; Q_T = 38.6
 
 ev = []
 def E(*a): ev.append(a)
 # ── Skor ──
 # buka: hentakan pada potongan ke peta; dengung D rendah sepanjang filem
-E(LAMP_T, 'timpani', 'D2', 2.0, .55, 0, .55); E(FLAP_T, 'gran_cassa', 'hit', 1.6, .55, 0, .55)
-for t0, d in [(.5, 13.5), (14.0, 8.0), (22.0, 6.0), (28.0, 8.0)]: E(t0, 'contrabass', 'D2', d, .5, -.15, .5)
-E(.6, 'cellos', 'A2', 4.6, .3, .2, .28)
+E(1.7, 'timpani', 'D2', 2.0, .7, 0, .7); E(1.7, 'gran_cassa', 'hit', 1.6, .6, 0, .6)
+for t0, d in [(1.7, 12.3), (14.0, 8.0), (22.0, 6.0), (28.0, 8.0)]: E(t0, 'contrabass', 'D2', d, .5, -.15, .5)
+E(1.7, 'cellos', 'A2', 3.8, .35, .2, .3)
 # rekod: ostinato pizzicato (lapan = 0.25 s), Dm → B♭ → Gm → A
 pat = [(5.5, ['D4', 'F4', 'A4', 'F4']), (7.5, ['D4', 'F4', 'Bb4', 'F4']), (9.5, ['D4', 'G4', 'Bb4', 'G4']), (11.5, ['C#4', 'E4', 'A4', 'E4'])]
 for i, (t0, p) in enumerate(pat):
     t1 = pat[i + 1][0] if i + 1 < len(pat) else 14.0; k = 0; tt = t0
     while tt < t1 - .01: E(tt, 'violas_pizz', p[k % 4], .3, .42 + .12 * (k % 4 == 0), .25, .42); k += 1; tt += .25
 for t0, r in [(5.5, 'D2'), (7.5, 'Bb1'), (9.5, 'G2'), (11.5, 'A1')]: E(t0, 'cellos', {'D2': 'D3', 'Bb1': 'Bb2', 'G2': 'G2', 'A1': 'A2'}[r], 2.0, .4, .1, .35)
-for k in range(6): E(HL_T(k) + .1, 'glockenspiel', ['D6', 'E6', 'F6', 'A6', 'C7', 'D7'][k], 1.0, .5, -.3 + .12 * k, .42)
+for k in range(6): E(HL_T(k) + .14, 'glockenspiel', ['D6', 'E6', 'F6', 'A6', 'C7', 'D7'][k], 1.0, .5, -.3 + .12 * k, .42)
 # dunia: rentetan lebar, nota pin pada setiap pendaratan
 E(14.0, 'cellos', 'D3', 8.0, .35, .1, .32); E(14.0, 'violas', 'A3', 8.0, .3, -.1, .25); E(16.0, 'violins', 'F4', 6.0, .25, .3, .18)
 for i, p in enumerate(['A5', 'C6', 'D6', 'F6']): E(ARC_T[i] + ARC_D, 'vibraphone', p, 1.8, .5, -.3 + .2 * i, .4); E(ARC_T[i] + ARC_D, 'timpani', 'D2', .8, .35, 0, .3)
@@ -41,7 +40,7 @@ E(NEG_T, 'gran_cassa', 'hit', 1.4, .55, 0, .55); E(NEG_T, 'timpani', 'A2', 1.2, 
 k = 0; tt = 22.0
 while tt < 27.95: E(tt, 'violas_pizz', ['D4', 'F4', 'A4', 'F4'][k % 4] if tt < 25 else ['C#4', 'E4', 'A4', 'E4'][k % 4], .3, .45, .25, .42); k += 1; tt += .25
 E(22.0, 'violins_trem', 'A5', 6.0, .22, .4, .15)
-for i in range(5): E(TICK_T(i) + .1, 'glockenspiel', ['D6', 'F6', 'A6', 'C7', 'D7'][i], 1.0, .5, -.3 + .15 * i, .42)
+for i in range(5): E(LINK_T(i) + .45, 'glockenspiel', ['D6', 'F6', 'A6', 'C7', 'D7'][i], 1.0, .5, -.3 + .15 * i, .42)
 E(JAW_T, 'gran_cassa', 'hit', 1.4, .55, 0, .55); E(JAW_T, 'timpani', 'D2', 1.4, .65, 0, .55)
 # papan: ketegangan minor-second, jantung bes
 E(28.0, 'violins_trem', 'E5', 8.0, .28, .35, .22); E(30.8, 'violins_trem', 'F5', 5.2, .34, -.35, .24); E(28.0, 'cellos', 'D3', 8.0, .42, .1, .38)
@@ -52,8 +51,8 @@ for i in range(3): E(U_T(i), 'timpani', 'D2', .9, .5, 0, .45)
 E(36.0, 'gran_cassa', 'hit', 2.0, .75, 0, .7); E(36.0, 'timpani', 'D2', 2.0, .8, 0, .7)
 for p, pan in [('D2', 0), ('D3', -.2), ('A3', .2), ('E4', -.3), ('F4', .3)]: E(36.0, 'cellos' if p != 'D2' else 'contrabass', p, 5.2, .4, pan, .36)
 for i, p in enumerate(['D4', 'A4', 'E5', 'F5', 'A5', 'D6']): E(36.1 + .22 * i, 'vibraphone', p, 2.2, .45, -.3 + .12 * i, .33)
-for i in range(5): E(STR_T(i) + .1, 'glockenspiel', ['A6', 'C7', 'D7', 'E7', 'F7'][i], .9, .5, -.2 + .13 * i, .4)
-E(CAP_T, 'violins', 'A4', 2.7, .32, .3, .2)
+for i in range(4): E(BADGE_T(i), 'glockenspiel', ['A6', 'C7', 'D7', 'F7'][i], .9, .5, -.2 + .13 * i, .4)
+E(Q_T, 'violins', 'A4', 2.7, .32, .3, .2)
 # akhir: senyap 0.2 s, kemudian hentakan dalam + harpa
 E(41.5, 'gran_cassa', 'hit', 2.4, 1.0, 0, .95); E(41.5, 'timpani', 'D2', 2.6, .9, 0, .85); E(41.5, 'contrabass', 'D2', 3.4, .55, 0, .5)
 for i, p in enumerate(['D3', 'A3', 'E4', 'F4']): E(42.2 + .4 * i, 'harp', p, 2.4, .45, -.2 + .12 * i, .38)
@@ -61,7 +60,7 @@ for i, p in enumerate(['D3', 'A3', 'E4', 'F4']): E(42.2 + .4 * i, 'harp', p, 2.4
 mus += S.render(ev, dur=DUR, master=False)[:N]
 mus = S.room(mus, size=.5, mix=.2)
 # senyap sebelum hentakan akhir
-g = np.ones(N); a, b = int(41.2 * SR), int(41.45 * SR); g[a:b] = np.linspace(1, .05, b - a); mus[:b] *= 1; mus[a:b] *= g[a:b, None]
+g = np.ones(N); a, b = int(41.25 * SR), int(41.5 * SR); g[a:b] = np.linspace(1, .05, b - a); mus[:b] *= 1; mus[a:b] *= g[a:b, None]
 
 # ── Kesan bunyi ──
 def tick(v=1.0, f=2400):
@@ -76,38 +75,32 @@ def typekey(v=1.0):
 def pencil(d=.4, v=1.0):
     return bp(noise(d), 2500, 7000) * (.6 + .4 * np.abs(np.sin(np.pi * t_(d) * 9))) * np.sin(np.pi * t_(d) / d) * .35 * v
 
-def click(v=1.0):      # suis lampu
-    d = .06; return norm(hp(noise(d), 1500) * env_exp(d, .004) + np.sin(2 * np.pi * 95 * t_(d)) * env_exp(d, .01) * .7) * v
-def slide(d=.5, v=1.0): # kertas menggelongsor di atas kayu
-    tt = t_(d); return bp(noise(d), 700, 5000) * np.sin(np.pi * tt / d) ** 1.5 * .55 * v
-def marker(d=.4, v=1.0): # pen marker berdecit
-    tt = t_(d); return bp(noise(d), 1800, 6500) * (.5 + .5 * np.abs(np.sin(2 * np.pi * 7 * tt))) * np.sin(np.pi * tt / d) * .45 * v
-def pinhit(v=1.0):
-    d = .05; return norm(hp(noise(d), 2500) * env_exp(d, .003) + np.sin(2 * np.pi * 1400 * t_(d)) * env_exp(d, .006) * .4) * v
-add(fx, click(1), LAMP_T, .6, -.2); add(fx, click(.6), LAMP_T + .12, .4, -.2)
-for tt in np.arange(1.0, 36.0, .5):
-    add(fx, tick(.5, 2600 if int(tt * 2) % 2 == 0 else 2200), float(tt), .2, .35)          # jam dinding
-add(fx, slide(.45), FLAP_T, .5, 0); add(fx, paper(1), FLAP_T + .2, .4)
-for i in range(7): add(fx, slide(.55, .9), P_T(i), .5, -.5 + i * .16); add(fx, paper(.7), P_T(i) + .45, .3, -.5 + i * .16)
-for k in range(6): add(fx, marker(.32), HL_T(k), .5, -.2)
-add(fx, paper(.8), 10.4, .35, .3)
-for tt, d in [(N18_T, .8), (N06_T, .7), (N06_T + .7, .4), (TALLY_T, .9)]: add(fx, marker(d), tt, .45, .25)
-add(fx, slide(.6), 14.1, .35); add(fx, pinhit(1), 14.6, .4)
-for i in range(4): add(fx, marker(ARC_D, .9), ARC_T[i], .4, -.3 + .2 * i); add(fx, pinhit(1), ARC_T[i] + ARC_D, .5, -.3 + .2 * i)
-for tt, d in [(NEG_T, .6), (KM_T, .6)]: add(fx, marker(d), tt, .45)
-add(fx, slide(.6), 22.0, .35)
-for i in range(5): add(fx, marker(.3), TICK_T(i), .45, .2)
-add(fx, marker(.55), JAW_T, .45); add(fx, marker(.5), JAW_T + .6, .4)
-add(fx, slide(.6), 28.0, .35)
-for i in range(5): add(fx, marker(.38, .8), K_T(i), .4, -.2)
-for i in range(3): add(fx, marker(.3), U_T(i), .45, .3); add(fx, marker(.2, .7), U_T(i) + .3, .4, .3)
-add(fx, slide(.7), 36.0, .35)
-for i in range(5): add(fx, pinhit(1), STR_T(i), .45, -.4 + .2 * i)
-add(fx, marker(.7), CAP_T, .45)
-add(fx, click(1), END_T - .1, .6, -.2)
-for k in range(13): add(fx, typekey(.9), END_T + .2 + k * .054, .32)
-for k in range(48): add(fx, typekey(.7), 42.5 + k * .021, .22)
-add(fx, thump(1.0, 42), END_T, .8)
+for k in range(16): add(fx, typekey(.8 + .2 * rng.random()), .15 + k * .037, .32, .2 * np.sin(k))        # FAIL KES · TM-26
+for k in range(6): add(fx, typekey(.8), .8 + k * .042, .3, -.1)
+add(fx, pencil(.22), 1.08, .35, .1)                                                                       # bar penghitaman
+for k in range(19): add(fx, typekey(.8), 1.3 + k * .02, .28, .2)
+add(fx, whoosh(.3, 1), 1.62, .3); add(fx, shutter(1), 1.7, .5)
+add(fx, pencil(.5), 2.3, .4, -.2); add(fx, paper(1), 3.1, .35); add(fx, typekey(1), 3.8, .4)
+for tt in np.arange(2.0, 28.0, .5):
+    if 14.0 <= tt < 14.6: continue
+    add(fx, tick(.55, 2600 if int(tt * 2) % 2 == 0 else 2200), float(tt), .22, -.2)
+add(fx, paper(1), 5.5, .5, -.3)
+for i in range(18):
+    for k in range(3): add(fx, typekey(.9), ROW_T(i) + k * .045, .3, -.35 + .02 * i)
+for k in range(6): add(fx, pencil(.28), HL_T(k), .45, -.3)
+add(fx, whoosh(.35, 1), 13.9, .35); add(fx, shutter(1), 14.0, .45)
+for i in range(4): add(fx, pencil(ARC_D), ARC_T[i], .3, -.3 + .2 * i); add(fx, shutter(.6), ARC_T[i] + ARC_D, .3, -.3 + .2 * i)
+add(fx, thump(.7, 50), NEG_T, .5)
+add(fx, whoosh(.3, 1), 21.92, .3); add(fx, paper(1), 22.0, .35)
+for i in range(5): add(fx, pencil(.4), LINK_T(i), .35, .2); add(fx, paper(.7), LINK_T(i) + .35, .3, .3)
+add(fx, thump(.7, 50), JAW_T, .5)
+add(fx, whoosh(.3, 1), 27.92, .3)
+for i in range(5): add(fx, typekey(1), K_T(i), .35, -.3); add(fx, shutter(.6), K_T(i), .25, -.3)
+for i in range(3): add(fx, pencil(.4), U_T(i) + .1, .35, .3)
+add(fx, whoosh(.4, 1), 35.9, .35)
+for i in range(4): add(fx, shutter(.7), B_T(i), .3, -.4 + .25 * i); add(fx, pencil(.5), B_T(i) + .25, .25, -.2 + .15 * i)
+for k in range(13): add(fx, typekey(.9), Q_T + k * .03, .3)
+add(fx, thump(1.0, 42), 41.5, .9)
 fx += np.repeat(lp(brown(DUR), 400)[:N, None] * .012, 2, axis=1).astype(np.float32)
 
 out = mus * 3.0 + fx * .8
