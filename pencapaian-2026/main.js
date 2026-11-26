@@ -5,7 +5,9 @@ import { TTFLoader } from 'three/addons/loaders/TTFLoader.js';
 import { Font } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { PROGRAM, AWARDS, SEC, INTRO, DUR } from './content.js';
+import { CHAPTERS, OUTRO, SEKOLAH } from './content.js';
+import { buildTimeline } from './timeline.js';
+const TL = buildTimeline(), DUR = TL.DUR;
 
 const W = innerWidth || 1920, H = innerHeight || 1080, ASP = W / H;
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
@@ -267,27 +269,42 @@ function popPlane(m, t, tin, tout, base = 1) {
 
 // ---------- kad foto (shader: bucu bulat, bingkai polaroid, kilauan, kilat, warna) ----------
 const PHOTO_VS = 'varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }';
-const PHOTO_FS = `varying vec2 vUv; uniform sampler2D map; uniform float aspect, radius, border, cy, shine, flash, op, pAsp, grade;
+const PHOTO_FS = `varying vec2 vUv; uniform sampler2D map; uniform float aspect, radius, border, cy, shine, flash, op, pAsp, grade, fit;
+  vec3 grd(vec3 c){ float l=dot(c,vec3(.299,.587,.114)); c=mix(vec3(l),c,1.+.16*grade); c=(c-.5)*(1.+.08*grade)+.5+.035*grade; return clamp(c,0.,1.); }
   void main(){
     vec2 hs=vec2(aspect,1.)*.5; vec2 p=(vUv-.5)*vec2(aspect,1.);
     vec2 q=abs(p)-(hs-radius); float d=length(max(q,0.))+min(max(q.x,q.y),0.)-radius;
     float a=1.-smoothstep(-.002,.002,d); if(a<=0.) discard;
     vec2 hi=hs-border; vec3 col=vec3(1.,.98,.95);
     if(abs(p.x)<hi.x && abs(p.y)<hi.y){
-      vec2 iu=(p+hi)/(2.*hi); float ia=hi.x/hi.y; float ch=pAsp/ia;   // tinggi potongan (pecahan tinggi foto)
-      float yTop=cy-ch*.5+(1.-iu.y)*ch;
-      vec3 c=texture2D(map,vec2(iu.x,1.-yTop)).rgb;
-      float l=dot(c,vec3(.299,.587,.114)); c=mix(vec3(l),c,1.+.16*grade); c=(c-.5)*(1.+.08*grade)+.5+.035*grade;   // warna lebih 'pop'
-      col=clamp(c,0.,1.);
+      vec2 iu=(p+hi)/(2.*hi); float ia=hi.x/hi.y;
+      float ch=min(1.,pAsp/ia), cw=min(1.,ia/pAsp);      // potongan 'cover' (pecahan tinggi / lebar foto)
+      vec2 cu=vec2(.5+(iu.x-.5)*cw, 1.-(cy-ch*.5+(1.-iu.y)*ch));
+      if(fit<.5){ col=grd(texture2D(map,cu).rgb); }
+      else {
+        float wF=pAsp/ia; float sx=(iu.x-.5)/wF+.5;          // 'contain': penuh tinggi, tepi diisi versi kabur
+        vec3 bg=texture2D(map,vec2(.5+(iu.x-.5)*cw*.9, 1.-(.5+(.5-iu.y)*ch*.9)),5.5).rgb;
+        bg=mix(bg,vec3(1.,.85,.93),.28)*.92;
+        float e=abs(sx-.5)-.5; bg*=1.-.35*exp(-max(e,0.)*wF*ia*14.);   // bayang lembut di tepi foto
+        col = (sx>=0. && sx<=1.) ? grd(texture2D(map,vec2(sx,iu.y)).rgb) : bg;
+      }
     }
     float sb=p.x+p.y*.55-shine; col+=vec3(1.,.97,.9)*exp(-sb*sb/.006)*.55+vec3(1.)*exp(-sb*sb/.06)*.12;
     col=mix(col,vec3(1.),flash);
     gl_FragColor=vec4(col,a*op);
   }`;
-function photoMat(tex, crop) {
+const TEX = {};
+async function loadTex(f) {
+  if (!TEX[f]) TEX[f] = new THREE.TextureLoader().loadAsync(f).then(t => { t.colorSpace = THREE.NoColorSpace; t.anisotropy = 8; t.minFilter = THREE.LinearMipmapLinearFilter; return t; });
+  return TEX[f];
+}
+function photoMat(tex, ph = {}) {
+  const img = tex.image, pAsp = img.width / img.height;
+  const fit = ph.fit ? (ph.fit === 'contain' ? 1 : 0) : (pAsp >= 1.45 ? 0 : 1);
+  const cy = ph.crop != null ? (ph.crop + img.width / ASP / 2) / img.height : .5;
   return new THREE.ShaderMaterial({
     vertexShader: PHOTO_VS, fragmentShader: PHOTO_FS, transparent: true, side: THREE.DoubleSide, toneMapped: false,
-    uniforms: { map: { value: tex }, aspect: { value: ASP }, radius: { value: .05 }, border: { value: .04 }, cy: { value: crop }, shine: { value: -9 }, flash: { value: 0 }, op: { value: 1 }, pAsp: { value: 1.5 }, grade: { value: 1 } },
+    uniforms: { map: { value: tex }, aspect: { value: ASP }, radius: { value: .05 }, border: { value: .04 }, cy: { value: cy }, shine: { value: -9 }, flash: { value: 0 }, op: { value: 1 }, pAsp: { value: pAsp }, grade: { value: 1 }, fit: { value: fit } },
   });
 }
 
@@ -385,157 +402,145 @@ function sparkShow(t, t0, t1, edgeOnly = true) {
   });
 }
 
-// ---------- bina semua elemen ----------
+// ---------- bina semua elemen daripada garis masa ----------
 const ttf = await new TTFLoader().loadAsync('fonts/Fredoka-Bold.ttf');
 font = new Font(ttf);
 await document.fonts.load('700 100px Fredoka');
-const tl = new THREE.TextureLoader();
-const texs = await Promise.all(AWARDS.map(a => tl.loadAsync(a.foto)));
-texs.forEach(t => { t.colorSpace = THREE.NoColorSpace; t.anisotropy = 8; t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; });
 
-// Pembukaan
-const introTitle = word3D([PROGRAM.nama], 3.3, PAL.pink, 24, .8);
-const introSub = pillPlane(PROGRAM.sub, '#7f5cf0', 1.35);
-const introSch = ribbonPlane('PENCAPAIAN ' + PROGRAM.sekolah, 1.7);
-const bigFive = word3D([String(AWARDS.length)], 6.5, PAL.gold, 24, 1.4);
-const bigFiveTxt = word3D(['ANUGERAH', 'DIRANGKUL!'], 1.9, PAL.pink, 11, .6);
-
-// Setiap anugerah
-const awards = AWARDS.map((a, i) => {
-  const pal = PAL[a.warna];
-  const title = word3D(a.title, 2.2, pal, 25, .65);
-  const rib = ribbonPlane(a.ribbon, 1.75);
-  const sub = pillPlane(a.sub, pal.accent, 1.15);
+const cardMesh = async (ph) => {
   const pivot = new THREE.Group(); camera.add(pivot);
-  const card = new THREE.Mesh(new THREE.PlaneGeometry(VW * 1.002, VH * 1.002), photoMat(texs[i], (a.crop + 1125 / 2) / 1333));
-  pivot.add(card);
-  return { a, title, rib, sub, pivot, card, start: INTRO + i * SEC };
-});
-// Penutup
-const outTitle = word3D(['TAHNIAH!'], 3.4, PAL.pink, 17, .9);
-const outSch = ribbonPlane(PROGRAM.sekolah, 1.7);
-const outSub = pillPlane(PROGRAM.nama + ' · ' + PROGRAM.sub, '#7f5cf0', 1.05);
-const polaroids = AWARDS.map((a, i) => {
-  const m = new THREE.Mesh(new THREE.PlaneGeometry(5.0, 5.0 / ASP), photoMat(texs[i], (a.crop + 1125 / 2) / 1333));
-  m.material.uniforms.border.value = .055; m.material.uniforms.radius.value = .06; m.material.uniforms.aspect.value = ASP; scene.add(m); return m;
-});
-const OUT = INTRO + AWARDS.length * SEC;
+  const card = new THREE.Mesh(new THREE.PlaneGeometry(VW * 1.002, VH * 1.002), photoMat(await loadTex(ph.f.f), ph.f));
+  pivot.add(card); pivot.visible = false; return { ...ph, pivot, card };
+};
+const segs = [];
+for (const S0 of TL.seg) {
+  const S = { ...S0 };
+  if (S.type === 'opener') {
+    const ch = CHAPTERS[S.ci];
+    S.title = word3D(ch.nama, ch.nama.length > 1 ? 2.9 : 3.3, PAL[ch.warna], 24, .8);
+    S.sub = pillPlane(ch.sub, '#7f5cf0', 1.35);
+    S.rib = ribbonPlane(ch.ribbon, 1.7);
+    if (S.hero) {
+      S.num = word3D([String(S.hero.n)], 6.5, PAL.gold, 24, 1.4);
+      S.htxt = word3D(ch.hero.teks, 1.9, PAL.pink, 11, .6);
+    }
+  } else if (S.type === 'award' || S.type === 'group') {
+    const pal = PAL[S.it.warna];
+    S.title = word3D(S.it.title, 2.2, pal, 25, .65);
+    S.rib = ribbonPlane(S.it.ribbon, 1.75);
+    S.sub = pillPlane(S.it.sub, pal.accent, 1.15);
+    S.photos = await Promise.all(S.photos.map(cardMesh));
+  } else if (S.type === 'outro') {
+    S.title = word3D(['TAHNIAH!'], 3.4, PAL.pink, 17, .9);
+    S.rib = ribbonPlane(SEKOLAH, 1.7);
+    S.sub = pillPlane(CHAPTERS.map(c => c.nama.join(' ')).join('  ·  '), '#7f5cf0', 1.05);
+    S.pol = await Promise.all(OUTRO.slice(0, 5).map(async f => {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(5.0, 5.0 / ASP), photoMat(await loadTex(f), {}));
+      m.material.uniforms.border.value = .055; m.material.uniforms.radius.value = .06; m.visible = false; scene.add(m); return m;
+    }));
+  }
+  segs.push(S);
+}
+const OUT = segs.find(s => s.type === 'outro');
+const HERO = segs.find(s => s.hero);
 
 // ---------- render(t) ----------
 function render(t) {
-  // kamera: terbang menembusi awan pada pembukaan, kemudian bergoyang lembut
   const fly = eo3(seg(t, 0, 2.2));
-  const outDolly = eio(seg(t, OUT, DUR));
+  const outDolly = eio(seg(t, OUT.start, DUR));
   camera.position.set(Math.sin(t * .31) * .7, Math.cos(t * .23) * .35 + (1 - fly) * 2, lerp(62, 22, fly) - outDolly * 1.2);
   camera.lookAt(Math.sin(t * .31) * .3, (1 - fly) * 1.5, 0);
   camera.rotation.z += Math.sin(t * .5) * .008;
 
-  // dunia
   rays.material.uniforms.rot.value = t * .12;
   rays.material.uniforms.amt.value = .16 + .08 * Math.sin(t * 2);
   clouds.forEach(c => { const u = c.userData; c.position.set(u.z > 0 ? u.x : (((u.x + t * u.sp + 60) % 120) + 120) % 120 - 60, u.y + Math.sin(t * .4 + u.sp * 9) * .3, u.z); });
   balloons.forEach(b => { const u = b.userData; b.position.set(u.x + Math.sin(t * .8 + u.ph) * .6, ((u.y0 + t * u.sp) % 30) - 15, u.z); b.rotation.z = Math.sin(t * 1.1 + u.ph) * .12; });
   bokeh.forEach(s => { const u = s.userData; s.position.set(u.x + Math.sin(t * .2 + u.ph) * 2, u.y + Math.cos(t * .17 + u.ph) * 1.5, u.z); s.scale.setScalar(u.s * (1.1 + .3 * Math.sin(t * 1.3 + u.ph))); });
 
-  // --- pembukaan (0 – INTRO) ---
-  animWord(introTitle, t, 1.1, 4.5, { stagger: .09, drop: 7 });
-  introTitle.position.set(0, 2.4, 0);
-  popPlane(introSub, t, 2.2, 4.4); introSub.position.set(0, -.6, 1);
-  popPlane(introSch, t, 2.8, 4.5); introSch.position.set(0, -3.4, 1);
-  // "5 ANUGERAH DIRANGKUL!" + piala
-  animWord(bigFive, t, 5.0, 8.4, { stagger: 0, drop: 2 }); bigFive.position.set(-5.8, 2.2, 0);
-  bigFive.rotation.y = Math.sin(t * 1.4) * .25;
-  animWord(bigFiveTxt, t, 5.35, 8.4, { stagger: .035 }); bigFiveTxt.position.set(-5.8, -3.6, 1);
-  {
-    const u = seg(t, 4.8, 5.8), v = seg(t, 8.3, 8.9);
-    trophy.visible = u > 0 && v < 1;
-    trophy.scale.setScalar(Math.max(.001, backOut(u, 2.2) * (1 - ei3(v)) * 1.25));
-    trophy.position.set(6.5 + ei3(v) * 10, -3.6 + (1 - eo3(u)) * -8 + Math.sin(t * 2) * .25, 0);
-    trophy.rotation.y = t * 1.3 + (1 - eo3(u)) * 6;
-    trophy.userData.star.rotation.y = t * 3;
+  let fx = null;   // kesan foto aktif terkini
+  trophy.visible = false;
+  for (const S of segs) {
+    const near = t > S.start - 1.5 && t < S.end + 1.5;
+    if (S.type === 'opener') {
+      animWord(S.title, near ? t : -99, S.titleIn, S.titleOut, { stagger: S.first ? .09 : .06, drop: 7 });
+      S.title.position.set(0, S.title.userData.letters.some(l => l.y < 0) ? 1.5 : 2.4, 0);
+      popPlane(S.sub, t, S.subIn, S.titleOut - .1); S.sub.position.set(0, CHAPTERS[S.ci].nama.length > 1 ? -3.1 : -.6, 1);
+      popPlane(S.rib, t, S.ribIn, S.titleOut); S.rib.position.set(0, CHAPTERS[S.ci].nama.length > 1 ? -5.4 : -3.4, 1);
+      if (S.hero) {
+        const H = S.hero;
+        animWord(S.num, near ? t : -99, H.in + .2, H.out, { stagger: 0, drop: 2 }); S.num.position.set(-5.8, 2.2, 0); S.num.rotation.y = Math.sin(t * 1.4) * .25;
+        animWord(S.htxt, near ? t : -99, H.in + .55, H.out, { stagger: .035 }); S.htxt.position.set(-5.8, -3.6, 1);
+        const u = seg(t, H.in, H.in + 1), v = seg(t, H.out - .05, H.out + .55);
+        if (u > 0 && v < 1) {
+          trophy.visible = true;
+          trophy.scale.setScalar(Math.max(.001, backOut(u, 2.2) * (1 - ei3(v)) * 1.25));
+          trophy.position.set(6.5 + ei3(v) * 10, -3.6 + (1 - eo3(u)) * -8 + Math.sin(t * 2) * .25, 0);
+          trophy.rotation.y = t * 1.3 + (1 - eo3(u)) * 6; trophy.userData.star.rotation.y = t * 3;
+        }
+      }
+    } else if (S.type === 'award' || S.type === 'group') {
+      const c = S.card;
+      animWord(S.title, near ? t : -99, c.lettersIn, c.out, { stagger: .035 });
+      S.title.position.set(0, S.it.title.length > 1 ? .9 : 1.1, 0);
+      popPlane(S.rib, t, c.ribIn, c.out - .05); S.rib.position.set(0, 5.0, .5);
+      popPlane(S.sub, t, c.subIn, c.out + .05); S.sub.position.set(0, -3.7, .5);
+      for (const P of S.photos) {
+        const vis = t >= P.fly && t < P.end; P.pivot.visible = vis;
+        if (!vis) continue;
+        const U = P.card.material.uniforms, piv = P.pivot, card = P.card;
+        const e = eo3(seg(t, P.fly, P.land)), land = t - P.land;
+        const z = lerp(-95, -D, e);
+        let sc = lerp(.55, 1, e), px = (1 - e) * 6, py = (1 - e) * -3;
+        if (land > 0) { sc = 1 + .035 * Math.exp(-land * 5) * Math.sin(land * 22); px = Math.sin(land * 53) * .06 * Math.exp(-land * 7); py = Math.cos(land * 47) * .06 * Math.exp(-land * 7); }
+        const f = ei3(seg(t, P.flip, P.end));
+        const L = land > 0 ? 1 : 0;
+        piv.position.set(-VW / 2 * L - f * 1.5, 0, z); piv.rotation.set(0, f * -2.0, 0);
+        card.position.set(VW / 2 * L + px, py, 0);
+        card.rotation.set(0, L ? 0 : (1 - e) * Math.PI * 2, L ? 0 : (1 - e) * .6); card.scale.setScalar(sc);
+        const fr = 1 - eo3(seg(t, P.land - .1, P.land + .25)), fb = eo3(seg(t, P.flip, P.flip + .25));
+        U.border.value = .045 * Math.max(fr, fb); U.radius.value = .06 * Math.max(fr, fb) + .0001;
+        U.flash.value = land > 0 ? Math.max(0, 1 - land * 3.2) * (P.fx === 'mid' ? .5 : .85) : 0;
+        U.shine.value = t < P.land + 1.6 ? lerp(-2.2, 2.2, eio(seg(t, P.land + .5, P.land + 1.6))) : lerp(-2.2, 2.2, eio(seg(t, P.flip - 1.0, P.flip - .1)));
+        if (land >= 0) fx = { P, finale: S.it.finale };
+      }
+    } else if (S.type === 'outro') {
+      const o = S.start;
+      S.pol.forEach((m, i) => {
+        const k = i - (S.pol.length - 1) / 2, u = seg(t, o + .1 + i * .13, o + .9 + i * .13), e = backOut(u, 1.6);
+        m.visible = u > 0;
+        m.position.set(lerp(k * 12, k * 5.25, eo3(u)), lerp(-14, -3.2 - k * k * .28, e) + Math.sin(t * 1.6 + i) * .18, -Math.abs(k) * .9);
+        m.rotation.set(0, -k * .16, k * -.05 + Math.sin(t * 1.2 + i) * .03 + (1 - eo3(u)) * k * .8);
+        m.scale.setScalar(Math.max(.001, e));
+        m.material.uniforms.shine.value = lerp(-3, 3, ((t - o - i * .25) * .35) % 1.5);
+      });
+      animWord(S.title, t, o + 1.0, DUR + 5, { stagger: .07, drop: 6 }); S.title.position.set(1.2, 3.9, 0);
+      popPlane(S.rib, t, o + 1.9, DUR + 5); S.rib.position.set(0, 1.25, 1);
+      popPlane(S.sub, t, o + 2.4, DUR + 5); S.sub.position.set(0, -.45, 1);
+    }
   }
 
-  // --- maskot ---
-  if (t < OUT) {
+  // maskot: kiri bawah; ke kanan semasa babak "N ANUGERAH"; atas-kiri pada penutup
+  if (t < OUT.start) {
     const mi = eo3(seg(t, .6, 1.6));
-    // semasa babak "5 ANUGERAH" maskot melompat ke kanan bawah, kemudian kembali ke kiri untuk kad anugerah
-    const go = eio(seg(t, 4.4, 5.2)) - eio(seg(t, 8.2, 9.0));
+    const go = HERO ? eio(seg(t, HERO.hero.in - .4, HERO.hero.in + .4)) - eio(seg(t, HERO.hero.out - .15, HERO.hero.out + .65)) : 0;
     poseMascot(t, lerp(lerp(-18, -11.5, mi), 11.8, go), -5.2 + Math.sin(go * Math.PI) * 3, 2, 1.25, t < 2 ? mi : 1);
-  } else {
-    const mi = backOut(seg(t, OUT + 1.2, OUT + 1.9));
-    poseMascot(t, -10.6, 3.2, 1, 1.15, mi);
-  }
+  } else poseMascot(t, -10.6, 3.2, 1, 1.15, backOut(seg(t, OUT.start + 1.2, OUT.start + 1.9)));
 
-  // --- anugerah ---
-  let confettiOn = false, starOn = false, sparkOn = false;
-  awards.forEach((A, i) => {
-    const s = A.start, last = i === AWARDS.length - 1;
-    const tIn = s - .45, tFly = s + 2.15, tLand = s + 2.85, tFlip = s + 8.35, tEnd = s + 9.0;
-    animWord(A.title, t, tIn + .25, tFly + .15, { stagger: .035 });
-    A.title.position.set(0, A.a.title.length > 1 ? .9 : 1.1, 0);
-    popPlane(A.rib, t, tIn, tFly + .1); A.rib.position.set(0, 5.0, .5);
-    popPlane(A.sub, t, tIn + .7, tFly + .2); A.sub.position.set(0, -3.7, .5);
-
-    // kad foto
-    const card = A.card, U = card.material.uniforms, piv = A.pivot;
-    const vis = t >= tFly && t < tEnd; piv.visible = vis;
-    if (!vis) return;
-    const u = seg(t, tFly, tLand), e = eo3(u);
-    const land = t - tLand;
-    // terbang: dari jauh di belakang teks, berpusing 1 pusingan, mendarat penuh skrin
-    let z = lerp(-95, -D, e), rx = 0, ry = (1 - e) * Math.PI * 2.0, rz = (1 - e) * .6, sc = lerp(.55, 1, e);
-    let px = (1 - e) * 6, py = (1 - e) * -3;
-    if (land > 0) { const b = Math.exp(-land * 5) * Math.sin(land * 22); sc = 1 + .035 * b; px = Math.sin(land * 53) * .06 * Math.exp(-land * 7); py = Math.cos(land * 47) * .06 * Math.exp(-land * 7); }
-    // keluar: selak seperti muka surat (pangsi di tepi kiri)
-    const f = ei3(seg(t, tFlip, tEnd));
-    piv.position.set(-VW / 2 * (land > 0 ? 1 : 0), 0, 0);
-    card.position.set((land > 0 ? VW / 2 : 0) + px, py, 0);
-    piv.position.z = z; piv.rotation.set(0, f * -2.0, 0);
-    piv.position.x += -f * 1.5;
-    card.rotation.set(rx, land > 0 ? 0 : ry, land > 0 ? 0 : rz); card.scale.setScalar(sc);
-    // bingkai polaroid & bucu bulat semasa terbang → hilang ketika penuh skrin
-    const fr = 1 - eo3(seg(t, tLand - .1, tLand + .25));
-    const fb = eo3(seg(t, tFlip, tFlip + .25));
-    U.border.value = .045 * Math.max(fr, fb); U.radius.value = .06 * Math.max(fr, fb) + .0001;
-    U.flash.value = Math.max(0, 1 - land * 3.2) * (land > 0 ? .85 : 0);
-    U.shine.value = lerp(-2.2, 2.2, eio(seg(t, tLand + .5, tLand + 1.6)));
-    if (t > tLand + 1.6) U.shine.value = lerp(-2.2, 2.2, eio(seg(t, tLand + 3.6, tLand + 4.5)));
-    U.op.value = 1;
-    // kesan
-    if (t >= tLand) { if (confettiBurst(t, tLand, last)) confettiOn = true; starShow(t, tLand, tFlip); starOn = true; sparkShow(t, tLand + .3, tFlip, true); sparkOn = true; }
-    if (last && t >= tLand + 2.2) { confettiBurst(t, tLand + 2.2, true) && (confettiOn = true); }
-  });
-
-  // --- penutup ---
-  const o = OUT;
-  polaroids.forEach((m, i) => {
-    const k = i - 2, u = seg(t, o + .1 + i * .13, o + .9 + i * .13), e = backOut(u, 1.6);
-    m.visible = u > 0;
-    const bob = Math.sin(t * 1.6 + i) * .18;
-    m.position.set(lerp(k * 12, k * 5.25, eo3(u)), lerp(-14, -3.2 - k * k * .28, e) + bob, -Math.abs(k) * .9);
-    m.rotation.set(0, -k * .16, k * -.05 + Math.sin(t * 1.2 + i) * .03 + (1 - eo3(u)) * k * .8);
-    m.scale.setScalar(Math.max(.001, e));
-    m.material.uniforms.shine.value = lerp(-3, 3, ((t - o - i * .25) * .35) % 1.5);
-  });
-  animWord(outTitle, t, o + 1.0, DUR + 5, { stagger: .07, drop: 6 }); outTitle.position.set(1.2, 3.9, 0);
-  popPlane(outSch, t, o + 1.9, DUR + 5); outSch.position.set(0, 1.25, 1);
-  popPlane(outSub, t, o + 2.4, DUR + 5); outSub.position.set(0, -.45, 1);
-  if (t >= o + 1.2) { confettiRain(t, o + 1.2); confettiOn = true; sparkShow(t, o + 1.5, DUR + 5, false); sparkOn = true; }
-  if (t >= .9 && t < INTRO && !confettiOn) { /* tiada */ }
-
-  if (!confettiOn) hide(confetti, CONF_N);
-  if (!starOn) { hide(stars, STARS_N); hide(hearts, HEARTS_N); }
-  if (!sparkOn) sparkShow(t, 1e9, 0);
-  // pembukaan: kilauan bila tajuk mendarat
-  if (t > 1.6 && t < 4.6) sparkShow(t, 1.6, 4.6, false);
-
+  // kesan zarah
+  let conf = false, spk = false;
+  if (fx) {
+    const P = fx.P;
+    if (P.fx !== 'mid') conf = confettiBurst(t, P.land, P.fx === 'gold');
+    if (fx.finale && t >= P.land + 2.2) conf = confettiBurst(t, P.land + 2.2, true) || conf;
+    starShow(t, P.land, P.flip); sparkShow(t, P.land + .3, P.flip, true); spk = true;
+  } else { hide(stars, STARS_N); hide(hearts, HEARTS_N); }
+  if (t >= OUT.start + 1.2) { conf = confettiRain(t, OUT.start + 1.2); sparkShow(t, OUT.start + 1.5, DUR + 5, false); spk = true; }
+  for (const S of segs) if (S.type === 'opener' && !spk && t > S.subIn && t < S.titleOut) { sparkShow(t, S.subIn, S.titleOut, false); spk = true; }
+  if (!conf) hide(confetti, CONF_N);
+  if (!spk) sparkShow(t, 1e9, 0);
   renderer.render(scene, camera);
-  // pudar ke putih pada hujung
-  const fade = seg(t, DUR - .8, DUR);
-  renderer.domElement.style.filter = '';
-  return fade;
 }
-// pudar akhir: lapisan putih dilukis dalam adegan (supaya tangkapan skrin mengandunginya)
 const fadeQuad = new THREE.Mesh(new THREE.PlaneGeometry(VW * 2, VH * 2), new THREE.MeshBasicMaterial({ color: 0xfff4fa, transparent: true, opacity: 0, depthTest: false, toneMapped: false }));
 fadeQuad.position.z = -1; fadeQuad.renderOrder = 999; camera.add(fadeQuad);
 window.render = t => { fadeQuad.material.opacity = eio(seg(t, DUR - .9, DUR)) + (1 - eo3(seg(t, 0, .5))); render(t); };

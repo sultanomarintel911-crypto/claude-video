@@ -1,12 +1,11 @@
 """Muzik asal comel (sintesis numpy: marimba, glockenspiel, ukulele petik, bass petik, kick lembut, tepukan, shaker)
 + kesan bunyi (whoosh, pop, ding, letupan konfeti, kilauan) diselaraskan dengan main.js → out/mix.wav
 106.67 BPM (rentak 0.5625 s, bar 2.25 s), C major. Jalankan: python3 mix.py"""
-import os, re
+import os, json
 import numpy as np, soundfile as sf
 HERE = os.path.dirname(os.path.abspath(__file__))
-src = open(os.path.join(HERE, 'content.js')).read()
-NAW = len(re.findall(r"foto:", src)); SEC = 9.0; INTRO = 9.0; OUT = INTRO + NAW * SEC; DUR = OUT + 9.0
-LAST_TITLE = [len(t) for t in re.findall(r"title: \[([^\]]*)\]", src)]
+TL = json.load(open(os.path.join(HERE, 'out/timeline.json')))   # dari: node tools/timeline.mjs
+DUR = TL['DUR']; EV = TL['ev']; BIG = TL['big']; OUT = DUR - 9.0
 SR = 44100; N = int((DUR + 1) * SR)
 mus = np.zeros((N, 2)); sfx = np.zeros((N, 2))
 rng = np.random.default_rng(3)
@@ -83,7 +82,7 @@ for k, m in enumerate([72, 76, 79, 84, 79, 76, 79, 84]): add(mus, glock(m, 1.4),
 t = intro_end
 while t < DUR - 1.2:
     bar = int(round((t - intro_end) / BAR)); c = chord_at(t - intro_end); ch = CH[c]
-    big = t >= INTRO + (NAW-1)*SEC   # anugerah terakhir + penutup: lapisan tambahan
+    big = t >= OUT or any(a - .1 <= t < b for a, b in BIG)   # anugerah klimaks + penutup: lapisan tambahan
     for e in range(8):
         s = t + e*B/2; mi = MOT[bar % 4][e]
         if mi >= 0:
@@ -105,33 +104,29 @@ while t < DUR - 1.2:
 for j, m in enumerate([48, 60, 64, 67, 72, 76, 79, 84]): add(mus, glock(m, 3.5) if m > 70 else ks(m, 3, .5, .9995), DUR - 1.4 + j*.03, .14, (j/7-.5)*.6)
 add(mus, kick(), DUR - 1.4, .5)
 
-# ---------------- KESAN BUNYI (diselaraskan dengan main.js) ----------------
-add(sfx, whoosh(2.0, True), 0, .35)                                  # kamera terbang menembusi awan
-for k in range(9): add(sfx, pop(79 + [0,2,4,5,7,9,11,12,14][k]), 1.1 + k*.09 + .18, .3, (k/8-.5))   # huruf TERAFECTA
-add(sfx, pop(88), 2.3, .3); add(sfx, pop(91), 2.9, .3); add(sfx, sparkle(), 1.7, .25)
-add(sfx, whoosh(.6, False), 4.4, .3)
-add(sfx, boom(), 5.0, .5); add(sfx, ding(91), 5.0, .3); add(sfx, sparkle(6, 91), 5.2, .25)
-for k in range(10): add(sfx, pop(84 + k), 5.35 + k*.035 + .15, .18, (k/9-.5))
-add(sfx, whoosh(.6, False), 8.35, .3)
-for i in range(NAW):
-    s = INTRO + i*SEC; last = i == NAW - 1
-    add(sfx, pop(86), s - .45 + .1, .3)                               # reben
-    for k in range(min(14, LAST_TITLE[i] if i < len(LAST_TITLE) else 10)): add(sfx, pop(76 + (k*3) % 14), s - .2 + k*.035 + .15, .14, (k/13-.5))
-    add(sfx, pop(93), s + .35, .22)                                     # pil
-    add(sfx, whoosh(.75, True), s + 2.1, .55)                           # kad foto terbang
-    add(sfx, boom(), s + 2.85, .7); add(sfx, ding(96 if not last else 100), s + 2.85, .35)
-    add(sfx, confpop(), s + 2.88, .35); add(sfx, sparkle(), s + 3.2, .22)
-    add(sfx, sparkle(6, 100), s + 3.4, .12); add(sfx, sparkle(6, 103), s + 6.5, .1)   # kilauan sapuan
-    if last: add(sfx, confpop(), s + 5.05, .35); add(sfx, sparkle(6, 91), s + 5.05, .25)
-    add(sfx, whoosh(.6, False), s + 8.35, .35)                          # selak muka surat
-add(sfx, whoosh(.9, True), OUT + .1, .35)
-for k in range(8): add(sfx, pop(84 + [0,2,4,5,7,9,11,12][k]), OUT + 1.0 + k*.07 + .2, .25, (k/7-.5))
-add(sfx, ding(96), OUT + 1.3, .3); add(sfx, confpop(), OUT + 1.2, .3); add(sfx, pop(88), OUT + 2.0, .25); add(sfx, pop(91), OUT + 2.5, .25)
-
-# duck muzik sedikit pada setiap hentakan pendaratan
+# ---------------- KESAN BUNYI (dari garis masa yang sama dengan main.js) ----------------
 duck = np.ones(N)
-for i in range(NAW):
-    a = int((INTRO + i*SEC + 2.85) * SR); d = np.linspace(.55, 1, int(.6*SR)); duck[a:a+len(d)] *= d
+for e in EV:
+    t, k = e['t'], e['k']
+    if k == 'flyin': add(sfx, whoosh(2.0, True), t, .35)
+    elif k == 'letters':
+        for j in range(min(e['n'], 16)): add(sfx, pop(76 + (j * 3) % 14 + 3), t + j * e['st'], .16, (j / max(1, e['n'] - 1) - .5))
+    elif k == 'pop': add(sfx, pop(e['m']), t, .28)
+    elif k == 'sparkle': add(sfx, sparkle(), t, .22)
+    elif k == 'whooshOut': add(sfx, whoosh(.6, False), t, .3)
+    elif k == 'heroHit': add(sfx, boom(), t, .5); add(sfx, ding(91), t, .3); add(sfx, sparkle(6, 91), t + .2, .25)
+    elif k == 'cardFly': add(sfx, whoosh(.75, True), t, .5)
+    elif k == 'land':
+        big = e['fx'] != 'mid'
+        add(sfx, boom(), t, .7 if big else .45); add(sfx, ding(100 if e['fx'] == 'gold' else 96), t, .35 if big else .25)
+        if big: add(sfx, confpop(), t + .03, .35)
+        add(sfx, sparkle(), t + .35, .2); add(sfx, sparkle(6, 100), t + .55, .1)
+        a_ = int(t * SR); d = np.linspace(.55 if big else .75, 1, int(.6 * SR)); duck[a_:a_ + len(d)] *= d[:max(0, N - a_)]
+    elif k == 'flip': add(sfx, whoosh(.6, False), t, .35)
+    elif k == 'confettiExtra': add(sfx, confpop(), t, .35); add(sfx, sparkle(6, 91), t, .25)
+    elif k == 'confetti': add(sfx, confpop(), t, .3)
+    elif k == 'ding': add(sfx, ding(96), t, .3)
+
 mix = mus * duck[:, None] * .9 + sfx
 mix[:int(.02*SR)] *= np.linspace(0, 1, int(.02*SR))[:, None]
 mix = mix[:int(DUR*SR)]; mix[-int(.5*SR):] *= np.linspace(1, 0, int(.5*SR))[:, None]
