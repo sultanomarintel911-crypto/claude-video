@@ -240,7 +240,7 @@ function sSphere(t, l) {
   const hit = eob(seg(l, .15, .6));
   x.save(); x.globalAlpha = seg(l, .15, .3); x.translate(W / 2, 580); x.scale(lerp(1.3, 1, hit), lerp(1.3, 1, hit)); x.font = '700 200px Disp'; x.letterSpacing = '-6px'; x.textAlign = 'center'; x.fillStyle = WHITE;
   x.shadowColor = 'rgba(0,0,0,.6)'; x.shadowBlur = 50; x.fillText('Siapakah dia?', 0, 0); x.restore(); if (REC && l > .7) REC.push({ id: 'q', text: 'Siapakah dia?' });
-  drawCards(L.filter(q => q.dz < -.9).map(q => { q.c.a = .9; return q.c; }), [3600, 6000]);
+  drawCards(L.filter(q => q.dz < -.9).map(q => { q.c.a = .32; return q.c; }), [3600, 6000]);
   mono('IDENTITI: DIRAHSIAKAN', W / 2, 700, 24, seg(l, 1.2, 1.5) * (1 - seg(l, 7.6, 7.9)), GOLD, 'center');
 }
 function sEnd(t, l) {
